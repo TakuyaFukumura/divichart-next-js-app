@@ -147,11 +147,11 @@ export default function ChartPage() {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                    {data.map((row, index) => (
-                                        <tr key={index}>
-                                            {Object.values(row).map((value, i) => (
+                                    {data.map((row) => (
+                                        <tr key={row['月'] as string}>
+                                            {Object.entries(row).map(([key, value]) => (
                                                 <td
-                                                    key={i}
+                                                    key={`${row['月']}-${key}`}
                                                     className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300"
                                                 >
                                                     {value}
