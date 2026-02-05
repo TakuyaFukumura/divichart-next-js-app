@@ -1,76 +1,240 @@
 'use client';
 
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
+import Papa from 'papaparse';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-export default function Home() {
-    const [message, setMessage] = useState<string>('読み込み中...');
+type DividendData = {
+    year: string;
+    totalDividend: number;
+};
+
+type CSVRow = {
+    '入金日': string;
+    '受取通貨': string;
+    '受取金額[円/現地通貨]': string;
+};
+
+// 為替レート設定（1ドル=150円）
+// NOTE: 将来的に環境変数や設定ファイルから読み込むことを推奨
+const USD_TO_JPY_RATE = 150;
+
+export default function ChartPage() {
+    const [data, setData] = useState<DividendData[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [chartType, setChartType] = useState<'line' | 'bar'>('bar');
 
     useEffect(() => {
-        const fetchMessage = async () => {
+        const loadCSV = async () => {
             try {
-                const response = await fetch('/api/message');
+                const response = await fetch('/data/dividendlist_20260205.csv');
                 if (!response.ok) {
-                    throw new Error('メッセージの取得に失敗しました');
+                    throw new Error('CSVファイルの読み込みに失敗しました');
                 }
-                const data = await response.json();
-                setMessage(data.message);
+                
+                // SHIFT_JIS エンコーディングを処理するため、arrayBufferとして取得
+                const arrayBuffer = await response.arrayBuffer();
+                const decoder = new TextDecoder('shift-jis');
+                const csvText = decoder.decode(arrayBuffer);
+                
+                Papa.parse<CSVRow>(csvText, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: (results) => {
+                        // 年別に配当金を集計
+                        const yearlyDividends: { [year: string]: number } = {};
+                        
+                        results.data.forEach((row) => {
+                            const dateStr = row['入金日'];
+                            const currency = row['受取通貨'];
+                            const amountStr = row['受取金額[円/現地通貨]'];
+                            
+                            if (!dateStr || !amountStr) return;
+                            
+                            // 日付から年を抽出（YYYY/MM/DD形式）
+                            const year = dateStr.split('/')[0];
+                            if (!year) return;
+                            
+                            // 金額を数値に変換（カンマを除去）
+                            // NOTE: CSVデータでは税額が"-"で表示されることがあり、その場合は0として扱う
+                            const amountValue = amountStr === '-' ? 0 : parseFloat(amountStr.replace(/,/g, ''));
+                            if (isNaN(amountValue)) return;
+                            
+                            // USドルの場合は円に換算、円の場合はそのまま
+                            let amountInYen = amountValue;
+                            if (currency === 'USドル') {
+                                amountInYen = amountValue * USD_TO_JPY_RATE;
+                            }
+                            
+                            // 年別に集計
+                            yearlyDividends[year] = (yearlyDividends[year] || 0) + amountInYen;
+                        });
+                        
+                        // グラフ用のデータに変換（年でソート）
+                        const chartData: DividendData[] = Object.keys(yearlyDividends)
+                            .sort()
+                            .map((year) => ({
+                                year: `${year}年`,
+                                totalDividend: Math.round(yearlyDividends[year]),
+                            }));
+                        
+                        setData(chartData);
+                        setLoading(false);
+                    },
+                    error: (error: Error) => {
+                        setError(error.message);
+                        setLoading(false);
+                    },
+                });
             } catch (err) {
                 setError(err instanceof Error ? err.message : '予期しないエラーが発生しました');
-            } finally {
                 setLoading(false);
             }
         };
 
-        fetchMessage();
+        loadCSV();
     }, []);
 
-    let content;
     if (loading) {
-        content = (
-            <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                <span className="ml-2 text-gray-600 dark:text-gray-400">読み込み中...</span>
-            </div>
-        );
-    } else if (error) {
-        content = (
-            <div className="text-red-600 dark:text-red-400 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
-                エラー: {error}
-            </div>
-        );
-    } else {
-        content = (
-            <div
-                className="text-2xl font-semibold text-blue-600 dark:text-blue-400 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl border-2 border-blue-200 dark:border-blue-700">
-                {message}
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+                <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                    <span className="ml-2 text-gray-600 dark:text-gray-400">読み込み中...</span>
+                </div>
             </div>
         );
     }
 
+    if (error) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+                <div className="text-red-600 dark:text-red-400 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                    エラー: {error}
+                </div>
+            </div>
+        );
+    }
+
+    // カスタムツールチップコンポーネント
+    const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ payload: DividendData; value: number }> }) => {
+        if (active && payload && payload.length) {
+            return (
+                <div className="bg-white dark:bg-gray-800 p-3 border border-gray-300 dark:border-gray-600 rounded shadow-lg">
+                    <p className="text-gray-800 dark:text-gray-200 font-semibold">{payload[0].payload.year}</p>
+                    <p className="text-blue-600 dark:text-blue-400">
+                        配当金: ¥{payload[0].value.toLocaleString()}
+                    </p>
+                </div>
+            );
+        }
+        return null;
+    };
+
     return (
-        <div
-            className="font-sans flex items-center justify-center min-h-[calc(100vh-4rem)] bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-            <main className="text-center p-8">
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-12 max-w-md mx-auto">
-                    <h1 className="text-4xl font-bold mb-8 text-gray-800 dark:text-gray-200">
-                        divichart-next-js-app
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-8">
+            <div className="max-w-6xl mx-auto">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
+                    <h1 className="text-4xl font-bold mb-6 text-gray-800 dark:text-gray-200">
+                        配当金グラフ
                     </h1>
 
-                    <div className="mb-8">
-                        {content}
+                    <div className="mb-6">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            グラフの種類
+                        </label>
+                        <div className="flex gap-4">
+                            <button
+                                onClick={() => setChartType('bar')}
+                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                                    chartType === 'bar'
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                                }`}
+                            >
+                                棒グラフ
+                            </button>
+                            <button
+                                onClick={() => setChartType('line')}
+                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                                    chartType === 'line'
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                                }`}
+                            >
+                                折れ線グラフ
+                            </button>
+                        </div>
                     </div>
 
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                        このメッセージはSQLiteデータベースから取得されています
-                    </p>
+                    <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-6">
+                        <ResponsiveContainer width="100%" height={400}>
+                            {chartType === 'bar' ? (
+                                <BarChart data={data}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="year" />
+                                    <YAxis />
+                                    <Tooltip content={<CustomTooltip />} />
+                                    <Legend />
+                                    <Bar dataKey="totalDividend" fill="#3b82f6" name="配当金（税引き後）[円]" />
+                                </BarChart>
+                            ) : (
+                                <LineChart data={data}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="year" />
+                                    <YAxis />
+                                    <Tooltip content={<CustomTooltip />} />
+                                    <Legend />
+                                    <Line type="monotone" dataKey="totalDividend" stroke="#3b82f6" strokeWidth={2} name="配当金（税引き後）[円]" />
+                                </LineChart>
+                            )}
+                        </ResponsiveContainer>
+                    </div>
 
-                    <div className="text-xs text-gray-400 dark:text-gray-500">
-                        Next.js + TypeScript + Tailwind CSS + SQLite
+                    <div className="mt-8">
+                        <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
+                            年別配当金集計
+                        </h2>
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead className="bg-gray-100 dark:bg-gray-700">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                            年
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                            配当金合計（税引き後）[円]
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                    {data.map((row) => (
+                                        <tr key={row.year}>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                                                {row.year}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                                                ¥{row.totalDividend.toLocaleString()}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div className="mt-6 text-sm text-gray-500 dark:text-gray-400">
+                        <p>CSVファイル: /data/dividendlist_20260205.csv</p>
+                        <p className="mt-2">
+                            このグラフは、配当金データから年別に税引き後の配当金を集計して表示しています。
+                        </p>
+                        <p className="mt-1">
+                            ※ USドル建ての配当金は1ドル=150円で換算しています。
+                        </p>
                     </div>
                 </div>
-            </main>
+            </div>
         </div>
     );
 }
