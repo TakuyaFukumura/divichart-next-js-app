@@ -4,7 +4,7 @@
 name: CI
 
 # ワークフローを実行するタイミング
-on: 
+on:
   push:
 
 jobs:
@@ -16,32 +16,32 @@ jobs:
     # Node.jsのバージョン戦略（複数バージョンでテスト）
     strategy:
       matrix:
-        node-version: [20.x]
+        node-version: [ 20.x ]
 
     steps:
-    # 1. リポジトリのコードをチェックアウト
-    - name: コードのチェックアウト
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      # 1. リポジトリのコードをチェックアウト
+      - name: コードのチェックアウト
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
-    # 2. Node.js環境をセットアップ
-    - name: Node.js ${{ matrix.node-version }} のセットアップ
-      uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
+      # 2. Node.js環境をセットアップ
+      - name: Node.js ${{ matrix.node-version }} のセットアップ
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
 
-    # 3. 依存関係をインストール
-    - name: 依存関係のインストール
-      run: npm ci
+      # 3. 依存関係をインストール
+      - name: 依存関係のインストール
+        run: npm ci
 
-    # 4. ESLintによるコード品質チェック
-    - name: ESLint実行
-      run: npm run lint
+      # 4. ESLintによるコード品質チェック
+      - name: ESLint実行
+        run: npm run lint
 
-    # 5. TypeScript型チェック付きでビルド実行
-    - name: ビルド実行（型チェック含む）
-      run: npm run build
+      # 5. TypeScript型チェック付きでビルド実行
+      - name: ビルド実行（型チェック含む）
+        run: npm run build
 
-    # 6. テストの実行
-    - name: テスト実行
-      run: npm test
+      # 6. テストの実行
+      - name: テスト実行
+        run: npm test
