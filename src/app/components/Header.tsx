@@ -41,8 +41,8 @@ export default function Header() {
                             divichart-next-js-app
                         </h1>
                         <nav className="flex gap-4">
-                            <Link 
-                                href="/" 
+                            <Link
+                                href="/"
                                 className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                             >
                                 ホーム

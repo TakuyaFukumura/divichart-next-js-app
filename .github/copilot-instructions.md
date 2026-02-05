@@ -4,7 +4,8 @@ This file provides context and guidelines for GitHub Copilot when working with t
 
 ## Project Overview
 
-divichart-next-js-app is a Next.js application for visualizing dividend data. The application reads dividend data from CSV files and displays them using interactive charts.
+divichart-next-js-app is a Next.js application for visualizing dividend data. The application reads dividend data from
+CSV files and displays them using interactive charts.
 
 ## Technology Stack
 
@@ -40,10 +41,10 @@ divichart-next-js-app is a Next.js application for visualizing dividend data. Th
 1. **TypeScript**: Use strict typing. Define proper interfaces and types.
 2. **React Components**: Use functional components with hooks.
 3. **Client Components**: Mark components with `'use client'` directive when using hooks or browser APIs.
-4. **Naming Conventions**: 
-   - Components: PascalCase (e.g., `DarkModeProvider.tsx`)
-   - Files: camelCase for utilities, PascalCase for components
-   - Variables: camelCase
+4. **Naming Conventions**:
+    - Components: PascalCase (e.g., `DarkModeProvider.tsx`)
+    - Files: camelCase for utilities, PascalCase for components
+    - Variables: camelCase
 
 ### File Encoding
 
@@ -88,6 +89,7 @@ divichart-next-js-app is a Next.js application for visualizing dividend data. Th
 ### CSV Data Processing
 
 When working with dividend CSV data:
+
 - Expected columns: `入金日`, `受取通貨`, `受取金額[円/現地通貨]`
 - Date format: `YYYY/MM/DD`
 - Currency conversion: USD dividends converted to JPY using configurable rate
@@ -145,6 +147,7 @@ When working with dividend CSV data:
 ## Documentation
 
 When making significant changes:
+
 - Update README.md if it affects usage or setup
 - Add JSDoc comments for complex functions
 - Update this copilot-instructions.md if it affects development workflow
