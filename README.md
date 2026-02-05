@@ -1,7 +1,6 @@
 # divichart-next-js-app
 
-Next.jsを使ったシンプルなアプリケーションです。
-
+配当金データを可視化するNext.jsアプリケーションです。
 
 ## 技術スタック
 
@@ -9,10 +8,17 @@ Next.jsを使ったシンプルなアプリケーションです。
 - **React 19.2.4** - ユーザーインターフェース構築
 - **TypeScript** - 型安全性
 - **Tailwind CSS 4** - スタイリング
-- **SQLite** - データベース（better-sqlite3）
+- **Recharts** - グラフ描画ライブラリ
+- **PapaParse** - CSV解析
 - **ESLint** - コード品質管理
 
 ## 機能
+
+- 配当金データのCSVファイル読み込み
+- 年別配当金の集計と表示
+- 棒グラフ・折れ線グラフでのデータ可視化
+- ダークモード対応
+- レスポンシブデザイン
 
 ## 始め方
 
@@ -100,61 +106,37 @@ pnpm start
 ## プロジェクト構造
 
 ```
-├── lib/
-│   └── database.ts          # SQLiteデータベース接続・操作
+├── public/
+│   └── data/                # CSVデータファイル
+│       └── dividendlist_20260205.csv
 ├── src/
 │   └── app/
-│       ├── api/
-│       │   └── message/
-│       │       └── route.ts # APIエンドポイント
 │       ├── components/      # Reactコンポーネント
 │       │   ├── DarkModeProvider.tsx  # ダークモードProvider
 │       │   └── Header.tsx   # ヘッダーコンポーネント
 │       ├── globals.css      # グローバルスタイル
 │       ├── layout.tsx       # アプリケーションレイアウト
-│       └── page.tsx         # メインページコンポーネント
-├── data/                    # SQLiteデータベースファイル（自動生成）
+│       └── page.tsx         # メインページ（配当金グラフ表示）
 ├── package.json
 ├── next.config.ts
 ├── tailwind.config.ts
 └── tsconfig.json
 ```
 
-## API エンドポイント
+## データ形式
 
-### GET /api/message
+配当金データはCSV形式（Shift-JIS）で提供されます。
 
-データベースから最新のメッセージを取得します。
+### 必須カラム
 
-**レスポンス:**
+- **入金日**: YYYY/MM/DD形式
+- **受取通貨**: 通貨コード（例: USドル、円）
+- **受取金額[円/現地通貨]**: 配当金額（税引き後）
 
-```json
-{
-  "message": "Hello, world."
-}
-```
+### 為替レート
 
-## データベース
-
-SQLiteデータベースは初回起動時に自動的に作成されます：
-
-- データベースファイル: `data/app.db`
-- テーブル: `messages`
-    - `id`: 自動増分プライマリーキー
-    - `content`: メッセージ内容
-    - `created_at`: 作成日時
-
-## カスタマイズ
-
-### メッセージの変更
-
-データベース内のメッセージを変更したい場合は、
-SQLiteクライアントを使用して `data/app.db` ファイル内の `messages` テーブルを編集してください。
-
-### スタイルの変更
-
-スタイルは Tailwind CSS を使用しています。
-`src/app/page.tsx` ファイル内のクラス名を変更することで、外観をカスタマイズできます。
+- USドル建ての配当金は固定レート（1ドル=150円）で円換算されます
+- 将来的に環境変数や設定ファイルから読み込むことを推奨します
 
 ## 開発
 
@@ -194,13 +176,11 @@ npm run test:coverage
 
 #### テストファイルの構成
 
-- `__tests__/lib/database.test.ts`: データベース機能のテスト
 - `__tests__/src/app/components/DarkModeProvider.test.tsx`: ダークモードProvider のテスト
 - `__tests__/src/app/components/Header.test.tsx`: ヘッダーコンポーネントのテスト
 
 #### テストの特徴
 
-- **データベーステスト**: SQLiteを使用した実際のデータベース操作のテスト
 - **Reactコンポーネントテスト**: React Testing Library を使用したコンポーネントのレンダリングとインタラクションのテスト
 - **モッキング**: localStorage や外部依存関係のモック
 - **カバレッジ**: コードカバレッジの測定と報告
@@ -254,10 +234,10 @@ CIでは以下のチェックが行われます：
 
 ## トラブルシューティング
 
-### データベース関連のエラー
+### CSVファイルの読み込みエラー
 
-- `data/` フォルダが存在しない場合、自動的に作成されます
-- データベースファイルが破損した場合は、`data/app.db` を削除して再起動してください
+- `public/data/` フォルダに配当金CSVファイルが配置されていることを確認してください
+- CSVファイルのエンコーディングがShift-JISであることを確認してください
 
 ### ポート競合
 

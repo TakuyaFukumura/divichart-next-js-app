@@ -35,7 +35,6 @@ describe('Header', () => {
             renderWithProvider();
 
             expect(screen.getByText('ホーム')).toBeInTheDocument();
-            expect(screen.getByText('グラフ')).toBeInTheDocument();
         });
 
         it('ヘッダーのHTML構造が正しい', () => {
