@@ -53,7 +53,7 @@ File                   | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line
 -----------------------|---------|----------|---------|---------|-------------------
 All files              |   38.59 |       25 |    42.3 |   39.09 |                   
  app                   |       0 |        0 |       0 |       0 |                   
-  page.tsx             |       0 |        0 |       0 |       0 | 3-266             
+  page.tsx             |       0 |        0 |       0 |       0 | 3-294             
  app/components        |     100 |    93.75 |     100 |     100 |                   
   DarkModeProvider.tsx |     100 |       90 |     100 |     100 | 21                
   Header.tsx           |     100 |      100 |     100 |     100 |                   
