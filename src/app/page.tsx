@@ -16,10 +16,14 @@ type CSVRow = {
 };
 
 // 為替レート設定（1ドル=150円）
-// NOTE: 将来的に環境変数や設定ファイルから読み込むことを推奨
-const USD_TO_JPY_RATE = 150;
+// 環境変数から読み込み、未設定の場合はデフォルト値を使用
+const DEFAULT_USD_TO_JPY_RATE = 150;
+const USD_TO_JPY_RATE =
+    typeof process !== 'undefined' && process.env.NEXT_PUBLIC_USD_TO_JPY_RATE
+        ? Number(process.env.NEXT_PUBLIC_USD_TO_JPY_RATE)
+        : DEFAULT_USD_TO_JPY_RATE;
 
-export default function ChartPage() {
+export default function Home() {
     const [data, setData] = useState<DividendData[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
