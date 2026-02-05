@@ -92,8 +92,6 @@ export default function Home() {
                     skipEmptyLines: true,
                     complete: (results) => {
                         setRawData(results.data);
-                        const chartData = calculateDividendData(results.data, usdToJpyRate);
-                        setData(chartData);
                         setLoading(false);
                     },
                     error: (error: Error) => {
