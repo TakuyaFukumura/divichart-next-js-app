@@ -128,7 +128,7 @@ describe('RootLayout', () => {
         });
 
         it('子コンポーネントがHeaderの後にレンダリングされる', () => {
-            const {container} = render(
+            render(
                 <RootLayout>
                     <div data-testid="test-child">Test Child</div>
                 </RootLayout>

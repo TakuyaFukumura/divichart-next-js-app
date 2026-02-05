@@ -13,37 +13,34 @@ import '@testing-library/jest-dom';
 const mockPapaParse = jest.fn();
 jest.mock('papaparse', () => ({
     default: {
-        parse: (csvText: string, options: any) => mockPapaParse(csvText, options),
+        parse: (csvText: string, options: { header: boolean; skipEmptyLines: boolean; complete: (results: { data: unknown[] }) => void; error?: (error: Error) => void }) => mockPapaParse(csvText, options),
     },
-    parse: (csvText: string, options: any) => mockPapaParse(csvText, options),
+    parse: (csvText: string, options: { header: boolean; skipEmptyLines: boolean; complete: (results: { data: unknown[] }) => void; error?: (error: Error) => void }) => mockPapaParse(csvText, options),
 }));
 
 // Rechartsコンポーネントのモック（実際のレンダリングは重いため）
-jest.mock('recharts', () => {
-    const React = require('react');
-    return {
-        ResponsiveContainer: ({children}: { children: React.ReactNode }) => (
-            <div data-testid="responsive-container">{children}</div>
-        ),
-        BarChart: ({data, children}: { data: unknown; children: React.ReactNode }) => (
-            <div data-testid="bar-chart" data-chart-data={JSON.stringify(data)}>
-                {children}
-            </div>
-        ),
-        LineChart: ({data, children}: { data: unknown; children: React.ReactNode }) => (
-            <div data-testid="line-chart" data-chart-data={JSON.stringify(data)}>
-                {children}
-            </div>
-        ),
-        CartesianGrid: () => <div data-testid="cartesian-grid"/>,
-        XAxis: () => <div data-testid="x-axis"/>,
-        YAxis: () => <div data-testid="y-axis"/>,
-        Tooltip: () => <div data-testid="tooltip"/>,
-        Legend: () => <div data-testid="legend"/>,
-        Bar: () => <div data-testid="bar"/>,
-        Line: () => <div data-testid="line"/>,
-    };
-});
+jest.mock('recharts', () => ({
+    ResponsiveContainer: ({children}: { children: React.ReactNode }) => (
+        <div data-testid="responsive-container">{children}</div>
+    ),
+    BarChart: ({data, children}: { data: unknown; children: React.ReactNode }) => (
+        <div data-testid="bar-chart" data-chart-data={JSON.stringify(data)}>
+            {children}
+        </div>
+    ),
+    LineChart: ({data, children}: { data: unknown; children: React.ReactNode }) => (
+        <div data-testid="line-chart" data-chart-data={JSON.stringify(data)}>
+            {children}
+        </div>
+    ),
+    CartesianGrid: () => <div data-testid="cartesian-grid"/>,
+    XAxis: () => <div data-testid="x-axis"/>,
+    YAxis: () => <div data-testid="y-axis"/>,
+    Tooltip: () => <div data-testid="tooltip"/>,
+    Legend: () => <div data-testid="legend"/>,
+    Bar: () => <div data-testid="bar"/>,
+    Line: () => <div data-testid="line"/>,
+}));
 
 // コンポーネントのインポートはモック定義の後に行う
 import Home from '@/app/page';
@@ -71,9 +68,10 @@ const getParsedCSV = () => [
 ];
 
 // PapaParse モックの実装
-const setupPapaParseMock = (csvText: string) => {
-    mockPapaParse.mockImplementation((text: string, options: any) => {
+const setupPapaParseMock = () => {
+    mockPapaParse.mockImplementation((text: string, options: { header: boolean; skipEmptyLines: boolean; complete: (results: { data: unknown[] }) => void; error?: (error: Error) => void }) => {
         setTimeout(() => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             let data: any[] = [];
             
             // text パラメータではなく、csvText パラメータを使用
@@ -119,7 +117,7 @@ const mockFetchSuccess = (csvContent: string) => {
     const encoder = new TextEncoder();
     const arrayBuffer = encoder.encode(csvContent).buffer;
     
-    setupPapaParseMock(csvContent);
+    setupPapaParseMock();
     
     mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -405,9 +403,6 @@ describe('Home Page', () => {
             }, {timeout: 3000});
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）') as HTMLInputElement;
-            
-            // 初期値を記録
-            const initialValue = input.value;
             
             act(() => {
                 fireEvent.change(input, {target: {value: '-100'}});
