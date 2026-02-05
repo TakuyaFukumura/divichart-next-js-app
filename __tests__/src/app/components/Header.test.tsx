@@ -31,6 +31,13 @@ describe('Header', () => {
             expect(screen.getByText('basic-next-js-app')).toBeInTheDocument();
         });
 
+        it('ナビゲーションリンクが表示される', () => {
+            renderWithProvider();
+
+            expect(screen.getByText('ホーム')).toBeInTheDocument();
+            expect(screen.getByText('グラフ')).toBeInTheDocument();
+        });
+
         it('ヘッダーのHTML構造が正しい', () => {
             renderWithProvider();
 
