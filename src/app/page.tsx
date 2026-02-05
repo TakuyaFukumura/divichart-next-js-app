@@ -108,6 +108,8 @@ export default function Home() {
         };
 
         loadCSV();
+        // CSVは初回マウント時のみ読み込む。usdToJpyRateとcalculateDividendDataは
+        // 初期値としてのみ使用され、その後の変更は別のuseEffectで処理される
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
