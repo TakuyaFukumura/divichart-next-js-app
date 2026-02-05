@@ -178,7 +178,6 @@ npm run test:coverage
 
 - `__tests__/src/app/components/DarkModeProvider.test.tsx`: ダークモードProvider のテスト
 - `__tests__/src/app/components/Header.test.tsx`: ヘッダーコンポーネントのテスト
-- `__tests__/src/app/chart/page.test.tsx`: グラフページのテスト
 
 #### テストの特徴
 
