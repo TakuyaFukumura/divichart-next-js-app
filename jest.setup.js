@@ -1,6 +1,6 @@
 // Jest用のセットアップファイル
 import '@testing-library/jest-dom'
-import { TextEncoder, TextDecoder } from 'util'
+import {TextDecoder, TextEncoder} from 'util'
 
 // mock用のグローバル設定
 global.TextEncoder = TextEncoder
@@ -8,10 +8,10 @@ global.TextDecoder = TextDecoder
 
 // localStorageのモック
 const localStorageMock = {
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
-  clear: jest.fn(),
+    getItem: jest.fn(),
+    setItem: jest.fn(),
+    removeItem: jest.fn(),
+    clear: jest.fn(),
 }
 global.localStorage = localStorageMock
 

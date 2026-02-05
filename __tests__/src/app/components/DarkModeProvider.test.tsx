@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import {render, screen, act, renderHook} from '@testing-library/react';
+import {act, render, renderHook, screen} from '@testing-library/react';
 import {DarkModeProvider, useDarkMode} from '@/app/components/DarkModeProvider';
 
 // localStorageをモック

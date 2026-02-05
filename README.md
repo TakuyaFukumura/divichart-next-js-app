@@ -214,10 +214,12 @@ TypeScriptの型チェックは、ビルド時またはIDEで自動的に実行�
 ### 自動テスト
 
 以下の条件でCIが実行されます：
+
 - `main`ブランチへのプッシュ時
 - プルリクエストの作成・更新時
 
 CIでは以下のチェックが行われます：
+
 - ESLintによる静的解析
 - TypeScriptの型チェック
 - Jestを使用したユニットテストとインテグレーションテスト
@@ -226,7 +228,8 @@ CIでは以下のチェックが行われます：
 
 ## 自動依存関係更新（Dependabot）
 
-このプロジェクトでは、依存関係の安全性と最新化のために[Dependabot](https://docs.github.com/ja/code-security/dependabot)を利用しています。
+このプロジェクトでは、依存関係の安全性と最新化のために[Dependabot](https://docs.github.com/ja/code-security/dependabot)
+を利用しています。
 
 - GitHub Actionsおよびnpmパッケージの依存関係は**月次（月曜日 09:00 JST）**で自動チェック・更新されます。
 - 更新内容は自動でプルリクエストとして作成されます。
