@@ -134,6 +134,7 @@ const mockFetchError = () => {
 describe('Home Page', () => {
     beforeEach(() => {
         mockFetch.mockClear();
+        mockPapaParse.mockClear();
     });
 
     describe('ローディング状態', () => {
