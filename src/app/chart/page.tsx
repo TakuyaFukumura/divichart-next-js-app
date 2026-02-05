@@ -15,6 +15,8 @@ type CSVRow = {
     '受取金額[円/現地通貨]': string;
 };
 
+// 為替レート設定（1ドル=150円）
+// NOTE: 将来的に環境変数や設定ファイルから読み込むことを推奨
 const USD_TO_JPY_RATE = 150;
 
 export default function ChartPage() {
@@ -54,7 +56,8 @@ export default function ChartPage() {
                             const year = dateStr.split('/')[0];
                             if (!year) return;
                             
-                            // 金額を数値に変換（カンマを除去し、"-"は0として扱う）
+                            // 金額を数値に変換（カンマを除去）
+                            // NOTE: CSVデータでは税額が"-"で表示されることがあり、その場合は0として扱う
                             const amountValue = amountStr === '-' ? 0 : parseFloat(amountStr.replace(/,/g, ''));
                             if (isNaN(amountValue)) return;
                             
