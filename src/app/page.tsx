@@ -18,10 +18,10 @@ type CSVRow = {
 // 為替レート設定（1ドル=150円）
 // 環境変数から読み込み、未設定の場合はデフォルト値を使用
 const DEFAULT_USD_TO_JPY_RATE = 150;
-const USD_TO_JPY_RATE =
-    typeof process !== 'undefined' && process.env.NEXT_PUBLIC_USD_TO_JPY_RATE
-        ? Number(process.env.NEXT_PUBLIC_USD_TO_JPY_RATE)
-        : DEFAULT_USD_TO_JPY_RATE;
+const envRate = process.env.NEXT_PUBLIC_USD_TO_JPY_RATE 
+    ? Number(process.env.NEXT_PUBLIC_USD_TO_JPY_RATE) 
+    : NaN;
+const USD_TO_JPY_RATE = !isNaN(envRate) && envRate > 0 ? envRate : DEFAULT_USD_TO_JPY_RATE;
 
 export default function Home() {
     const [data, setData] = useState<DividendData[]>([]);
