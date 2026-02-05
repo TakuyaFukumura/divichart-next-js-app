@@ -278,8 +278,7 @@ export default function Home() {
                     </div>
 
                     <div className="mt-6 text-sm text-gray-500 dark:text-gray-400">
-                        <p>CSVファイル: /data/dividendlist_20260205.csv</p>
-                        <p className="mt-2">
+                        <p>
                             このグラフは、配当金データから年別に税引き後の配当金を集計して表示しています。
                         </p>
                         <p className="mt-1">
