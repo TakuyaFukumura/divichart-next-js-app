@@ -28,6 +28,50 @@ export default function Home() {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [chartType, setChartType] = useState<'line' | 'bar'>('bar');
+    const [usdToJpyRate, setUsdToJpyRate] = useState<number>(USD_TO_JPY_RATE);
+    const [rawData, setRawData] = useState<CSVRow[]>([]);
+
+    // CSVデータから年別配当金データを計算する関数
+    const calculateDividendData = (csvData: CSVRow[], exchangeRate: number): DividendData[] => {
+        // 年別に配当金を集計
+        const yearlyDividends: { [year: string]: number } = {};
+        
+        csvData.forEach((row) => {
+            const dateStr = row['入金日'];
+            const currency = row['受取通貨'];
+            const amountStr = row['受取金額[円/現地通貨]'];
+            
+            if (!dateStr || !amountStr) return;
+            
+            // 日付から年を抽出（YYYY/MM/DD形式）
+            const year = dateStr.split('/')[0];
+            if (!year) return;
+            
+            // 金額を数値に変換（カンマを除去）
+            // NOTE: CSVデータでは税額が"-"で表示されることがあり、その場合は0として扱う
+            const amountValue = amountStr === '-' ? 0 : parseFloat(amountStr.replace(/,/g, ''));
+            if (isNaN(amountValue)) return;
+            
+            // USドルの場合は円に換算、円の場合はそのまま
+            let amountInYen = amountValue;
+            if (currency === 'USドル') {
+                amountInYen = amountValue * exchangeRate;
+            }
+            
+            // 年別に集計
+            yearlyDividends[year] = (yearlyDividends[year] || 0) + amountInYen;
+        });
+        
+        // グラフ用のデータに変換（年でソート）
+        const chartData: DividendData[] = Object.keys(yearlyDividends)
+            .sort()
+            .map((year) => ({
+                year: `${year}年`,
+                totalDividend: Math.round(yearlyDividends[year]),
+            }));
+        
+        return chartData;
+    };
 
     useEffect(() => {
         const loadCSV = async () => {
@@ -46,43 +90,8 @@ export default function Home() {
                     header: true,
                     skipEmptyLines: true,
                     complete: (results) => {
-                        // 年別に配当金を集計
-                        const yearlyDividends: { [year: string]: number } = {};
-                        
-                        results.data.forEach((row) => {
-                            const dateStr = row['入金日'];
-                            const currency = row['受取通貨'];
-                            const amountStr = row['受取金額[円/現地通貨]'];
-                            
-                            if (!dateStr || !amountStr) return;
-                            
-                            // 日付から年を抽出（YYYY/MM/DD形式）
-                            const year = dateStr.split('/')[0];
-                            if (!year) return;
-                            
-                            // 金額を数値に変換（カンマを除去）
-                            // NOTE: CSVデータでは税額が"-"で表示されることがあり、その場合は0として扱う
-                            const amountValue = amountStr === '-' ? 0 : parseFloat(amountStr.replace(/,/g, ''));
-                            if (isNaN(amountValue)) return;
-                            
-                            // USドルの場合は円に換算、円の場合はそのまま
-                            let amountInYen = amountValue;
-                            if (currency === 'USドル') {
-                                amountInYen = amountValue * USD_TO_JPY_RATE;
-                            }
-                            
-                            // 年別に集計
-                            yearlyDividends[year] = (yearlyDividends[year] || 0) + amountInYen;
-                        });
-                        
-                        // グラフ用のデータに変換（年でソート）
-                        const chartData: DividendData[] = Object.keys(yearlyDividends)
-                            .sort()
-                            .map((year) => ({
-                                year: `${year}年`,
-                                totalDividend: Math.round(yearlyDividends[year]),
-                            }));
-                        
+                        setRawData(results.data);
+                        const chartData = calculateDividendData(results.data, usdToJpyRate);
                         setData(chartData);
                         setLoading(false);
                     },
@@ -99,6 +108,14 @@ export default function Home() {
 
         loadCSV();
     }, []);
+
+    // 為替レートが変更されたときにデータを再計算
+    useEffect(() => {
+        if (rawData.length > 0) {
+            const chartData = calculateDividendData(rawData, usdToJpyRate);
+            setData(chartData);
+        }
+    }, [usdToJpyRate, rawData]);
 
     if (loading) {
         return (
@@ -172,6 +189,30 @@ export default function Home() {
                         </div>
                     </div>
 
+                    <div className="mb-6">
+                        <label htmlFor="usd-jpy-rate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            為替レート（1ドル = 円）
+                        </label>
+                        <div className="flex items-center gap-4">
+                            <input
+                                id="usd-jpy-rate"
+                                type="number"
+                                min="1"
+                                step="0.01"
+                                value={usdToJpyRate}
+                                onChange={(e) => {
+                                    const value = parseFloat(e.target.value);
+                                    if (!isNaN(value) && value > 0) {
+                                        setUsdToJpyRate(value);
+                                    }
+                                }}
+                                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                style={{ width: '150px' }}
+                            />
+                            <span className="text-gray-600 dark:text-gray-400">円</span>
+                        </div>
+                    </div>
+
                     <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-6">
                         <ResponsiveContainer width="100%" height={400}>
                             {chartType === 'bar' ? (
@@ -234,7 +275,7 @@ export default function Home() {
                             このグラフは、配当金データから年別に税引き後の配当金を集計して表示しています。
                         </p>
                         <p className="mt-1">
-                            ※ USドル建ての配当金は1ドル=150円で換算しています。
+                            ※ USドル建ての配当金は1ドル={usdToJpyRate}円で換算しています。
                         </p>
                     </div>
                 </div>
