@@ -25,10 +25,10 @@ Next.jsを使ったシンプルなアプリケーションです。
 
 1. リポジトリをクローン：
     ```bash
-    git clone https://github.com/TakuyaFukumura/basic-next-js-app.git
+    git clone https://github.com/TakuyaFukumura/divichart-next-js-app.git
     ```
     ```bash
-    cd basic-next-js-app
+    cd divichart-next-js-app
     ```
 
 2. 依存関係をインストール：

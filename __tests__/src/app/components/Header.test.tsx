@@ -28,7 +28,7 @@ describe('Header', () => {
         it('ヘッダータイトルが表示される', () => {
             renderWithProvider();
 
-            expect(screen.getByText('basic-next-js-app')).toBeInTheDocument();
+            expect(screen.getByText('divichart-next-js-app')).toBeInTheDocument();
         });
 
         it('ナビゲーションリンクが表示される', () => {
