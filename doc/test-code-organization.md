@@ -176,15 +176,7 @@ All files              |   38.59 |       25 |    42.3 |   39.09 |
 
 ### 3.2. 優先度：中
 
-#### 1. パフォーマンステストの不在
-
-**現状**: 大規模データでのパフォーマンス未検証
-
-**リスク**:
-
-- 大量データ処理時のパフォーマンス劣化未検出
-
-#### 2. モバイル端末でのテスト不足
+#### 1. モバイル端末でのテスト不足
 
 **現状**: レスポンシブCSSクラスの検証のみ
 
@@ -350,65 +342,6 @@ coverageThreshold: {
 
 1. **カバレッジレポートのアップロード**
     - Codecovなどのサービス連携を検討
-2. **パフォーマンス計測**
-    - Lighthouse CI の導入を検討
-
-### 4.3. 長期目標（3ヶ月以上）
-
-#### 1. パフォーマンステストの追加
-
-**目的**:
-
-- 大規模CSVファイルの処理性能確認
-- レンダリングパフォーマンスの計測
-- メモリリーク検出
-
-**実装方針**:
-
-1. **Jest Performance Tests**
-   ```typescript
-   describe('Performance Tests', () => {
-     it('大量データの処理が1秒以内に完了する', () => {
-       const startTime = performance.now();
-       // 大量データでcalculateDividendDataを実行
-       const endTime = performance.now();
-       expect(endTime - startTime).toBeLessThan(1000);
-     });
-   });
-   ```
-
-2. **Lighthouse CI の統合**
-    - パフォーマンススコアの計測
-    - アクセシビリティスコアの計測
-    - SEOスコアの計測
-
-#### 2. テストデータ管理の改善
-
-**現在の課題**:
-
-- テストデータがテストコード内にハードコード
-- 実データファイルへの依存
-
-**改善方針**:
-
-1. **テストフィクスチャの作成**
-   ```
-   __tests__/
-   └── fixtures/
-       └── sample-dividend.csv  # テスト用サンプルCSV
-   ```
-
-2. **テストデータジェネレータの作成**
-   ```typescript
-   // __tests__/helpers/dataGenerator.ts
-   export function generateDividendData(options: {
-     years: number;
-     currency: 'JPY' | 'USD';
-     amount: number;
-   }): CSVRow[] {
-     // テストデータを生成
-   }
-   ```
 
 ## 5. テストベストプラクティス
 
@@ -509,6 +442,4 @@ coverageThreshold: {
 
 ### 優先度3（3ヶ月以降）
 
-1. ⬜ パフォーマンステスト
-2. ⬜ テストデータ管理の改善
-
+1. ⬜ テストデータ管理の改善
