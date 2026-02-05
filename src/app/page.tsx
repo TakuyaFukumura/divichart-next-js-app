@@ -1,8 +1,19 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import Papa from 'papaparse';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+    Bar,
+    BarChart,
+    CartesianGrid,
+    Legend,
+    Line,
+    LineChart,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis
+} from 'recharts';
 
 type DividendData = {
     year: string;
@@ -18,8 +29,8 @@ type CSVRow = {
 // 為替レート設定（1ドル=150円）
 // 環境変数から読み込み、未設定の場合はデフォルト値を使用
 const DEFAULT_USD_TO_JPY_RATE = 150;
-const envRate = process.env.NEXT_PUBLIC_USD_TO_JPY_RATE 
-    ? Number(process.env.NEXT_PUBLIC_USD_TO_JPY_RATE) 
+const envRate = process.env.NEXT_PUBLIC_USD_TO_JPY_RATE
+    ? Number(process.env.NEXT_PUBLIC_USD_TO_JPY_RATE)
     : NaN;
 const USD_TO_JPY_RATE = !isNaN(envRate) && envRate > 0 ? envRate : DEFAULT_USD_TO_JPY_RATE;
 
@@ -36,33 +47,33 @@ export default function Home() {
     const calculateDividendData = useCallback((csvData: CSVRow[], exchangeRate: number): DividendData[] => {
         // 年別に配当金を集計
         const yearlyDividends: { [year: string]: number } = {};
-        
+
         csvData.forEach((row) => {
             const dateStr = row['入金日'];
             const currency = row['受取通貨'];
             const amountStr = row['受取金額[円/現地通貨]'];
-            
+
             if (!dateStr || !amountStr) return;
-            
+
             // 日付から年を抽出（YYYY/MM/DD形式）
             const year = dateStr.split('/')[0];
             if (!year) return;
-            
+
             // 金額を数値に変換（カンマを除去）
             // NOTE: CSVデータでは税額が"-"で表示されることがあり、その場合は0として扱う
             const amountValue = amountStr === '-' ? 0 : parseFloat(amountStr.replace(/,/g, ''));
             if (isNaN(amountValue)) return;
-            
+
             // USドルの場合は円に換算、円の場合はそのまま
             let amountInYen = amountValue;
             if (currency === 'USドル') {
                 amountInYen = amountValue * exchangeRate;
             }
-            
+
             // 年別に集計
             yearlyDividends[year] = (yearlyDividends[year] || 0) + amountInYen;
         });
-        
+
         // グラフ用のデータに変換（年でソート）
         const chartData: DividendData[] = Object.keys(yearlyDividends)
             .sort()
@@ -70,7 +81,7 @@ export default function Home() {
                 year: `${year}年`,
                 totalDividend: Math.round(yearlyDividends[year]),
             }));
-        
+
         return chartData;
     }, []);
 
@@ -81,12 +92,12 @@ export default function Home() {
                 if (!response.ok) {
                     throw new Error('CSVファイルの読み込みに失敗しました');
                 }
-                
+
                 // SHIFT_JIS エンコーディングを処理するため、arrayBufferとして取得
                 const arrayBuffer = await response.arrayBuffer();
                 const decoder = new TextDecoder('shift-jis');
                 const csvText = decoder.decode(arrayBuffer);
-                
+
                 Papa.parse<CSVRow>(csvText, {
                     header: true,
                     skipEmptyLines: true,
@@ -121,7 +132,8 @@ export default function Home() {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+            <div
+                className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
                 <div className="flex items-center justify-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                     <span className="ml-2 text-gray-600 dark:text-gray-400">読み込み中...</span>
@@ -132,7 +144,8 @@ export default function Home() {
 
     if (error) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+            <div
+                className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
                 <div className="text-red-600 dark:text-red-400 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
                     エラー: {error}
                 </div>
@@ -141,10 +154,14 @@ export default function Home() {
     }
 
     // カスタムツールチップコンポーネント
-    const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ payload: DividendData; value: number }> }) => {
+    const CustomTooltip = ({active, payload}: {
+        active?: boolean;
+        payload?: Array<{ payload: DividendData; value: number }>
+    }) => {
         if (active && payload && payload.length) {
             return (
-                <div className="bg-white dark:bg-gray-800 p-3 border border-gray-300 dark:border-gray-600 rounded shadow-lg">
+                <div
+                    className="bg-white dark:bg-gray-800 p-3 border border-gray-300 dark:border-gray-600 rounded shadow-lg">
                     <p className="text-gray-800 dark:text-gray-200 font-semibold">{payload[0].payload.year}</p>
                     <p className="text-blue-600 dark:text-blue-400">
                         配当金: ¥{payload[0].value.toLocaleString()}
@@ -156,7 +173,8 @@ export default function Home() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-8">
+        <div
+            className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-8">
             <div className="max-w-6xl mx-auto">
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
                     <h1 className="text-4xl font-bold mb-6 text-gray-800 dark:text-gray-200">
@@ -192,7 +210,8 @@ export default function Home() {
                     </div>
 
                     <div className="mb-6">
-                        <label htmlFor="usd-jpy-rate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label htmlFor="usd-jpy-rate"
+                               className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             為替レート（1ドル = 円）
                         </label>
                         <div className="flex items-center gap-4">
@@ -205,7 +224,7 @@ export default function Home() {
                                 onChange={(e) => {
                                     const value = e.target.value;
                                     setInputValue(value);
-                                    
+
                                     const numValue = parseFloat(value);
                                     if (!isNaN(numValue) && numValue > 0) {
                                         setUsdToJpyRate(numValue);
@@ -225,21 +244,22 @@ export default function Home() {
                         <ResponsiveContainer width="100%" height={400}>
                             {chartType === 'bar' ? (
                                 <BarChart data={data}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="year" />
-                                    <YAxis />
-                                    <Tooltip content={<CustomTooltip />} />
-                                    <Legend />
-                                    <Bar dataKey="totalDividend" fill="#3b82f6" name="配当金（税引き後）[円]" />
+                                    <CartesianGrid strokeDasharray="3 3"/>
+                                    <XAxis dataKey="year"/>
+                                    <YAxis/>
+                                    <Tooltip content={<CustomTooltip/>}/>
+                                    <Legend/>
+                                    <Bar dataKey="totalDividend" fill="#3b82f6" name="配当金（税引き後）[円]"/>
                                 </BarChart>
                             ) : (
                                 <LineChart data={data}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="year" />
-                                    <YAxis />
-                                    <Tooltip content={<CustomTooltip />} />
-                                    <Legend />
-                                    <Line type="monotone" dataKey="totalDividend" stroke="#3b82f6" strokeWidth={2} name="配当金（税引き後）[円]" />
+                                    <CartesianGrid strokeDasharray="3 3"/>
+                                    <XAxis dataKey="year"/>
+                                    <YAxis/>
+                                    <Tooltip content={<CustomTooltip/>}/>
+                                    <Legend/>
+                                    <Line type="monotone" dataKey="totalDividend" stroke="#3b82f6" strokeWidth={2}
+                                          name="配当金（税引き後）[円]"/>
                                 </LineChart>
                             )}
                         </ResponsiveContainer>
@@ -252,26 +272,27 @@ export default function Home() {
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                 <thead className="bg-gray-100 dark:bg-gray-700">
-                                    <tr>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                            年
-                                        </th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                            配当金合計（税引き後）[円]
-                                        </th>
-                                    </tr>
+                                <tr>
+                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                        年
+                                    </th>
+                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                        配当金合計（税引き後）[円]
+                                    </th>
+                                </tr>
                                 </thead>
-                                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                    {data.map((row) => (
-                                        <tr key={row.year}>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right">
-                                                {row.year}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right">
-                                                ¥{row.totalDividend.toLocaleString()}
-                                            </td>
-                                        </tr>
-                                    ))}
+                                <tbody
+                                    className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                {data.map((row) => (
+                                    <tr key={row.year}>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right">
+                                            {row.year}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right">
+                                            ¥{row.totalDividend.toLocaleString()}
+                                        </td>
+                                    </tr>
+                                ))}
                                 </tbody>
                             </table>
                         </div>

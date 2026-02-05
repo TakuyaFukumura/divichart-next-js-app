@@ -18,7 +18,7 @@ export default function RootLayout({
         <html lang="ja">
         <body className="antialiased">
         <DarkModeProvider>
-            <Header />
+            <Header/>
             {children}
         </DarkModeProvider>
         </body>
