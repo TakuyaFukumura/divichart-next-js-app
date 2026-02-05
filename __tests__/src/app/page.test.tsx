@@ -71,8 +71,7 @@ const getParsedCSV = () => [
 const setupPapaParseMock = () => {
     mockPapaParse.mockImplementation((text: string, options: { header: boolean; skipEmptyLines: boolean; complete: (results: { data: unknown[] }) => void; error?: (error: Error) => void }) => {
         setTimeout(() => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            let data: any[] = [];
+            let data: Array<Record<string, string>> = [];
             
             // text パラメータではなく、csvText パラメータを使用
             if (text.includes('2023/01/15') && text.includes('2024')) {
