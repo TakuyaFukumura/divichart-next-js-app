@@ -73,7 +73,7 @@ const setupPapaParseMock = () => {
         setTimeout(() => {
             let data: Array<Record<string, string>> = [];
             
-            // text パラメータではなく、csvText パラメータを使用
+            // CSVテキスト（text）の内容に基づいてモック用のパース結果データを返す
             if (text.includes('2023/01/15') && text.includes('2024')) {
                 data = getParsedCSV();
             } else if (text.includes('10,000')) {
