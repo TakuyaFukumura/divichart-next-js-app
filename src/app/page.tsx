@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Papa from 'papaparse';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
@@ -29,10 +29,11 @@ export default function Home() {
     const [error, setError] = useState<string | null>(null);
     const [chartType, setChartType] = useState<'line' | 'bar'>('bar');
     const [usdToJpyRate, setUsdToJpyRate] = useState<number>(USD_TO_JPY_RATE);
+    const [inputValue, setInputValue] = useState<string>(String(USD_TO_JPY_RATE));
     const [rawData, setRawData] = useState<CSVRow[]>([]);
 
     // CSVデータから年別配当金データを計算する関数
-    const calculateDividendData = (csvData: CSVRow[], exchangeRate: number): DividendData[] => {
+    const calculateDividendData = useCallback((csvData: CSVRow[], exchangeRate: number): DividendData[] => {
         // 年別に配当金を集計
         const yearlyDividends: { [year: string]: number } = {};
         
@@ -71,7 +72,7 @@ export default function Home() {
             }));
         
         return chartData;
-    };
+    }, []);
 
     useEffect(() => {
         const loadCSV = async () => {
@@ -107,6 +108,7 @@ export default function Home() {
         };
 
         loadCSV();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // 為替レートが変更されたときにデータを再計算
@@ -115,7 +117,7 @@ export default function Home() {
             const chartData = calculateDividendData(rawData, usdToJpyRate);
             setData(chartData);
         }
-    }, [usdToJpyRate, rawData]);
+    }, [usdToJpyRate, rawData, calculateDividendData]);
 
     if (loading) {
         return (
@@ -199,12 +201,19 @@ export default function Home() {
                                 type="number"
                                 min="1"
                                 step="0.01"
-                                value={usdToJpyRate}
+                                value={inputValue}
                                 onChange={(e) => {
-                                    const value = parseFloat(e.target.value);
-                                    if (!isNaN(value) && value > 0) {
-                                        setUsdToJpyRate(value);
+                                    const value = e.target.value;
+                                    setInputValue(value);
+                                    
+                                    const numValue = parseFloat(value);
+                                    if (!isNaN(numValue) && numValue > 0) {
+                                        setUsdToJpyRate(numValue);
                                     }
+                                }}
+                                onBlur={() => {
+                                    // フォーカスが外れたときに、無効な入力を現在の有効な値にリセット
+                                    setInputValue(String(usdToJpyRate));
                                 }}
                                 className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 style={{ width: '150px' }}
