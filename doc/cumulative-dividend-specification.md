@@ -570,15 +570,16 @@ test('累計配当グラフページが正しく動作する', async ({ page }) 
   // テーブルが表示されることを確認
   await expect(page.locator('table')).toBeVisible();
   
+  // 為替レート変更前のテーブル内容を取得
+  const beforeTableContent = await page.textContent('table');
+  
   // 為替レートを変更
   await page.fill('input[type="number"]', '140');
   
-  // データが更新されることを確認（スナップショットテスト等）
-  await page.waitForTimeout(500); // 再計算を待つ
-  
-  // テーブルの値が変更されることを確認
-  const tableContent = await page.textContent('table');
-  expect(tableContent).toBeTruthy();
+  // テーブルの値が変更されることを確認（DOM更新を待つ）
+  await expect
+    .poll(async () => await page.textContent('table'))
+    .not.toBe(beforeTableContent);
 });
 
 test('ヘッダーのナビゲーションが機能する', async ({ page }) => {
