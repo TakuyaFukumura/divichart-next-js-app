@@ -246,13 +246,15 @@ function aggregateOthers(
   if (stocks.length <= topN) {
     return stocks;
   }
-  
+
+  const totalAmount = stocks.reduce((sum, s) => sum + s.amount, 0);
+
   const topStocks = stocks.slice(0, topN);
   const otherStocks = stocks.slice(topN);
-  
+
   const otherAmount = otherStocks.reduce((sum, s) => sum + s.amount, 0);
-  const otherPercentage = otherStocks.reduce((sum, s) => sum + s.percentage, 0);
-  
+  const otherPercentage =
+    totalAmount === 0 ? 0 : (otherAmount / totalAmount) * 100;
   return [
     ...topStocks,
     {
