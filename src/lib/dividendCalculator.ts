@@ -52,11 +52,17 @@ export function calculateStockDividends(
     const totalAmount = Object.values(stockAmounts).reduce((sum, amount) => sum + amount, 0);
 
     // 3. StockDividend配列に変換し、金額の降順でソート
-    const stocks: StockDividend[] = Object.entries(stockAmounts)
-        .map(([stockName, amount]) => ({
-            stockName,
-            amount: Math.round(amount),
-            percentage: totalAmount === 0 ? 0 : (amount / totalAmount) * 100,
+    const roundedStocks = Object.entries(stockAmounts).map(([stockName, amount]) => ({
+        stockName,
+        amount: Math.round(amount),
+    }));
+
+    const totalRoundedAmount = roundedStocks.reduce((sum, stock) => sum + stock.amount, 0);
+
+    const stocks: StockDividend[] = roundedStocks
+        .map((stock) => ({
+            ...stock,
+            percentage: totalRoundedAmount === 0 ? 0 : (stock.amount / totalRoundedAmount) * 100,
         }))
         .sort((a, b) => b.amount - a.amount);
 
