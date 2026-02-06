@@ -322,6 +322,9 @@ export default function Home() {
                                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                         配当金合計（税引き後）[円]
                                     </th>
+                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                        月平均配当額[円]
+                                    </th>
                                 </tr>
                                 </thead>
                                 <tbody
@@ -333,6 +336,9 @@ export default function Home() {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right">
                                             ¥{row.totalDividend.toLocaleString()}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right">
+                                            ¥{Math.floor(row.totalDividend / 12).toLocaleString()}
                                         </td>
                                     </tr>
                                 ))}
