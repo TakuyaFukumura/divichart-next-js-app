@@ -4,6 +4,7 @@ about: GitHub Copilot Coding Agent への指示文
 ---
 
 # 内容
+- 下記内容を実装する前に仕様を検討して資料を作成したい
 
 # 備考
 
