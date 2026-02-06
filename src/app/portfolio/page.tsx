@@ -32,7 +32,7 @@ function PortfolioContent() {
     const [error, setError] = useState<string | null>(null);
     const [usdToJpyRate] = useState<number>(USD_TO_JPY_RATE);
 
-    // CSVデータの読み込み
+    // CSVデータの読み込み（初回マウント時のみ）
     useEffect(() => {
         const loadData = async () => {
             try {
@@ -43,16 +43,6 @@ function PortfolioContent() {
                 const years = getAvailableYears(data);
                 setAvailableYears(years);
 
-                // URLパラメータから年度を取得、なければ現在年またはデータがある最新年
-                const yearParam = searchParams.get('year');
-                let targetYear = yearParam ? parseInt(yearParam, 10) : new Date().getFullYear();
-
-                // データがない年の場合は最新年を使用
-                if (years.length > 0 && !years.includes(targetYear)) {
-                    targetYear = years[years.length - 1];
-                }
-
-                setCurrentYear(targetYear);
                 setLoading(false);
             } catch (err) {
                 setError(err instanceof Error ? err.message : '予期しないエラーが発生しました');
@@ -61,7 +51,22 @@ function PortfolioContent() {
         };
 
         loadData();
-    }, [searchParams]);
+    }, []); // 初回マウント時のみ実行
+
+    // URLパラメータの年度を反映
+    useEffect(() => {
+        if (availableYears.length === 0) return;
+
+        const yearParam = searchParams.get('year');
+        let targetYear = yearParam ? parseInt(yearParam, 10) : new Date().getFullYear();
+
+        // データがない年の場合は最新年を使用
+        if (!availableYears.includes(targetYear)) {
+            targetYear = availableYears[availableYears.length - 1];
+        }
+
+        setCurrentYear(targetYear);
+    }, [searchParams, availableYears]);
 
     // 年度またはデータが変更されたときにポートフォリオを再計算
     useEffect(() => {

@@ -80,7 +80,9 @@ export default function DividendTable({
                                 ¥{data.reduce((sum, row) => sum + row.amount, 0).toLocaleString()}
                             </td>
                             <td className="px-6 py-4 text-sm font-bold text-gray-900 dark:text-gray-200 text-right font-mono">
-                                100.0%
+                                {data.length > 0 
+                                    ? data.reduce((sum, row) => sum + row.percentage, 0).toFixed(1) + '%'
+                                    : '-'}
                             </td>
                         </tr>
                     </tfoot>
