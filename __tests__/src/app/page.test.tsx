@@ -74,21 +74,44 @@ const setupPapaParseMock = () => {
             let data: Array<Record<string, string>> = [];
             
             // CSVテキスト（text）の内容に基づいてモック用のパース結果データを返す
+            // より長い/特定的なパターンを先にチェック（部分一致を避けるため）
             if (text.includes('2023/01/15') && text.includes('2024')) {
                 data = getParsedCSV();
-            } else if (text.includes('10,000')) {
+            } else if (text.includes('"125,500"')) {
                 data = [
-                    {'入金日': '2023/01/15', '受取通貨': '円', '受取金額[円/現地通貨]': '10,000'},
-                    {'入金日': '2023/06/15', '受取通貨': '円', '受取金額[円/現地通貨]': '5,500'},
+                    {'入金日': '2023/01/15', '受取通貨': '円', '受取金額[円/現地通貨]': '125,500'},
                 ];
-            } else if (text.includes('100,000')) {
+            } else if (text.includes('"120,000"')) {
+                data = [
+                    {'入金日': '2023/01/15', '受取通貨': '円', '受取金額[円/現地通貨]': '120,000'},
+                ];
+            } else if (text.includes('"100,001"')) {
+                data = [
+                    {'入金日': '2023/01/15', '受取通貨': '円', '受取金額[円/現地通貨]': '100,001'},
+                ];
+            } else if (text.includes('"100,000"')) {
                 data = [
                     {'入金日': '2023/01/15', '受取通貨': '円', '受取金額[円/現地通貨]': '100,000'},
                     {'入金日': '2023/06/15', '受取通貨': '円', '受取金額[円/現地通貨]': '250,000'},
                 ];
+            } else if (text.includes('"10,000"')) {
+                data = [
+                    {'入金日': '2023/01/15', '受取通貨': '円', '受取金額[円/現地通貨]': '10,000'},
+                    {'入金日': '2023/06/15', '受取通貨': '円', '受取金額[円/現地通貨]': '5,500'},
+                ];
             } else if (text.includes('2024/01/15') && !text.includes('2024/06')) {
                 data = [
                     {'入金日': '2024/01/15', '受取通貨': 'USドル', '受取金額[円/現地通貨]': '10'},
+                ];
+            } else if (text.includes(',100\n') || text.endsWith(',100')) {
+                // 小額配当（100円）のテストケース
+                data = [
+                    {'入金日': '2023/01/15', '受取通貨': '円', '受取金額[円/現地通貨]': '100'},
+                ];
+            } else if (text.includes(',0\n') || text.endsWith(',0')) {
+                // ゼロ配当のテストケース
+                data = [
+                    {'入金日': '2023/01/15', '受取通貨': '円', '受取金額[円/現地通貨]': '0'},
                 ];
             } else if (text.includes('invalid')) {
                 data = [
@@ -560,6 +583,7 @@ describe('Home Page', () => {
             // テーブルヘッダー
             expect(screen.getByText('年')).toBeInTheDocument();
             expect(screen.getByText('配当金合計（税引き後）[円]')).toBeInTheDocument();
+            expect(screen.getByText('月平均配当額[円]')).toBeInTheDocument();
         });
 
         it('金額がカンマ区切りでフォーマットされる', async () => {
@@ -576,6 +600,140 @@ describe('Home Page', () => {
 
             // 年別配当金集計のヘッダーが表示されることを確認
             expect(screen.getByText('配当金合計（税引き後）[円]')).toBeInTheDocument();
+        });
+
+        it('月平均配当額が正しく計算される（割り切れる場合）', async () => {
+            const csvData = `入金日,受取通貨,受取金額[円/現地通貨]
+2023/01/15,円,"120,000"`;
+            mockFetchSuccess(csvData);
+
+            render(<Home/>);
+
+            await waitFor(() => {
+                expect(screen.getByText('年別配当金集計')).toBeInTheDocument();
+            }, {timeout: 3000});
+
+            // データが描画されることを確認
+            await waitFor(() => {
+                expect(screen.getByText('2023年')).toBeInTheDocument();
+            });
+
+            // 120,000 / 12 = 10,000
+            expect(screen.getByText('¥120,000')).toBeInTheDocument();
+            expect(screen.getByText('¥10,000')).toBeInTheDocument();
+        });
+
+        it('月平均配当額が正しく計算される（切り捨て確認）', async () => {
+            const csvData = `入金日,受取通貨,受取金額[円/現地通貨]
+2023/01/15,円,"125,500"`;
+            mockFetchSuccess(csvData);
+
+            render(<Home/>);
+
+            await waitFor(() => {
+                expect(screen.getByText('年別配当金集計')).toBeInTheDocument();
+            }, {timeout: 3000});
+
+            // データが描画されることを確認
+            await waitFor(() => {
+                expect(screen.getByText('2023年')).toBeInTheDocument();
+            });
+
+            // floor(125,500 / 12) = floor(10458.333...) = 10,458
+            expect(screen.getByText('¥125,500')).toBeInTheDocument();
+            expect(screen.getByText('¥10,458')).toBeInTheDocument();
+        });
+
+        it('月平均配当額が正しく計算される（端数が大きい場合）', async () => {
+            const csvData = `入金日,受取通貨,受取金額[円/現地通貨]
+2023/01/15,円,"100,001"`;
+            mockFetchSuccess(csvData);
+
+            render(<Home/>);
+
+            await waitFor(() => {
+                expect(screen.getByText('年別配当金集計')).toBeInTheDocument();
+            }, {timeout: 3000});
+
+            // データが描画されることを確認
+            await waitFor(() => {
+                expect(screen.getByText('2023年')).toBeInTheDocument();
+            });
+
+            // floor(100,001 / 12) = floor(8333.416...) = 8,333
+            expect(screen.getByText('¥100,001')).toBeInTheDocument();
+            expect(screen.getByText('¥8,333')).toBeInTheDocument();
+        });
+
+        it('月平均配当額が正しく計算される（小額の配当金）', async () => {
+            const csvData = `入金日,受取通貨,受取金額[円/現地通貨]
+2023/01/15,円,100`;
+            mockFetchSuccess(csvData);
+
+            render(<Home/>);
+
+            await waitFor(() => {
+                expect(screen.getByText('年別配当金集計')).toBeInTheDocument();
+            }, {timeout: 3000});
+
+            // データが描画されることを確認
+            await waitFor(() => {
+                expect(screen.getByText('2023年')).toBeInTheDocument();
+            });
+
+            // floor(100 / 12) = floor(8.333...) = 8
+            expect(screen.getByText('¥100')).toBeInTheDocument();
+            expect(screen.getByText('¥8')).toBeInTheDocument();
+        });
+
+        it('月平均配当額が正しく計算される（ゼロ配当）', async () => {
+            const csvData = `入金日,受取通貨,受取金額[円/現地通貨]
+2023/01/15,円,0`;
+            mockFetchSuccess(csvData);
+
+            render(<Home/>);
+
+            await waitFor(() => {
+                expect(screen.getByText('年別配当金集計')).toBeInTheDocument();
+            }, {timeout: 3000});
+
+            // データが描画されることを確認
+            await waitFor(() => {
+                expect(screen.getByText('2023年')).toBeInTheDocument();
+            });
+
+            // floor(0 / 12) = 0
+            // ¥0 が2つ表示される（合計と月平均）
+            const zeroElements = screen.getAllByText('¥0');
+            expect(zeroElements).toHaveLength(2);
+        });
+
+        it('為替レート変更時に月平均配当額も更新される', async () => {
+            const csvData = `入金日,受取通貨,受取金額[円/現地通貨]
+2024/01/15,USドル,10`;
+            mockFetchSuccess(csvData);
+
+            render(<Home/>);
+
+            await waitFor(() => {
+                expect(screen.getByText('配当金グラフ')).toBeInTheDocument();
+            }, {timeout: 3000});
+
+            // 初期値: 10ドル * 150円 = 1,500円、月平均: floor(1,500 / 12) = 125円
+            await waitFor(() => {
+                expect(screen.getByText('¥125')).toBeInTheDocument();
+            });
+
+            const input = screen.getByLabelText('為替レート（1ドル = 円）');
+            
+            act(() => {
+                fireEvent.change(input, {target: {value: '200'}});
+            });
+
+            // 変更後: 10ドル * 200円 = 2,000円、月平均: floor(2,000 / 12) = 166円
+            await waitFor(() => {
+                expect(screen.getByText('¥166')).toBeInTheDocument();
+            });
         });
     });
 
