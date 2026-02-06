@@ -286,7 +286,6 @@ src/app/
   ```tsx
   <Link href="/">配当金グラフ</Link>
   <Link href="/cumulative">累計配当グラフ</Link>
-  ```
 
 ### 6.3 将来の共通化候補（今回の実装対象外）
 
