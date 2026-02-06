@@ -28,13 +28,13 @@ describe('Header', () => {
         it('ヘッダータイトルが表示される', () => {
             renderWithProvider();
 
-            expect(screen.getByText('divichart-next-js-app')).toBeInTheDocument();
+            expect(screen.getByText('divichart')).toBeInTheDocument();
         });
 
         it('ナビゲーションリンクが表示される', () => {
             renderWithProvider();
 
-            expect(screen.getByText('ホーム')).toBeInTheDocument();
+            expect(screen.getByText('年別配当')).toBeInTheDocument();
         });
 
         it('ヘッダーのHTML構造が正しい', () => {
