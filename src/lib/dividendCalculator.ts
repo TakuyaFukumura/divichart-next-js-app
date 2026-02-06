@@ -48,10 +48,7 @@ export function calculateStockDividends(
         stockAmounts[stockName] = (stockAmounts[stockName] || 0) + amountInYen;
     });
 
-    // 2. 合計金額を計算
-    const totalAmount = Object.values(stockAmounts).reduce((sum, amount) => sum + amount, 0);
-
-    // 3. StockDividend配列に変換し、金額の降順でソート
+    // 2. StockDividend配列に変換し、金額の降順でソート
     const roundedStocks = Object.entries(stockAmounts).map(([stockName, amount]) => ({
         stockName,
         amount: Math.round(amount),
