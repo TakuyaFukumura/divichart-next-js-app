@@ -280,12 +280,13 @@ src/app/
 - 変更内容: ナビゲーションリンクの追加
 - Before:
   ```tsx
-  <Link href="/">ホーム</Link>
+  <Link href="/">年別配当</Link>
   ```
 - After:
   ```tsx
-  <Link href="/">年別配当グラフ</Link>
-  <Link href="/cumulative">累計配当グラフ</Link>
+
+  <Link href="/">年別配当</Link>
+  <Link href="/cumulative">累計配当</Link>
 
 ### 6.3 将来の共通化候補（今回の実装対象外）
 
@@ -757,7 +758,7 @@ test('ヘッダーのナビゲーションが機能する', async ({ page }) => 
 
 ```
 +------------------------------------------------------------------+
-|  divichart-next-js-app    年別配当グラフ  累計配当グラフ     🌙    |
+|  divichart-next-js-app    年別配当  累計配当             🌙    |
 +------------------------------------------------------------------+
 |                                                                  |
 |    累計配当グラフ                                                |
@@ -889,7 +890,7 @@ test('ヘッダーのナビゲーションが機能する', async ({ page }) => 
 <RootLayout>
   └── <Header>
       └── ナビゲーション
-          ├── 年別配当グラフ (/)
+          ├── 年別配当 (/)
           └── 累計配当グラフ (/cumulative)
 
 <CumulativeDividendPage> (/cumulative/page.tsx)
