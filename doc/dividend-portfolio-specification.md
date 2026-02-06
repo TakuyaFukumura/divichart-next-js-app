@@ -629,7 +629,7 @@ Playwrightを使用したE2Eテスト:
    - アーキテクチャ図の更新
    - 機能一覧の更新
 
-3. **copilot-instructions.md**
+3. **.github/copilot-instructions.md**
    - 新規コンポーネントの説明を追加
    - 開発ガイドラインの更新
 
