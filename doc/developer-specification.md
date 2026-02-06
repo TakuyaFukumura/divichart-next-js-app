@@ -17,27 +17,27 @@ divichart-next-js-appは、証券会社から提供される配当金データ�
 ### 2.2 主要機能
 
 1. **CSVデータ読み込み**
-   - Shift-JISエンコーディングのCSVファイルを読み込み
-   - 複数通貨（円、USドル等）の配当金データに対応
+    - Shift-JISエンコーディングのCSVファイルを読み込み
+    - 複数通貨（円、USドル等）の配当金データに対応
 
 2. **データ集計・変換**
-   - 入金日から年を抽出し、年別に配当金を集計
-   - USドル建て配当を設定可能な為替レートで円換算
-   - 税引き後配当金を表示
+    - 入金日から年を抽出し、年別に配当金を集計
+    - USドル建て配当を設定可能な為替レートで円換算
+    - 税引き後配当金を表示
 
 3. **データ可視化**
-   - 年別配当金の棒グラフ表示
-   - 年別配当金の折れ線グラフ表示
-   - インタラクティブなツールチップ表示
+    - 年別配当金の棒グラフ表示
+    - 年別配当金の折れ線グラフ表示
+    - インタラクティブなツールチップ表示
 
 4. **データ一覧表示**
-   - 年別配当金を集計したテーブル表示
-   - 配当金額を日本円でフォーマット表示
+    - 年別配当金を集計したテーブル表示
+    - 配当金額を日本円でフォーマット表示
 
 5. **設定機能**
-   - ダークモード/ライトモードの切り替え
-   - 為替レートのリアルタイム変更
-   - グラフ種類（棒/折れ線）の切り替え
+    - ダークモード/ライトモードの切り替え
+    - 為替レートのリアルタイム変更
+    - グラフ種類（棒/折れ線）の切り替え
 
 ### 2.3 対象ユーザー
 
@@ -79,30 +79,30 @@ divichart-next-js-appは、証券会社から提供される配当金データ�
 
 #### フロントエンド
 
-| カテゴリ | 技術 | バージョン | 用途 |
-|---------|------|-----------|------|
-| フレームワーク | Next.js | 16.1.6 | Reactベースのフルスタックフレームワーク |
-| UIライブラリ | React | 19.2.4 | ユーザーインターフェース構築 |
-| 言語 | TypeScript | 5.x | 型安全性の確保 |
-| スタイリング | Tailwind CSS | 4.x | ユーティリティファーストCSS |
-| チャート | Recharts | 3.7.0 | グラフ描画ライブラリ |
-| CSV解析 | PapaParse | 5.5.3 | CSVパーサー |
+| カテゴリ    | 技術           | バージョン  | 用途                     |
+|---------|--------------|--------|------------------------|
+| フレームワーク | Next.js      | 16.1.6 | Reactベースのフルスタックフレームワーク |
+| UIライブラリ | React        | 19.2.4 | ユーザーインターフェース構築         |
+| 言語      | TypeScript   | 5.x    | 型安全性の確保                |
+| スタイリング  | Tailwind CSS | 4.x    | ユーティリティファーストCSS        |
+| チャート    | Recharts     | 3.7.0  | グラフ描画ライブラリ             |
+| CSV解析   | PapaParse    | 5.5.3  | CSVパーサー                |
 
 #### 開発ツール
 
-| カテゴリ | 技術 | バージョン | 用途 |
-|---------|------|-----------|------|
-| リンター | ESLint | 9.x | コード品質管理 |
-| テスト | Jest | 30.2.0 | ユニット・インテグレーションテスト |
-| テスト | React Testing Library | 16.3.2 | Reactコンポーネントテスト |
-| ビルド | Next.js Turbopack | - | 高速ビルド |
+| カテゴリ | 技術                    | バージョン  | 用途                |
+|------|-----------------------|--------|-------------------|
+| リンター | ESLint                | 9.x    | コード品質管理           |
+| テスト  | Jest                  | 30.2.0 | ユニット・インテグレーションテスト |
+| テスト  | React Testing Library | 16.3.2 | Reactコンポーネントテスト   |
+| ビルド  | Next.js Turbopack     | -      | 高速ビルド             |
 
 #### CI/CD
 
-| カテゴリ | 技術 | 用途 |
-|---------|------|------|
-| CI | GitHub Actions | 自動テスト・ビルド |
-| 依存関係管理 | Dependabot | セキュリティ更新 |
+| カテゴリ   | 技術             | 用途        |
+|--------|----------------|-----------|
+| CI     | GitHub Actions | 自動テスト・ビルド |
+| 依存関係管理 | Dependabot     | セキュリティ更新  |
 
 ### 3.3 ディレクトリ構成
 
@@ -154,27 +154,29 @@ divichart-next-js-app/
 #### 入力データ（CSVファイル）
 
 **ファイル情報**
+
 - **エンコーディング**: Shift-JIS
 - **ファイル名**: `dividendlist_YYYYMMDD.csv`
 - **配置場所**: `public/data/`
 
 **CSVカラム定義**
 
-| カラム名 | データ型 | 必須 | 説明 | 例 |
-|---------|---------|------|------|-----|
-| 入金日 | string (YYYY/MM/DD) | ✓ | 配当金の入金日 | 2026/02/06 |
-| 商品 | string | - | 商品種別 | 米国株式 |
-| 口座 | string | - | 口座種別 | 旧NISA |
-| 銘柄コード | string | - | 証券コード | BLV |
-| 銘柄 | string | - | 銘柄名 | VA L-TERM BOND |
-| 受取通貨 | string | ✓ | 通貨コード | USドル, 円 |
-| 単価[円/現地通貨] | string | - | 1株あたり配当金 | 0.27745 |
-| 数量[株/口] | string | - | 保有株数 | 11 |
-| 配当・分配金合計（税引前）[円/現地通貨] | string | - | 税引前配当金額 | 3.05 |
-| 税額合計[円/現地通貨] | string | - | 税額 | 0 |
-| 受取金額[円/現地通貨] | string | ✓ | 税引き後配当金額 | 2.74 |
+| カラム名                  | データ型                | 必須 | 説明       | 例              |
+|-----------------------|---------------------|----|----------|----------------|
+| 入金日                   | string (YYYY/MM/DD) | ✓  | 配当金の入金日  | 2026/02/06     |
+| 商品                    | string              | -  | 商品種別     | 米国株式           |
+| 口座                    | string              | -  | 口座種別     | 旧NISA          |
+| 銘柄コード                 | string              | -  | 証券コード    | BLV            |
+| 銘柄                    | string              | -  | 銘柄名      | VA L-TERM BOND |
+| 受取通貨                  | string              | ✓  | 通貨コード    | USドル, 円        |
+| 単価[円/現地通貨]            | string              | -  | 1株あたり配当金 | 0.27745        |
+| 数量[株/口]               | string              | -  | 保有株数     | 11             |
+| 配当・分配金合計（税引前）[円/現地通貨] | string              | -  | 税引前配当金額  | 3.05           |
+| 税額合計[円/現地通貨]          | string              | -  | 税額       | 0              |
+| 受取金額[円/現地通貨]          | string              | ✓  | 税引き後配当金額 | 2.74           |
 
 **特殊値の扱い**
+
 - 税額が`-`の場合は0として扱う
 - カンマ区切りの数値（例: `3,683`）は正常にパース可能
 
@@ -227,6 +229,7 @@ DividendData[]
 #### `src/app/page.tsx` - メインページ
 
 **責務**
+
 - CSVデータの読み込みとパース
 - 年別配当金の集計
 - グラフとテーブルの表示
@@ -235,15 +238,15 @@ DividendData[]
 
 **主要な状態**
 
-| 状態変数 | 型 | 初期値 | 説明 |
-|---------|-----|--------|------|
-| data | DividendData[] | [] | 年別集計データ |
-| loading | boolean | true | 読み込み状態 |
-| error | string \| null | null | エラーメッセージ |
-| chartType | 'line' \| 'bar' | 'bar' | グラフ種類 |
-| usdToJpyRate | number | 150 | 為替レート（1ドル=円） |
-| inputValue | string | "150" | 為替レート入力値 |
-| rawData | CSVRow[] | [] | パース済みCSVデータ |
+| 状態変数         | 型               | 初期値   | 説明           |
+|--------------|-----------------|-------|--------------|
+| data         | DividendData[]  | []    | 年別集計データ      |
+| loading      | boolean         | true  | 読み込み状態       |
+| error        | string \| null  | null  | エラーメッセージ     |
+| chartType    | 'line' \| 'bar' | 'bar' | グラフ種類        |
+| usdToJpyRate | number          | 150   | 為替レート（1ドル=円） |
+| inputValue   | string          | "150" | 為替レート入力値     |
+| rawData      | CSVRow[]        | []    | パース済みCSVデータ  |
 
 **主要な関数**
 
@@ -255,29 +258,29 @@ DividendData[]
  * @returns 年別配当金データ（年でソート済み）
  */
 const calculateDividendData = (
-    csvData: CSVRow[], 
-    exchangeRate: number
-): DividendData[]
+        csvData: CSVRow[],
+        exchangeRate: number
+    ): DividendData[]
 ```
 
 **処理フロー**
 
 1. **初期化** (useEffect)
-   - CSVファイルをfetchでHTTP取得
-   - Shift-JISからUTF-8にデコード
-   - PapaParseでCSVをパース
-   - rawDataに保存
+    - CSVファイルをfetchでHTTP取得
+    - Shift-JISからUTF-8にデコード
+    - PapaParseでCSVをパース
+    - rawDataに保存
 
 2. **データ集計** (useEffect)
-   - rawDataと為替レートが変更されたら再計算
-   - calculateDividendData()を呼び出し
-   - 年別に配当金を集計（USドルは為替換算）
-   - 年でソートしてdataに保存
+    - rawDataと為替レートが変更されたら再計算
+    - calculateDividendData()を呼び出し
+    - 年別に配当金を集計（USドルは為替換算）
+    - 年でソートしてdataに保存
 
 3. **レンダリング**
-   - loading中: スピナー表示
-   - error発生時: エラーメッセージ表示
-   - 成功時: グラフと設定UI、テーブルを表示
+    - loading中: スピナー表示
+    - error発生時: エラーメッセージ表示
+    - 成功時: グラフと設定UI、テーブルを表示
 
 **UIコンポーネント構成**
 
@@ -296,20 +299,22 @@ Page
 #### `src/app/layout.tsx` - ルートレイアウト
 
 **責務**
+
 - アプリケーション全体のレイアウト構造
 - メタデータの設定
 - グローバルスタイルの適用
 - DarkModeProviderの配置
 
 **構成**
+
 ```tsx
 <html lang="ja">
-  <body>
-    <DarkModeProvider>
-      <Header />
-      {children}
-    </DarkModeProvider>
-  </body>
+<body>
+<DarkModeProvider>
+    <Header/>
+    {children}
+</DarkModeProvider>
+</body>
 </html>
 ```
 
@@ -318,11 +323,13 @@ Page
 #### `src/app/components/Header.tsx` - ヘッダー
 
 **責務**
+
 - アプリケーションタイトルの表示
 - ダークモード切り替えボタンの提供
 - ナビゲーションメニューの表示
 
 **主要機能**
+
 - `useDarkMode()`フックでテーマ情報を取得
 - テーマに応じたアイコン表示（☀️/🌙）
 - ボタンクリックでテーマ切り替え
@@ -330,6 +337,7 @@ Page
 **Props**: なし
 
 **スタイル特性**
+
 - スティッキーヘッダー（`sticky top-0`）
 - ガラスモルフィズム（`backdrop-blur-sm`）
 - ダークモード対応
@@ -337,6 +345,7 @@ Page
 #### `src/app/components/DarkModeProvider.tsx` - ダークモードプロバイダー
 
 **責務**
+
 - ダークモード状態の管理
 - localStorageへのテーマ保存
 - HTML要素へのdarkクラス適用
@@ -364,6 +373,7 @@ function useDarkMode(): DarkModeContextType
 ```
 
 **永続化**
+
 - `localStorage.getItem('theme')`で初期テーマを読み込み
 - `localStorage.setItem('theme', newTheme)`でテーマを保存
 
@@ -380,6 +390,7 @@ function useDarkMode(): DarkModeContextType
 各コンポーネント内でのみ使用する状態は`useState`で管理します。
 
 **使用例**
+
 - CSVデータ（`page.tsx`）
 - グラフ種類（`page.tsx`）
 - 為替レート（`page.tsx`）
@@ -390,6 +401,7 @@ function useDarkMode(): DarkModeContextType
 複数コンポーネント間で共有する状態は`Context API`で管理します。
 
 **現在の使用例**
+
 - ダークモードのテーマ状態（`DarkModeProvider`）
 
 ### 6.4 サーバー状態
@@ -481,9 +493,9 @@ function useDarkMode(): DarkModeContextType
 
 ### 8.1 環境変数一覧
 
-| 変数名 | 型 | デフォルト値 | 説明 | 必須 |
-|--------|-----|-------------|------|------|
-| NEXT_PUBLIC_USD_TO_JPY_RATE | number | 150 | 初期為替レート（1ドル=円） | ✗ |
+| 変数名                         | 型      | デフォルト値 | 説明             | 必須 |
+|-----------------------------|--------|--------|----------------|----|
+| NEXT_PUBLIC_USD_TO_JPY_RATE | number | 150    | 初期為替レート（1ドル=円） | ✗  |
 
 ### 8.2 環境変数の設定方法
 
@@ -508,12 +520,13 @@ NEXT_PUBLIC_USD_TO_JPY_RATE=145
 const envRate = process.env.NEXT_PUBLIC_USD_TO_JPY_RATE
     ? Number(process.env.NEXT_PUBLIC_USD_TO_JPY_RATE)
     : NaN;
-const USD_TO_JPY_RATE = !isNaN(envRate) && envRate > 0 
-    ? envRate 
+const USD_TO_JPY_RATE = !isNaN(envRate) && envRate > 0
+    ? envRate
     : DEFAULT_USD_TO_JPY_RATE;
 ```
 
 **注意事項**
+
 - `NEXT_PUBLIC_`プレフィックスが必須（クライアントサイドで使用するため）
 - 無効な値の場合はデフォルト値にフォールバック
 - 0以下の値は無効とみなす
@@ -533,12 +546,14 @@ const USD_TO_JPY_RATE = !isNaN(envRate) && envRate > 0
 #### カラーパレット
 
 **ライトモード**
+
 - 背景: `bg-gradient-to-br from-blue-50 to-indigo-100`
 - カード: `bg-white`
 - テキスト: `text-gray-800`, `text-gray-600`
 - アクセント: `text-blue-600`
 
 **ダークモード**
+
 - 背景: `dark:from-gray-900 dark:to-gray-800`
 - カード: `dark:bg-gray-800`
 - テキスト: `dark:text-gray-200`, `dark:text-gray-400`
@@ -561,6 +576,7 @@ const USD_TO_JPY_RATE = !isNaN(envRate) && envRate > 0
 ### 10.1 テスト戦略
 
 **テストピラミッド**
+
 ```
        /\
       /  \  E2E (未実装)
@@ -585,6 +601,7 @@ __tests__/
 ```
 
 **命名規則**
+
 - テストファイル: `{ComponentName}.test.tsx`
 - ソースコードの構造をミラーする
 
@@ -610,6 +627,7 @@ npm run test:coverage
 ### 10.5 モックの使用
 
 **localStorage**
+
 ```typescript
 const localStorageMock = (() => {
     let store: Record<string, string> = {};
@@ -630,14 +648,15 @@ const localStorageMock = (() => {
 
 ### 10.6 テストカバレッジ目標
 
-| カテゴリ | 目標カバレッジ | 現状 |
-|---------|---------------|------|
-| Statements | 80%以上 | 要測定 |
-| Branches | 70%以上 | 要測定 |
-| Functions | 80%以上 | 要測定 |
-| Lines | 80%以上 | 要測定 |
+| カテゴリ       | 目標カバレッジ | 現状  |
+|------------|---------|-----|
+| Statements | 80%以上   | 要測定 |
+| Branches   | 70%以上   | 要測定 |
+| Functions  | 80%以上   | 要測定 |
+| Lines      | 80%以上   | 要測定 |
 
 **未テストの領域**
+
 - `src/app/page.tsx` (メインページ)
 - `src/app/layout.tsx` (レイアウト)
 
@@ -662,6 +681,7 @@ npm run build
 ```
 
 **ビルド成果物**
+
 - `.next/`ディレクトリに出力
 - 静的最適化されたHTML
 - バンドルされたJavaScript
@@ -682,6 +702,7 @@ npm start
 - 自動プレビューURL生成
 
 **デプロイ手順**
+
 1. GitHubリポジトリをVercelに接続
 2. 自動的にビルド・デプロイ
 
@@ -698,10 +719,12 @@ npm start
 **ワークフロー**: `.github/workflows/ci.yml`
 
 **トリガー**
+
 - `main`ブランチへのプッシュ
 - プルリクエストの作成・更新
 
 **実行内容**
+
 1. Node.js 20.xのセットアップ
 2. 依存関係のインストール
 3. ESLint実行
@@ -720,8 +743,8 @@ npm start
 #### 依存関係の管理
 
 - **Dependabot**: 月次で依存関係の脆弱性チェック
-  - スケジュール: 毎週月曜日 09:00 JST
-  - 対象: npm packages, GitHub Actions
+    - スケジュール: 毎週月曜日 09:00 JST
+    - 対象: npm packages, GitHub Actions
 
 #### CSP（Content Security Policy）
 
@@ -768,12 +791,12 @@ npm start
 
 **目標値**
 
-| 指標 | 目標値 | 説明 |
-|------|--------|------|
-| FCP (First Contentful Paint) | < 1.8秒 | 最初のコンテンツ描画 |
-| LCP (Largest Contentful Paint) | < 2.5秒 | 最大コンテンツ描画 |
-| TTI (Time to Interactive) | < 3.8秒 | インタラクション可能になるまで |
-| CLS (Cumulative Layout Shift) | < 0.1 | レイアウトシフト累積 |
+| 指標                             | 目標値    | 説明              |
+|--------------------------------|--------|-----------------|
+| FCP (First Contentful Paint)   | < 1.8秒 | 最初のコンテンツ描画      |
+| LCP (Largest Contentful Paint) | < 2.5秒 | 最大コンテンツ描画       |
+| TTI (Time to Interactive)      | < 3.8秒 | インタラクション可能になるまで |
+| CLS (Cumulative Layout Shift)  | < 0.1  | レイアウトシフト累積      |
 
 ### 13.3 パフォーマンス改善案
 
@@ -844,6 +867,7 @@ npm start
 ```
 
 **Type一覧**
+
 - `feat`: 新機能
 - `fix`: バグ修正
 - `docs`: ドキュメント変更
@@ -853,6 +877,7 @@ npm start
 - `chore`: ビルド・設定変更
 
 **例**
+
 ```
 feat: 為替レート変更機能を追加
 
@@ -865,6 +890,7 @@ feat: 為替レート変更機能を追加
 #### PRタイトル
 
 簡潔で内容を表すタイトルを付ける：
+
 ```
 [Feature] 為替レート変更機能の追加
 [Fix] CSVパースエラーの修正
@@ -874,6 +900,7 @@ feat: 為替レート変更機能を追加
 #### PR説明
 
 以下を含める：
+
 - 変更内容の説明
 - 関連Issue番号（`Fixes #123`）
 - テスト方法
@@ -901,36 +928,39 @@ feat: 為替レート変更機能を追加
 **症状**: "CSVファイルの読み込みに失敗しました"エラー
 
 **原因と対処法**
+
 1. **ファイルが存在しない**
-   - `public/data/`にCSVファイルを配置
-   - ファイル名が`page.tsx`の`fetch()`と一致しているか確認
+    - `public/data/`にCSVファイルを配置
+    - ファイル名が`page.tsx`の`fetch()`と一致しているか確認
 
 2. **エンコーディング問題**
-   - CSVファイルがShift-JISであることを確認
-   - UTF-8の場合は`TextDecoder`の引数を変更
+    - CSVファイルがShift-JISであることを確認
+    - UTF-8の場合は`TextDecoder`の引数を変更
 
 3. **パース失敗**
-   - CSVフォーマットが正しいか確認
-   - ヘッダー行が存在するか確認
+    - CSVフォーマットが正しいか確認
+    - ヘッダー行が存在するか確認
 
 #### ダークモードが保存されない
 
 **症状**: ページリロード時にライトモードに戻る
 
 **原因と対処法**
+
 1. **localStorage無効**
-   - ブラウザの設定でlocalStorageが有効か確認
-   - プライベートブラウジングモードでは保存されない
+    - ブラウザの設定でlocalStorageが有効か確認
+    - プライベートブラウジングモードでは保存されない
 
 2. **JavaScript実行前のちらつき**
-   - 正常動作（Next.jsのクライアントサイド実行のため）
-   - サーバーサイドレンダリング対応で改善可能
+    - 正常動作（Next.jsのクライアントサイド実行のため）
+    - サーバーサイドレンダリング対応で改善可能
 
 #### ビルドエラー
 
 **症状**: `npm run build`が失敗する
 
 **原因と対処法**
+
 1. **依存関係の問題**
    ```bash
    rm -rf node_modules package-lock.json
@@ -938,8 +968,8 @@ feat: 為替レート変更機能を追加
    ```
 
 2. **型エラー**
-   - `npm run lint`で型チェック
-   - TypeScriptエラーを修正
+    - `npm run lint`で型チェック
+    - TypeScriptエラーを修正
 
 3. **メモリ不足**
    ```bash
@@ -967,15 +997,15 @@ console.log('Exchange Rate:', usdToJpyRate);
 
 ## 17. 用語集
 
-| 用語 | 説明 |
-|------|------|
-| 配当金 | 株式投資で企業から受け取る利益分配金 |
-| 税引き後配当金 | 源泉徴収税を差し引いた後の配当金額 |
-| 為替レート | 通貨間の交換比率（本アプリではUSD/JPY） |
-| Shift-JIS | 日本語文字エンコーディングの一種 |
-| CSP | Content Security Policy（セキュリティポリシー） |
-| SSR | Server-Side Rendering（サーバーサイドレンダリング） |
-| CSR | Client-Side Rendering（クライアントサイドレンダリング） |
+| 用語        | 説明                                     |
+|-----------|----------------------------------------|
+| 配当金       | 株式投資で企業から受け取る利益分配金                     |
+| 税引き後配当金   | 源泉徴収税を差し引いた後の配当金額                      |
+| 為替レート     | 通貨間の交換比率（本アプリではUSD/JPY）                |
+| Shift-JIS | 日本語文字エンコーディングの一種                       |
+| CSP       | Content Security Policy（セキュリティポリシー）    |
+| SSR       | Server-Side Rendering（サーバーサイドレンダリング）   |
+| CSR       | Client-Side Rendering（クライアントサイドレンダリング） |
 
 ---
 
@@ -1005,8 +1035,8 @@ console.log('Exchange Rate:', usdToJpyRate);
 
 ## 19. 変更履歴
 
-| 日付 | バージョン | 変更内容 | 作成者 |
-|------|-----------|---------|--------|
+| 日付         | バージョン | 変更内容 | 作成者            |
+|------------|-------|------|----------------|
 | 2026-02-05 | 1.0.0 | 初版作成 | GitHub Copilot |
 
 ---
@@ -1024,6 +1054,7 @@ Next.jsの設定ファイル。現在はデフォルト設定を使用。
 TypeScriptコンパイラの設定ファイル。
 
 **主要設定**
+
 - `strict: true`: 厳格な型チェック有効
 - `jsx: "preserve"`: JSXをそのまま保持（Next.jsが処理）
 - `moduleResolution: "bundler"`: バンドラー向けのモジュール解決
@@ -1033,6 +1064,7 @@ TypeScriptコンパイラの設定ファイル。
 Tailwind CSSの設定ファイル。
 
 **主要設定**
+
 - `darkMode: 'class'`: クラスベースのダークモード
 - `content`: スキャン対象ファイルパス
 
@@ -1041,6 +1073,7 @@ Tailwind CSSの設定ファイル。
 ESLintの設定ファイル。
 
 **主要ルール**
+
 - Next.js推奨設定を継承
 - React Hooksルール有効
 
@@ -1049,6 +1082,7 @@ ESLintの設定ファイル。
 Jestの設定ファイル。
 
 **主要設定**
+
 - `testEnvironment: 'jsdom'`: ブラウザ環境をシミュレート
 - `setupFilesAfterEnv`: `@testing-library/jest-dom`をセットアップ
 
