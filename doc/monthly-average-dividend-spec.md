@@ -394,7 +394,7 @@
 ### 10.2 関連コード
 
 - **メインページ**: `src/app/page.tsx`
-- **型定義**: `src/app/page.tsx` (22-40行目)
+- **型定義**: `src/app/page.tsx` (22-27行目: `DividendData`型、33-40行目: `CSVRow`型)
 - **テーブル実装**: `src/app/page.tsx` (311-342行目)
 
 ---
