@@ -556,6 +556,26 @@ describe('Cumulative Dividend Integration', () => {
 
 ### 10.3 E2Eテスト（Playwright）
 
+#### 10.3.1 前提条件・セットアップ
+
+本仕様では、E2Eテストに [Playwright](https://playwright.dev/)（`@playwright/test`）を利用することを想定します。  
+実行には、以下の前提と初期セットアップが必要です。
+
+- `devDependencies` に `@playwright/test` を追加する
+  - 例: `npm install --save-dev @playwright/test`
+- ブラウザバイナリのインストール
+  - 例: `npx playwright install`
+- プロジェクトルートに `playwright.config.ts` を作成し、少なくとも以下を設定する
+  - `testDir`: `tests/e2e` 等、E2Eテスト配置ディレクトリ
+  - `use.baseURL`: `http://localhost:3000`（`npm run dev` で起動するNext.jsのURL）
+- `package.json` にE2Eテスト用スクリプトを追加する
+  - 例: `"test:e2e": "playwright test"`
+- CI（GitHub Actions）への組み込み
+  - 既存のテスト・ビルドジョブに以下のステップを追加する想定
+    - 依存関係インストール後に `npx playwright install --with-deps`（必要に応じて）
+    - アプリケーションを起動（`npm run dev` など）し、別ジョブまたはステップで `npm run test:e2e` を実行
+
+上記の前提が整っていることを前提に、累計配当グラフページのE2Eテスト例を以下に示します。
 ```typescript
 test('累計配当グラフページが正しく動作する', async ({ page }) => {
   // ページに移動
