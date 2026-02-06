@@ -321,22 +321,23 @@ function aggregateOthers(
 ### 6.1 ファイル構成
 
 ```
-src/app/
-├── components/
-│   ├── DarkModeProvider.tsx      # 既存
-│   ├── Header.tsx                # 既存（メニュー追加）
-│   ├── DividendPieChart.tsx      # 新規：円グラフコンポーネント
-│   ├── DividendTable.tsx         # 新規：配当テーブルコンポーネント
-│   └── YearSelector.tsx          # 新規：年度選択コンポーネント
-├── portfolio/
-│   └── page.tsx                  # 新規：ポートフォリオページ
+src/
+├── app/
+│   ├── components/
+│   │   ├── DarkModeProvider.tsx      # 既存
+│   │   ├── Header.tsx                # 既存（メニュー追加）
+│   │   ├── DividendPieChart.tsx      # 新規：円グラフコンポーネント
+│   │   ├── DividendTable.tsx         # 新規：配当テーブルコンポーネント
+│   │   └── YearSelector.tsx          # 新規：年度選択コンポーネント
+│   ├── portfolio/
+│   │   └── page.tsx                  # 新規：ポートフォリオページ
+│   ├── layout.tsx                    # 既存
+│   └── page.tsx                      # 既存
 ├── lib/
-│   ├── dividendCalculator.ts    # 新規：配当計算ロジック
-│   └── csvLoader.ts             # 新規：CSV読み込みロジック（既存から抽出）
-├── types/
-│   └── dividend.ts              # 新規：型定義の集約
-├── layout.tsx                    # 既存
-└── page.tsx                      # 既存
+│   ├── dividendCalculator.ts        # 新規：配当計算ロジック
+│   └── csvLoader.ts                 # 新規：CSV読み込みロジック（既存から抽出）
+└── types/
+    └── dividend.ts                  # 新規：型定義の集約
 ```
 
 ### 6.2 実装の優先順位
@@ -344,13 +345,13 @@ src/app/
 #### Phase 1: 基本機能（必須）
 1. **CSV読み込みロジックの共通化**
    - 既存のpage.tsxからCSV読み込み部分を抽出
-   - `lib/csvLoader.ts`に移動
+   - `src/lib/csvLoader.ts`に移動
    - 想定工数: 2時間
 
 2. **配当計算ロジックの実装**
    - 銘柄別集計機能
    - 「その他」集約機能
-   - `lib/dividendCalculator.ts`に実装
+   - `src/lib/dividendCalculator.ts`に実装
    - 想定工数: 3時間
 
 3. **ポートフォリオページの作成**
@@ -426,7 +427,7 @@ src/app/
 ### 7.1 ユニットテスト
 
 #### 7.1.1 計算ロジックのテスト
-**対象**: `lib/dividendCalculator.ts`
+**対象**: `src/lib/dividendCalculator.ts`
 
 テストケース:
 1. **銘柄別集計の正確性**
