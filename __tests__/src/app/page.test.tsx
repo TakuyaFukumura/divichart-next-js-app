@@ -307,76 +307,6 @@ describe('Home Page', () => {
         });
     });
 
-    describe('UIインタラクション - グラフタイプ切り替え', () => {
-        it('初期状態では棒グラフが選択されている', async () => {
-            const csvData = createMockCSV();
-            mockFetchSuccess(csvData);
-
-            render(<Home/>);
-
-            await waitFor(() => {
-                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
-            });
-
-            const barButton = screen.getByRole('button', {name: '棒グラフ'});
-            expect(barButton).toHaveClass('bg-blue-600');
-            expect(screen.getByTestId('bar-chart')).toBeInTheDocument();
-        });
-
-        it('折れ線グラフボタンをクリックすると折れ線グラフに切り替わる', async () => {
-            const csvData = createMockCSV();
-            mockFetchSuccess(csvData);
-
-            render(<Home/>);
-
-            await waitFor(() => {
-                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
-            });
-
-            const lineButton = screen.getByRole('button', {name: '折れ線グラフ'});
-            
-            act(() => {
-                fireEvent.click(lineButton);
-            });
-
-            expect(lineButton).toHaveClass('bg-blue-600');
-            expect(screen.getByTestId('line-chart')).toBeInTheDocument();
-            expect(screen.queryByTestId('bar-chart')).not.toBeInTheDocument();
-        });
-
-        it('グラフタイプを複数回切り替えられる', async () => {
-            const csvData = createMockCSV();
-            mockFetchSuccess(csvData);
-
-            render(<Home/>);
-
-            await waitFor(() => {
-                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
-            });
-
-            const barButton = screen.getByRole('button', {name: '棒グラフ'});
-            const lineButton = screen.getByRole('button', {name: '折れ線グラフ'});
-
-            // 棒 → 折れ線
-            act(() => {
-                fireEvent.click(lineButton);
-            });
-            expect(screen.getByTestId('line-chart')).toBeInTheDocument();
-
-            // 折れ線 → 棒
-            act(() => {
-                fireEvent.click(barButton);
-            });
-            expect(screen.getByTestId('bar-chart')).toBeInTheDocument();
-
-            // 棒 → 折れ線
-            act(() => {
-                fireEvent.click(lineButton);
-            });
-            expect(screen.getByTestId('line-chart')).toBeInTheDocument();
-        });
-    });
-
     describe('UIインタラクション - 為替レート変更', () => {
         it('為替レート入力フィールドが表示される', async () => {
             const csvData = createMockCSV();
@@ -529,26 +459,6 @@ describe('Home Page', () => {
             expect(screen.getByTestId('tooltip')).toBeInTheDocument();
             expect(screen.getByTestId('legend')).toBeInTheDocument();
             expect(screen.getByTestId('bar')).toBeInTheDocument();
-        });
-
-        it('折れ線グラフの場合はLineコンポーネントがレンダリングされる', async () => {
-            const csvData = createMockCSV();
-            mockFetchSuccess(csvData);
-
-            render(<Home/>);
-
-            await waitFor(() => {
-                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
-            });
-
-            const lineButton = screen.getByRole('button', {name: '折れ線グラフ'});
-            
-            act(() => {
-                fireEvent.click(lineButton);
-            });
-
-            expect(screen.getByTestId('line')).toBeInTheDocument();
-            expect(screen.queryByTestId('bar')).not.toBeInTheDocument();
         });
 
         it('グラフに正しいデータが渡される', async () => {

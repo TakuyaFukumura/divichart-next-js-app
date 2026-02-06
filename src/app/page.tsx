@@ -7,8 +7,6 @@ import {
     BarChart,
     CartesianGrid,
     Legend,
-    Line,
-    LineChart,
     ResponsiveContainer,
     Tooltip,
     XAxis,
@@ -54,7 +52,7 @@ const USD_TO_JPY_RATE = !isNaN(envRate) && envRate > 0 ? envRate : DEFAULT_USD_T
  * @remarks
  * - CSVファイルはShift-JISエンコーディングで保存されている
  * - USドル建ての配当金は設定した為替レートで円換算される
- * - グラフは棒グラフと折れ線グラフを切り替え可能
+ * - グラフは棒グラフで表示される
  * 
  * @returns 配当金グラフアプリケーションのメインページ
  */
@@ -62,7 +60,6 @@ export default function Home() {
     const [data, setData] = useState<DividendData[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const [chartType, setChartType] = useState<'line' | 'bar'>('bar');
     const [usdToJpyRate, setUsdToJpyRate] = useState<number>(USD_TO_JPY_RATE);
     const [inputValue, setInputValue] = useState<string>(String(USD_TO_JPY_RATE));
     const [rawData, setRawData] = useState<CSVRow[]>([]);
@@ -152,9 +149,7 @@ export default function Home() {
         };
 
         loadCSV();
-        // CSVは初回マウント時のみ読み込む。usdToJpyRateとcalculateDividendDataは
-        // 初期値としてのみ使用され、その後の変更は別のuseEffectで処理される
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        // CSVは初回マウント時のみ読み込む
     }, []);
 
     // 為替レートが変更されたときにデータを再計算
@@ -225,34 +220,6 @@ export default function Home() {
                     </h1>
 
                     <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            グラフの種類
-                        </label>
-                        <div className="flex gap-4">
-                            <button
-                                onClick={() => setChartType('bar')}
-                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                                    chartType === 'bar'
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-                                }`}
-                            >
-                                棒グラフ
-                            </button>
-                            <button
-                                onClick={() => setChartType('line')}
-                                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                                    chartType === 'line'
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
-                                }`}
-                            >
-                                折れ線グラフ
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="mb-6">
                         <label htmlFor="usd-jpy-rate"
                                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             為替レート（1ドル = 円）
@@ -285,26 +252,14 @@ export default function Home() {
 
                     <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-6">
                         <ResponsiveContainer width="100%" height={400}>
-                            {chartType === 'bar' ? (
-                                <BarChart data={data}>
-                                    <CartesianGrid strokeDasharray="3 3"/>
-                                    <XAxis dataKey="year"/>
-                                    <YAxis/>
-                                    <Tooltip content={<CustomTooltip/>}/>
-                                    <Legend/>
-                                    <Bar dataKey="totalDividend" fill="#3b82f6" name="配当金（税引き後）[円]"/>
-                                </BarChart>
-                            ) : (
-                                <LineChart data={data}>
-                                    <CartesianGrid strokeDasharray="3 3"/>
-                                    <XAxis dataKey="year"/>
-                                    <YAxis/>
-                                    <Tooltip content={<CustomTooltip/>}/>
-                                    <Legend/>
-                                    <Line type="monotone" dataKey="totalDividend" stroke="#3b82f6" strokeWidth={2}
-                                          name="配当金（税引き後）[円]"/>
-                                </LineChart>
-                            )}
+                            <BarChart data={data}>
+                                <CartesianGrid strokeDasharray="3 3"/>
+                                <XAxis dataKey="year"/>
+                                <YAxis/>
+                                <Tooltip content={<CustomTooltip/>}/>
+                                <Legend/>
+                                <Bar dataKey="totalDividend" fill="#3b82f6" name="配当金（税引き後）[円]"/>
+                            </BarChart>
                         </ResponsiveContainer>
                     </div>
 
