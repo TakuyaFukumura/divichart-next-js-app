@@ -602,7 +602,7 @@ describe('Home Page', () => {
             expect(screen.getByText('税引後配当合計[円]')).toBeInTheDocument();
         });
 
-        it('月平均配当額が正しく計算される（割り切れる場合）', async () => {
+        it('月平均配当が正しく計算される（割り切れる場合）', async () => {
             const csvData = `入金日,受取通貨,受取金額[円/現地通貨]
 2023/01/15,円,"120,000"`;
             mockFetchSuccess(csvData);
