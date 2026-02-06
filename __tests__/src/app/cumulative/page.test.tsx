@@ -9,13 +9,21 @@ import React from 'react';
 import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import '@testing-library/jest-dom';
 
+// PapaParse オプションの型定義
+type PapaParseOptions = {
+    header: boolean;
+    skipEmptyLines: boolean;
+    complete: (results: { data: unknown[] }) => void;
+    error?: (error: Error) => void;
+};
+
 // PapaParse のモック - モジュール読み込み前に定義
 const mockPapaParse = jest.fn();
 jest.mock('papaparse', () => ({
     default: {
-        parse: (csvText: string, options: { header: boolean; skipEmptyLines: boolean; complete: (results: { data: unknown[] }) => void; error?: (error: Error) => void }) => mockPapaParse(csvText, options),
+        parse: (csvText: string, options: PapaParseOptions) => mockPapaParse(csvText, options),
     },
-    parse: (csvText: string, options: { header: boolean; skipEmptyLines: boolean; complete: (results: { data: unknown[] }) => void; error?: (error: Error) => void }) => mockPapaParse(csvText, options),
+    parse: (csvText: string, options: PapaParseOptions) => mockPapaParse(csvText, options),
 }));
 
 // Rechartsコンポーネントのモック
@@ -53,7 +61,7 @@ const getParsedCSV = () => [
 
 // PapaParse モックの実装
 const setupPapaParseMock = () => {
-    mockPapaParse.mockImplementation((text: string, options: { header: boolean; skipEmptyLines: boolean; complete: (results: { data: unknown[] }) => void; error?: (error: Error) => void }) => {
+    mockPapaParse.mockImplementation((text: string, options: PapaParseOptions) => {
         setTimeout(() => {
             const data = getParsedCSV();
             options.complete({data});
