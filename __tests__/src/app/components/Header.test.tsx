@@ -35,6 +35,21 @@ describe('Header', () => {
             renderWithProvider();
 
             expect(screen.getByText('年別配当')).toBeInTheDocument();
+            expect(screen.getByText('ポートフォリオ')).toBeInTheDocument();
+        });
+
+        it('年別配当リンクが正しいhrefを持つ', () => {
+            renderWithProvider();
+
+            const link = screen.getByText('年別配当').closest('a');
+            expect(link).toHaveAttribute('href', '/');
+        });
+
+        it('ポートフォリオリンクが正しいhrefを持つ', () => {
+            renderWithProvider();
+
+            const link = screen.getByText('ポートフォリオ').closest('a');
+            expect(link).toHaveAttribute('href', '/portfolio');
         });
 
         it('ヘッダーのHTML構造が正しい', () => {
