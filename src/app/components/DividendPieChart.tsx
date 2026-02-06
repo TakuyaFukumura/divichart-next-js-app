@@ -77,8 +77,15 @@ export default function DividendPieChart({
         outerRadius?: number;
     }) => {
         // 必要なプロパティがない場合は表示しない
-        if (!entry.name || !entry.percentage || !entry.cx || !entry.cy || 
-            entry.midAngle === undefined || !entry.innerRadius || !entry.outerRadius) {
+        if (
+            !entry.name ||
+            entry.percentage === undefined ||
+            entry.cx === undefined ||
+            entry.cy === undefined ||
+            entry.midAngle === undefined ||
+            entry.innerRadius === undefined ||
+            entry.outerRadius === undefined
+        ) {
             return null;
         }
 
