@@ -15,14 +15,27 @@ import {
     YAxis
 } from 'recharts';
 
+/**
+ * 配当金データの型定義
+ * グラフ表示に使用される年別配当金の集計データ
+ */
 type DividendData = {
+    /** 表示用の年（例: "2024年"） */
     year: string;
+    /** 年間配当金合計（税引き後）[円] */
     totalDividend: number;
 };
 
+/**
+ * CSVファイルの行データ型定義
+ * 配当金リストのCSVファイルから読み込まれるデータの形式
+ */
 type CSVRow = {
+    /** 入金日（YYYY/MM/DD形式） */
     '入金日': string;
+    /** 受取通貨（例: "円", "USドル"） */
     '受取通貨': string;
+    /** 受取金額（現地通貨）の文字列表現 */
     '受取金額[円/現地通貨]': string;
 };
 
@@ -34,6 +47,17 @@ const envRate = process.env.NEXT_PUBLIC_USD_TO_JPY_RATE
     : NaN;
 const USD_TO_JPY_RATE = !isNaN(envRate) && envRate > 0 ? envRate : DEFAULT_USD_TO_JPY_RATE;
 
+/**
+ * ホームページコンポーネント
+ * 配当金データをCSVファイルから読み込み、年別に集計してグラフと表で表示する
+ * 
+ * @remarks
+ * - CSVファイルはShift-JISエンコーディングで保存されている
+ * - USドル建ての配当金は設定した為替レートで円換算される
+ * - グラフは棒グラフと折れ線グラフを切り替え可能
+ * 
+ * @returns 配当金グラフアプリケーションのメインページ
+ */
 export default function Home() {
     const [data, setData] = useState<DividendData[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
@@ -43,7 +67,18 @@ export default function Home() {
     const [inputValue, setInputValue] = useState<string>(String(USD_TO_JPY_RATE));
     const [rawData, setRawData] = useState<CSVRow[]>([]);
 
-    // CSVデータから年別配当金データを計算する関数
+    /**
+     * CSVデータから年別配当金データを計算する関数
+     * 
+     * @param csvData - CSVファイルから読み込まれた配当金データの配列
+     * @param exchangeRate - USドルから円への為替レート
+     * @returns 年別に集計された配当金データの配列（年でソート済み）
+     * 
+     * @remarks
+     * - USドル建ての配当金は為替レートを使用して円に換算される
+     * - 配当金額が"-"の場合は0として扱われる（税額表示用）
+     * - 年別に集計し、最終的に円単位で四捨五入される
+     */
     const calculateDividendData = useCallback((csvData: CSVRow[], exchangeRate: number): DividendData[] => {
         // 年別に配当金を集計
         const yearlyDividends: { [year: string]: number } = {};
@@ -153,7 +188,15 @@ export default function Home() {
         );
     }
 
-    // カスタムツールチップコンポーネント
+    /**
+     * チャート用のカスタムツールチップコンポーネント
+     * マウスホバー時に表示される配当金情報のツールチップをカスタマイズする
+     * 
+     * @param props - ツールチップのプロパティ
+     * @param props.active - ツールチップがアクティブ（表示中）かどうか
+     * @param props.payload - 表示するデータの配列
+     * @returns カスタマイズされたツールチップのJSX要素、または非表示の場合はnull
+     */
     const CustomTooltip = ({active, payload}: {
         active?: boolean;
         payload?: Array<{ payload: DividendData; value: number }>
