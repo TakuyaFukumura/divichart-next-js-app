@@ -188,7 +188,7 @@ describe('Home Page', () => {
             render(<Home/>);
 
             await waitFor(() => {
-                expect(screen.getByText('配当金グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
             });
 
             expect(mockFetch).toHaveBeenCalledWith('/data/dividendlist_20260205.csv');
@@ -282,7 +282,7 @@ describe('Home Page', () => {
             render(<Home/>);
 
             await waitFor(() => {
-                expect(screen.getByText('配当金グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
             }, {timeout: 3000});
 
             // 年別配当金集計のヘッダーが表示されることを確認
@@ -296,7 +296,7 @@ describe('Home Page', () => {
             render(<Home/>);
 
             await waitFor(() => {
-                expect(screen.getByText('配当金グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
             });
 
             // テーブルにデータ行がないことを確認（theadではなくtbodyをチェック）
@@ -315,7 +315,7 @@ describe('Home Page', () => {
             render(<Home/>);
 
             await waitFor(() => {
-                expect(screen.getByText('配当金グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
             });
 
             const barButton = screen.getByRole('button', {name: '棒グラフ'});
@@ -330,7 +330,7 @@ describe('Home Page', () => {
             render(<Home/>);
 
             await waitFor(() => {
-                expect(screen.getByText('配当金グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
             });
 
             const lineButton = screen.getByRole('button', {name: '折れ線グラフ'});
@@ -351,7 +351,7 @@ describe('Home Page', () => {
             render(<Home/>);
 
             await waitFor(() => {
-                expect(screen.getByText('配当金グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
             });
 
             const barButton = screen.getByRole('button', {name: '棒グラフ'});
@@ -385,7 +385,7 @@ describe('Home Page', () => {
             render(<Home/>);
 
             await waitFor(() => {
-                expect(screen.getByText('配当金グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
             });
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）');
@@ -401,7 +401,7 @@ describe('Home Page', () => {
             render(<Home/>);
 
             await waitFor(() => {
-                expect(screen.getByText('配当金グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
             }, {timeout: 3000});
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）');
@@ -422,7 +422,7 @@ describe('Home Page', () => {
             render(<Home/>);
 
             await waitFor(() => {
-                expect(screen.getByText('配当金グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
             }, {timeout: 3000});
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）') as HTMLInputElement;
@@ -443,7 +443,7 @@ describe('Home Page', () => {
             render(<Home/>);
 
             await waitFor(() => {
-                expect(screen.getByText('配当金グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
             }, {timeout: 3000});
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）') as HTMLInputElement;
@@ -463,7 +463,7 @@ describe('Home Page', () => {
             render(<Home/>);
 
             await waitFor(() => {
-                expect(screen.getByText('配当金グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
             }, {timeout: 3000});
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）') as HTMLInputElement;
@@ -494,7 +494,7 @@ describe('Home Page', () => {
             render(<Home/>);
 
             await waitFor(() => {
-                expect(screen.getByText('配当金グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
             });
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）');
@@ -518,7 +518,7 @@ describe('Home Page', () => {
             render(<Home/>);
 
             await waitFor(() => {
-                expect(screen.getByText('配当金グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
             });
 
             expect(screen.getByTestId('responsive-container')).toBeInTheDocument();
@@ -538,7 +538,7 @@ describe('Home Page', () => {
             render(<Home/>);
 
             await waitFor(() => {
-                expect(screen.getByText('配当金グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
             });
 
             const lineButton = screen.getByRole('button', {name: '折れ線グラフ'});
@@ -558,7 +558,7 @@ describe('Home Page', () => {
             render(<Home/>);
 
             await waitFor(() => {
-                expect(screen.getByText('配当金グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
             }, {timeout: 3000});
 
             const barChart = screen.getByTestId('bar-chart');
@@ -582,8 +582,8 @@ describe('Home Page', () => {
 
             // テーブルヘッダー
             expect(screen.getByText('年')).toBeInTheDocument();
-            expect(screen.getByText('配当金合計（税引き後）[円]')).toBeInTheDocument();
-            expect(screen.getByText('月平均配当額[円]')).toBeInTheDocument();
+            expect(screen.getByText('税引後配当合計[円]')).toBeInTheDocument();
+            expect(screen.getByText('月平均配当[円]')).toBeInTheDocument();
         });
 
         it('金額がカンマ区切りでフォーマットされる', async () => {
@@ -599,7 +599,7 @@ describe('Home Page', () => {
             }, {timeout: 3000});
 
             // 年別配当金集計のヘッダーが表示されることを確認
-            expect(screen.getByText('配当金合計（税引き後）[円]')).toBeInTheDocument();
+            expect(screen.getByText('税引後配当合計[円]')).toBeInTheDocument();
         });
 
         it('月平均配当額が正しく計算される（割り切れる場合）', async () => {
@@ -716,7 +716,7 @@ describe('Home Page', () => {
             render(<Home/>);
 
             await waitFor(() => {
-                expect(screen.getByText('配当金グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
             }, {timeout: 3000});
 
             // 初期値: 10ドル * 150円 = 1,500円、月平均: floor(1,500 / 12) = 125円
@@ -745,7 +745,7 @@ describe('Home Page', () => {
             render(<Home/>);
 
             await waitFor(() => {
-                expect(screen.getByText('配当金グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
             });
 
             expect(
@@ -760,7 +760,7 @@ describe('Home Page', () => {
             render(<Home/>);
 
             await waitFor(() => {
-                expect(screen.getByText('配当金グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
             });
 
             expect(
@@ -775,7 +775,7 @@ describe('Home Page', () => {
             render(<Home/>);
 
             await waitFor(() => {
-                expect(screen.getByText('配当金グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
             });
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）');
