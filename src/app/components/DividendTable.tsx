@@ -52,7 +52,7 @@ export default function DividendTable({
                                 className={`${
                                     index % 2 === 0
                                         ? 'bg-white dark:bg-gray-800'
-                                        : 'bg-gray-50 dark:bg-gray-750'
+                                        : 'bg-gray-50 dark:bg-gray-700'
                                 } hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors`}
                             >
                                 <td
