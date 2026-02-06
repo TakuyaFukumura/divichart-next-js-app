@@ -221,7 +221,7 @@ export default function Home() {
             <div className="max-w-6xl mx-auto">
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
                     <h1 className="text-4xl font-bold mb-6 text-gray-800 dark:text-gray-200">
-                        配当金グラフ
+                        年別配当グラフ
                     </h1>
 
                     <div className="mb-6">
@@ -320,10 +320,10 @@ export default function Home() {
                                         年
                                     </th>
                                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                        配当金合計（税引き後）[円]
+                                        税引後配当合計[円]
                                     </th>
                                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                        月平均配当額[円]
+                                        月平均配当[円]
                                     </th>
                                 </tr>
                                 </thead>

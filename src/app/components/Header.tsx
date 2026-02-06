@@ -63,14 +63,14 @@ export default function Header() {
                 <div className="flex justify-between items-center h-16">
                     <div className="flex items-center gap-6">
                         <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
-                            divichart-next-js-app
+                            divichart
                         </h1>
                         <nav className="flex gap-4">
                             <Link
                                 href="/"
                                 className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                             >
-                                ホーム
+                                年別配当
                             </Link>
                         </nav>
                     </div>
