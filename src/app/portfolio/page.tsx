@@ -1,6 +1,6 @@
 'use client';
 
-import {useCallback, useEffect, useState} from 'react';
+import {Suspense, useCallback, useEffect, useState} from 'react';
 import {useRouter, useSearchParams} from 'next/navigation';
 import {loadCSV} from '@/lib/csvLoader';
 import {generateYearlyPortfolio, getAvailableYears} from '@/lib/dividendCalculator';
@@ -17,19 +17,10 @@ const envRate = process.env.NEXT_PUBLIC_USD_TO_JPY_RATE
 const USD_TO_JPY_RATE = !isNaN(envRate) && envRate > 0 ? envRate : DEFAULT_USD_TO_JPY_RATE;
 
 /**
- * 配当ポートフォリオページ
- * 
- * 指定した年の配当金を銘柄別に円グラフと表で表示する
- * 
- * @returns 配当ポートフォリオページのJSX要素
- * 
- * @remarks
- * - URLクエリパラメータで年度を指定可能（例: /portfolio?year=2026）
- * - 年度が指定されていない場合は現在年を表示
- * - データがない年の場合は最新年を表示
- * - 上位10件の銘柄を個別表示し、それ以外は「その他」として集約
+ * 配当ポートフォリオコンポーネント（内部実装）
+ * useSearchParams()を使用するため、Suspenseでラップされる必要がある
  */
-export default function PortfolioPage() {
+function PortfolioContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -160,5 +151,33 @@ export default function PortfolioPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+/**
+ * 配当ポートフォリオページ
+ * 
+ * 指定した年の配当金を銘柄別に円グラフと表で表示する
+ * 
+ * @returns 配当ポートフォリオページのJSX要素
+ * 
+ * @remarks
+ * - URLクエリパラメータで年度を指定可能（例: /portfolio?year=2026）
+ * - 年度が指定されていない場合は現在年を表示
+ * - データがない年の場合は最新年を表示
+ * - 上位10件の銘柄を個別表示し、それ以外は「その他」として集約
+ */
+export default function PortfolioPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+                <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                    <span className="ml-2 text-gray-600 dark:text-gray-400">読み込み中...</span>
+                </div>
+            </div>
+        }>
+            <PortfolioContent />
+        </Suspense>
     );
 }

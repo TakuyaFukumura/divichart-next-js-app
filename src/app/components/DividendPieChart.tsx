@@ -68,14 +68,20 @@ export default function DividendPieChart({
      * 円グラフのセグメントに銘柄名と割合を表示
      */
     const renderLabel = (entry: {
-        name: string;
-        percentage: number;
-        cx: number;
-        cy: number;
-        midAngle: number;
-        innerRadius: number;
-        outerRadius: number;
+        name?: string;
+        percentage?: number;
+        cx?: number;
+        cy?: number;
+        midAngle?: number;
+        innerRadius?: number;
+        outerRadius?: number;
     }) => {
+        // 必要なプロパティがない場合は表示しない
+        if (!entry.name || !entry.percentage || !entry.cx || !entry.cy || 
+            entry.midAngle === undefined || !entry.innerRadius || !entry.outerRadius) {
+            return null;
+        }
+
         // 割合が小さい場合は表示しない
         if (entry.percentage < 3) {
             return null;
