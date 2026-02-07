@@ -257,7 +257,7 @@ export function CustomTooltip({active, payload}: Readonly<{
     active?: boolean;
     payload?: Array<{ payload: CumulativeDividendData; value: number }>;
 }>) {
-    if (active?.valueOf() && payload?.length) {
+    if (active && payload?.length) {
         return (
             <div
                 className="bg-white dark:bg-gray-800 p-3 border border-gray-300 dark:border-gray-600 rounded shadow-lg">
