@@ -27,7 +27,7 @@
 | テーブルラッパー | `overflow-x-auto`のみ | `overflow-x-auto bg-white dark:bg-gray-800 rounded-xl shadow` |
 | ストライプ行 | なし | あり（奇数行・偶数行で背景色が交互） |
 | ホバー効果 | ホーム：なし<br>累計：`hover:bg-gray-50` | `hover:bg-blue-50 dark:hover:bg-gray-700` |
-| ボーダー | なし | `border border-gray-200 dark:border-gray-700` |
+| ボーダー | なし | なし |
 
 **問題**：テーブルの視覚的な統一感が欠けており、ユーザビリティに影響を与える可能性があります。
 
