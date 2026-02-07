@@ -12,9 +12,9 @@ import {StockDividend} from '@/types/dividend';
  */
 export default function DividendTable({
     data,
-}: {
+}: Readonly<{
     data: StockDividend[];
-}) {
+}>) {
     if (data.length === 0) {
         return (
             <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-6">
@@ -24,6 +24,16 @@ export default function DividendTable({
             </div>
         );
     }
+
+    // テーブル行の背景色を決定する関数
+    const getRowBgClass = (row: StockDividend, index: number) => {
+        if (row.stockName === 'その他') {
+            return 'bg-gray-50 dark:bg-gray-700';
+        }
+        return index % 2 === 0
+            ? 'bg-white dark:bg-gray-800'
+            : 'bg-gray-50 dark:bg-gray-700';
+    };
 
     return (
         <div className="mt-8">
@@ -52,13 +62,7 @@ export default function DividendTable({
                         {data.map((row, index) => (
                             <tr
                                 key={`${row.stockCode || 'NO_CODE'}-${row.stockName}`}
-                                className={`${
-                                    row.stockName === 'その他'
-                                        ? 'bg-gray-50 dark:bg-gray-700'
-                                        : index % 2 === 0
-                                        ? 'bg-white dark:bg-gray-800'
-                                        : 'bg-gray-50 dark:bg-gray-700'
-                                } hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors`}
+                                className={`${getRowBgClass(row, index)} hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors`}
                             >
                                 <td
                                     className={`px-6 py-4 whitespace-nowrap text-sm text-left ${
