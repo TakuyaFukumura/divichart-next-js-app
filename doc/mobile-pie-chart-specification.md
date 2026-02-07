@@ -998,5 +998,3 @@ describe('DividendPieChart - Responsive Design', () => {
 
 **ドキュメントバージョン**: 1.0  
 **最終更新日**: 2026年2月7日  
-**作成者**: GitHub Copilot  
-**承認者**: （未定）
