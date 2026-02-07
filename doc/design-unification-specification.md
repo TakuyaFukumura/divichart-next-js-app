@@ -373,15 +373,14 @@ const COLORS = [
 
 #### 7.1.3 累計配当ページのテーブル（src/app/cumulative/page.tsx）
 
-**問題点**：
-- テーブルラッパーにborderがない（統一性のため追加すべきか検討）
+**現状**：
+累計配当ページでは、テーブル自体に `border` が適用されており、他ページのテーブル表現とも整合しているため、追加の修正は不要です。
 
-**推奨修正**（オプション）：
 ```jsx
 // 現状
 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700">
 
-// この形式でborderが既に適用されている - 問題なし
+// この形式で border が既に適用されているため、そのままで問題なし
 ```
 
 ### 7.2 新規コンポーネント作成時のチェックリスト
