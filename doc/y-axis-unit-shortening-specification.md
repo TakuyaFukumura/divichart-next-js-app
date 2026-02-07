@@ -240,32 +240,16 @@ export function formatYAxisValue(value: number): string {
     const sign = value < 0 ? '-' : '';
     const absValue = Math.abs(value);
 
-    // 1万円以上の場合は万円単位で表示
+    // 1万円以上の場合は万円単位で表示（小数点なし）
     if (absValue >= 10000) {
-        const rawManValue = absValue / 10000;
-        // 小数第2位で四捨五入して1桁までに揃える
-        const manValue = Math.round(rawManValue * 10) / 10;
-
-        // 小数点以下が0の場合は整数表示、それ以外は小数点1桁表示（ただし末尾の .0 は削除）
-        if (Number.isInteger(manValue)) {
-            return `${sign}${manValue}万円`;
-        } else {
-            return `${sign}${manValue.toFixed(1).replace(/\.0$/, '')}万円`;
-        }
+        const manValue = Math.floor(absValue / 10000);
+        return `${sign}${manValue}万円`;
     }
 
-    // 1千円以上1万円未満の場合は千円単位で表示
+    // 1千円以上1万円未満の場合は千円単位で表示（小数点なし）
     if (absValue >= 1000) {
-        const rawSenValue = absValue / 1000;
-        // 小数第2位で四捨五入して1桁までに揃える
-        const senValue = Math.round(rawSenValue * 10) / 10;
-
-        // 小数点以下が0の場合は整数表示、それ以外は小数点1桁表示（ただし末尾の .0 は削除）
-        if (Number.isInteger(senValue)) {
-            return `${sign}${senValue}千円`;
-        } else {
-            return `${sign}${senValue.toFixed(1).replace(/\.0$/, '')}千円`;
-        }
+        const senValue = Math.floor(absValue / 1000);
+        return `${sign}${senValue}千円`;
     }
 
     // 1千円未満の場合は円単位で表示
@@ -408,14 +392,15 @@ Y軸表示:
 | 小額（円単位） | 500 | "500円" | 1千円未満 |
 | 境界値（千円） | 1000 | "1千円" | 1千円ちょうど |
 | 中額（千円単位） | 5000 | "5千円" | 1万円未満 |
+| 小数切り捨て（千円） | 5500 | "5千円" | 5.5千円→5千円に切り捨て |
 | 境界値（万円） | 10000 | "1万円" | 1万円ちょうど |
 | 中額（万円単位） | 50000 | "5万円" | 数万円 |
+| 小数切り捨て（万円） | 55000 | "5万円" | 5.5万円→5万円に切り捨て |
 | 大額（万円単位） | 320000 | "32万円" | 数十万円 |
 | 超大額（万円単位） | 3200000 | "320万円" | 数百万円 |
 | 超大額（万円単位） | 15000000 | "1500万円" | 千万円台 |
-| 小数点あり（千円） | 5500 | "5.5千円" | 千円単位で小数点表示 |
-| 小数点あり（万円） | 55000 | "5.5万円" | 万円単位で小数点表示 |
-| 負の値 | -5000 | "-5千円" | 負の値の処理 |
+| 負の値（千円） | -5000 | "-5千円" | 負の値の処理 |
+| 負の値（万円） | -50000 | "-5万円" | 負の値の処理 |
 
 テストファイル: `__tests__/src/lib/formatYAxisValue.test.ts`
 
@@ -431,16 +416,16 @@ describe('formatYAxisValue', () => {
         expect(formatYAxisValue(500)).toBe('500円');
     });
 
-    it('should format values from 1000 to 9999 as "N千円"', () => {
+    it('should format values from 1000 to 9999 as "N千円" (no decimal)', () => {
         expect(formatYAxisValue(1000)).toBe('1千円');
         expect(formatYAxisValue(5000)).toBe('5千円');
-        expect(formatYAxisValue(5500)).toBe('5.5千円');
+        expect(formatYAxisValue(5500)).toBe('5千円'); // 小数点なし、切り捨て
     });
 
-    it('should format values 10000 and above as "N万円"', () => {
+    it('should format values 10000 and above as "N万円" (no decimal)', () => {
         expect(formatYAxisValue(10000)).toBe('1万円');
         expect(formatYAxisValue(50000)).toBe('5万円');
-        expect(formatYAxisValue(55000)).toBe('5.5万円');
+        expect(formatYAxisValue(55000)).toBe('5万円'); // 小数点なし、切り捨て
         expect(formatYAxisValue(320000)).toBe('32万円');
         expect(formatYAxisValue(3200000)).toBe('320万円');
         expect(formatYAxisValue(15000000)).toBe('1500万円');
@@ -539,17 +524,15 @@ describe('formatYAxisValue', () => {
 
 #### 億円単位への対応
 
+**注**: 以下の拡張は現在のFR-4（y軸は「円/千円/万円」のみ）の適用範囲外です。将来的に億円単位の対応が必要になった場合は、FR-4の要件を更新した上で実装を行います。
+
 現在の配当データでは億円単位は想定されないが、将来的に対応が必要な場合は以下のように拡張可能：
 
 ```typescript
-// 1億円以上の場合は億円単位で表示
+// 1億円以上の場合は億円単位で表示（将来の拡張）
 if (value >= 100000000) {
-    const okuValue = value / 100000000;
-    if (okuValue % 1 === 0) {
-        return `${okuValue}億円`;
-    } else {
-        return `${okuValue.toFixed(1)}億円`;
-    }
+    const okuValue = Math.floor(value / 100000000);
+    return `${okuValue}億円`;
 }
 ```
 
