@@ -441,35 +441,47 @@ export default function DividendPieChart({ data }: { data: StockDividend[] }) {
 
     // ... データ処理ロジック
 
-    const renderLabel = (
-        {
-            name,
-            percentage,
-            cx,
-            cy,
-        }: {
-            name: string;
-            percentage: number;
-            cx: number;
-            cy: number;
+    const renderLabel = (entry: {
+        name?: string;
+        percentage?: number;
+        cx?: number;
+        cy?: number;
+        midAngle?: number;
+        innerRadius?: number;
+        outerRadius?: number;
+    }) => {
+        // 必要なプロパティの確認
+        if (
+            !entry.name ||
+            entry.percentage === undefined ||
+            entry.cx === undefined ||
+            entry.cy === undefined ||
+            entry.midAngle === undefined ||
+            entry.innerRadius === undefined ||
+            entry.outerRadius === undefined
+        ) {
+            return null;
         }
-    ) => {
-        if (!chartConfig.showLabels) return null;
-        if (percentage < chartConfig.labelThreshold) return null;
 
-        // ラベルを円グラフの外側に表示するシンプルな実装例
-        const offset = 16;
-        const y = cy - chartConfig.outerRadius - offset;
+        if (!chartConfig.showLabels) return null;
+        if (entry.percentage < chartConfig.labelThreshold) return null;
+
+        // 各セグメントの角度に基づいて座標を計算
+        const RADIAN = Math.PI / 180;
+        const radius = entry.innerRadius + (entry.outerRadius - entry.innerRadius) * 0.5;
+        const x = entry.cx + radius * Math.cos(-entry.midAngle * RADIAN);
+        const y = entry.cy + radius * Math.sin(-entry.midAngle * RADIAN);
 
         return (
             <text
-                x={cx}
+                x={x}
                 y={y}
-                textAnchor="middle"
+                fill="white"
+                textAnchor={x > entry.cx ? 'start' : 'end'}
                 dominantBaseline="central"
-                className={`fill-gray-800 dark:fill-gray-100 ${chartConfig.labelFontSize}`}
+                className={chartConfig.labelFontSize}
             >
-                {`${name} ${percentage.toFixed(1)}%`}
+                {`${entry.name} ${entry.percentage.toFixed(1)}%`}
             </text>
         );
     };
