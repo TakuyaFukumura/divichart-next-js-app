@@ -112,6 +112,47 @@ describe('dividendCalculator', () => {
             expect(result[0].stockCode).toBe('');
             expect(result[0].stockName).toBe('テスト投資信託');
         });
+
+        it('同一銘柄名でも銘柄コードが異なる場合は別銘柄として扱う', () => {
+            const dataWithSameName: CSVRow[] = [
+                {
+                    '入金日': '2026/01/15',
+                    '商品': '米国株式',
+                    '口座': '旧NISA',
+                    '銘柄コード': 'AAPL',
+                    '銘柄': 'Apple Inc',
+                    '受取通貨': '円',
+                    '単価[円/現地通貨]': '100',
+                    '数量[株/口]': '10',
+                    '配当・分配金合計（税引前）[円/現地通貨]': '1000',
+                    '税額合計[円/現地通貨]': '100',
+                    '受取金額[円/現地通貨]': '500',
+                },
+                {
+                    '入金日': '2026/02/15',
+                    '商品': '米国株式',
+                    '口座': '旧NISA',
+                    '銘柄コード': 'GOOGL',
+                    '銘柄': 'Apple Inc',
+                    '受取通貨': '円',
+                    '単価[円/現地通貨]': '100',
+                    '数量[株/口]': '10',
+                    '配当・分配金合計（税引前）[円/現地通貨]': '1000',
+                    '税額合計[円/現地通貨]': '100',
+                    '受取金額[円/現地通貨]': '300',
+                },
+            ];
+
+            const result = calculateStockDividends(dataWithSameName, 2026, 150);
+
+            expect(result).toHaveLength(2);
+            expect(result[0].stockCode).toBe('AAPL');
+            expect(result[0].stockName).toBe('Apple Inc');
+            expect(result[0].amount).toBe(500);
+            expect(result[1].stockCode).toBe('GOOGL');
+            expect(result[1].stockName).toBe('Apple Inc');
+            expect(result[1].amount).toBe(300);
+        });
     });
 
     describe('aggregateOthers', () => {

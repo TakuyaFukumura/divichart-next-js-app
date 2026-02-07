@@ -49,13 +49,13 @@ export default function DividendTable({
                         </tr>
                     </thead>
                     <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                        {data.map((row) => (
+                        {data.map((row, index) => (
                             <tr
                                 key={`${row.stockCode || 'NO_CODE'}-${row.stockName}`}
                                 className={`${
                                     row.stockName === 'その他'
                                         ? 'bg-gray-50 dark:bg-gray-700'
-                                        : data.indexOf(row) % 2 === 0
+                                        : index % 2 === 0
                                         ? 'bg-white dark:bg-gray-800'
                                         : 'bg-gray-50 dark:bg-gray-700'
                                 } hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors`}

@@ -41,7 +41,7 @@ export function calculateStockDividends(
 
     csvData.forEach((row) => {
         const dateStr = row['入金日'];
-        const stockCode = row['銘柄コード'] || '';
+        const stockCode = (row['銘柄コード'] || '').trim();
         const stockName = row['銘柄'];
         const currency = row['受取通貨'];
         const amountStr = row['受取金額[円/現地通貨]'];
