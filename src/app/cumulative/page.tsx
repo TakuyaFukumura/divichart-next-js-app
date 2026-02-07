@@ -4,6 +4,7 @@ import {useCallback, useEffect, useState} from 'react';
 import {CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from 'recharts';
 import {CSVRow, CumulativeDividendData} from '@/types/dividend';
 import {useDividendData} from '@/hooks/useDividendData';
+import {formatYAxisValue} from '@/lib/formatYAxisValue';
 
 // 為替レート設定（1ドル=150円）
 // 環境変数から読み込み、未設定の場合はデフォルト値を使用
@@ -172,11 +173,7 @@ export default function CumulativeDividendPage() {
                                 <YAxis
                                     tick={{fill: '#6b7280'}}
                                     className="dark:fill-gray-400"
-                                    tickFormatter={(value: number) =>
-                                        value < 1000
-                                            ? `¥${value.toLocaleString()}`
-                                            : `¥${(value / 1000).toFixed(0)}K`
-                                    }
+                                    tickFormatter={formatYAxisValue}
                                 />
                                 <Tooltip content={<CustomTooltip/>}/>
                                 <Legend
