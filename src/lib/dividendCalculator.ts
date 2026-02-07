@@ -49,12 +49,12 @@ export function calculateStockDividends(
         if (!dateStr || !stockName || !amountStr) return;
 
         // 日付から年を抽出
-        const year = parseInt(dateStr.split('/')[0], 10);
+        const year = Number.parseInt(dateStr.split('/')[0], 10);
         if (year !== targetYear) return;
 
         // 金額を数値に変換
-        const amountValue = amountStr === '-' ? 0 : parseFloat(amountStr.replace(/,/g, ''));
-        if (isNaN(amountValue)) return;
+        const amountValue = amountStr === '-' ? 0 : Number.parseFloat(amountStr.replace(/,/g, ''));
+        if (Number.isNaN(amountValue)) return;
 
         // USドルの場合は円に換算
         let amountInYen = amountValue;
@@ -174,8 +174,8 @@ export function getAvailableYears(csvData: CSVRow[]): number[] {
         const dateStr = row['入金日'];
         if (!dateStr) return;
 
-        const year = parseInt(dateStr.split('/')[0], 10);
-        if (!isNaN(year)) {
+        const year = Number.parseInt(dateStr.split('/')[0], 10);
+        if (!Number.isNaN(year)) {
             years.add(year);
         }
     });
