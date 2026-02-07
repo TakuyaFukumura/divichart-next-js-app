@@ -59,7 +59,7 @@ export default function CumulativeDividendPage() {
 
             // 金額を数値に変換（カンマを除去）
             // NOTE: CSVデータでは税額が"-"で表示されることがあり、その場合は0として扱う
-            const amountValue = amountStr === '-' ? 0 : Number.parseFloat(amountStr.replace(/,/g, ''));
+            const amountValue = amountStr === '-' ? 0 : Number.parseFloat(amountStr.replaceAll(',', ''));
             if (Number.isNaN(amountValue)) return;
 
             // USドルの場合は円に換算、円の場合はそのまま
