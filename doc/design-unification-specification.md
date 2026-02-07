@@ -178,7 +178,7 @@ const COLORS = [
 すべてのテーブルで使用する統一されたデザイン。
 
 ```jsx
-<div className="overflow-x-auto">
+<div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-xl shadow">
     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
         <thead className="bg-gray-100 dark:bg-gray-700">
             <tr>
