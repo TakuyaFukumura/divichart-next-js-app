@@ -439,7 +439,8 @@ const calculateCumulativeDividendData = (
 ```
 CumulativeDividendPage
 ├── 為替レート入力フィールド
-└── LineChart（年別＋累計の2つの折れ線）
+├── LineChart（累計配当金）
+└── 年別配当金テーブル
 ```
 
 #### `src/app/portfolio/page.tsx` - 配当ポートフォリオページ
