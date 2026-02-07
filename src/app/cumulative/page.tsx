@@ -119,39 +119,9 @@ export default function CumulativeDividendPage() {
         );
     }
 
-    /**
-     * チャート用のカスタムツールチップコンポーネント
-     * マウスホバー時に表示される配当金情報のツールチップをカスタマイズする
-     * 
-     * @param props - ツールチップのプロパティ
-     * @param props.active - ツールチップがアクティブ（表示中）かどうか
-     * @param props.payload - 表示するデータの配列
-     * @returns カスタマイズされたツールチップのJSX要素、または非表示の場合はnull
-     */
-    const CustomTooltip = ({active, payload}: {
-        active?: boolean;
-        payload?: Array<{ payload: CumulativeDividendData; value: number }>
-    }) => {
-        if (active && payload && payload.length) {
-            return (
-                <div
-                    className="bg-white dark:bg-gray-800 p-3 border border-gray-300 dark:border-gray-600 rounded shadow-lg">
-                    <p className="text-gray-800 dark:text-gray-200 font-semibold">{payload[0].payload.year}</p>
-                    <p className="text-blue-600 dark:text-blue-400">
-                        年間配当金: ¥{payload[0].payload.yearlyDividend.toLocaleString()}
-                    </p>
-                    <p className="text-blue-600 dark:text-blue-400 font-semibold">
-                        累計配当金: ¥{payload[0].value.toLocaleString()}
-                    </p>
-                </div>
-            );
-        }
-        return null;
-    };
-
     return (
         <div
-            className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-8">
+            className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-8">
             <div className="max-w-6xl mx-auto">
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
                     <h1 className="text-4xl font-bold mb-6 text-gray-800 dark:text-gray-200">
@@ -208,7 +178,7 @@ export default function CumulativeDividendPage() {
                                             : `¥${(value / 1000).toFixed(0)}K`
                                     }
                                 />
-                                <Tooltip content={<CustomTooltip/>}/>
+                                <Tooltip content={<CustomTooltip />} />
                                 <Legend
                                     wrapperStyle={{
                                         paddingTop: '20px',
@@ -274,4 +244,31 @@ export default function CumulativeDividendPage() {
             </div>
         </div>
     );
+}
+
+/**
+ * チャート用のカスタムツールチップコンポーネント
+ * マウスホバー時に表示される配当金情報のツールチップをカスタマイズする
+ * @param props - ツールチップのプロパティ
+ * @returns カスタマイズされたツールチップのJSX要素、または非表示の場合はnull
+ */
+export function CustomTooltip({active, payload}: {
+    active?: boolean;
+    payload?: Array<{ payload: CumulativeDividendData; value: number }>;
+}) {
+    if (active && payload && payload.length) {
+        return (
+            <div
+                className="bg-white dark:bg-gray-800 p-3 border border-gray-300 dark:border-gray-600 rounded shadow-lg">
+                <p className="text-gray-800 dark:text-gray-200 font-semibold">{payload[0].payload.year}</p>
+                <p className="text-blue-600 dark:text-blue-400">
+                    年間配当金: ¥{payload[0].payload.yearlyDividend.toLocaleString()}
+                </p>
+                <p className="text-blue-600 dark:text-blue-400 font-semibold">
+                    累計配当金: ¥{payload[0].value.toLocaleString()}
+                </p>
+            </div>
+        );
+    }
+    return null;
 }
