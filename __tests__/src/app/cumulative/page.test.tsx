@@ -8,7 +8,7 @@
 import React from 'react';
 import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import '@testing-library/jest-dom';
-// コンポーネントのインポートはモック定義の後に行う
+// next/jest 環境では jest.mock が巻き上げられるため、見た目上は先に import がありますが、実行時にはモック定義の後にコンポーネントが読み込まれます
 import CumulativeDividendPage from '@/app/cumulative/page';
 
 // PapaParse オプションの型定義
