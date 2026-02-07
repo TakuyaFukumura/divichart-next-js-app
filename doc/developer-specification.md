@@ -447,11 +447,13 @@ CumulativeDividendPage
 
 **責務**
 
-- CSVデータの読み込み（loadCSV関数使用）
+- CSVデータの読み込み（loadCSV関数を直接使用、useDividendDataフックは使用しない）
 - 年度選択機能の提供
 - 銘柄別配当金の集計と表示
 - 円グラフとテーブルによる可視化
 - URLクエリパラメータによる年度管理
+
+**注意**: ポートフォリオページは、メインページや累計ページと異なり、`useDividendData`フックを使用せず、`loadCSV()`関数を直接呼び出してCSVデータを読み込みます。これは、Suspenseとの互換性およびURLパラメータとの連携を最適化するためです。
 
 **主要な状態**
 
@@ -811,7 +813,9 @@ export function getAvailableYears(csvData: CSVRow[]): number[]
 
 ## 7. データフロー
 
-### 7.1 CSVデータ読み込みフロー（useDividendDataフック使用）
+### 7.1 CSVデータ読み込みフロー
+
+#### メインページ・累計ページ（useDividendDataフック使用）
 
 ```
 [ユーザーがページアクセス]
@@ -832,12 +836,45 @@ export function getAvailableYears(csvData: CSVRow[]): number[]
     ↓
 [{data: CSVRow[], loading: false, error: null} を返す]
     ↓
-[各ページで集計処理を実行]
+[ページで集計処理を実行]
     ├─ [メインページ] calculateDividendData()
-    ├─ [累計ページ] calculateCumulativeDividendData()
-    └─ [ポートフォリオページ] generateYearlyPortfolio()
+    └─ [累計ページ] calculateCumulativeDividendData()
     ↓
 [グラフ・テーブル描画]
+```
+
+#### ポートフォリオページ（loadCSV直接呼び出し）
+
+```
+[ユーザーがページアクセス]
+    ↓
+[PortfolioContent コンポーネント マウント]
+    ↓
+[useEffect: CSVデータ読み込み]
+    ↓
+[loadCSV('/data/dividendlist_20260205.csv')]
+    ↓
+[fetch でCSVファイル取得]
+    ↓
+[arrayBuffer取得]
+    ↓
+[TextDecoder('shift-jis')でデコード]
+    ↓
+[PapaParse.parse()]
+    ↓
+[setRawData(CSVRow[])]
+    ↓
+[getAvailableYears(data)]
+    ↓
+[setAvailableYears(years)]
+    ↓
+[URLパラメータから年度を取得]
+    ↓
+[generateYearlyPortfolio(rawData, currentYear, exchangeRate)]
+    ↓
+[setPortfolioData(portfolio)]
+    ↓
+[円グラフ・テーブル描画]
 ```
 
 ### 7.2 為替レート変更フロー
