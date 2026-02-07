@@ -16,12 +16,12 @@ const USD_TO_JPY_RATE = !Number.isNaN(envRate) && envRate > 0 ? envRate : DEFAUL
 /**
  * 累計配当グラフページコンポーネント
  * 配当金データをCSVファイルから読み込み、年別に累計して表示する
- * 
+ *
  * @remarks
  * - CSVファイルはShift-JISエンコーディングで保存されている
  * - USドル建ての配当金は設定した為替レートで円換算される
  * - グラフは折れ線グラフで累計配当金を表示する
- * 
+ *
  * @returns 累計配当グラフアプリケーションのページ
  */
 export default function CumulativeDividendPage() {
@@ -32,11 +32,11 @@ export default function CumulativeDividendPage() {
 
     /**
      * CSVデータから累計配当金データを計算する関数
-     * 
+     *
      * @param csvData - CSVファイルから読み込まれた配当金データの配列
      * @param exchangeRate - USドルから円への為替レート
      * @returns 年別に集計された累計配当金データの配列（年でソート済み）
-     * 
+     *
      * @remarks
      * - USドル建ての配当金は為替レートを使用して円に換算される
      * - 配当金額が"-"の場合は0として扱われる（税額表示用）
@@ -178,7 +178,7 @@ export default function CumulativeDividendPage() {
                                             : `¥${(value / 1000).toFixed(0)}K`
                                     }
                                 />
-                                <Tooltip content={<CustomTooltip />} />
+                                <Tooltip content={<CustomTooltip/>}/>
                                 <Legend
                                     wrapperStyle={{
                                         paddingTop: '20px',
@@ -217,7 +217,8 @@ export default function CumulativeDividendPage() {
                                     </th>
                                 </tr>
                                 </thead>
-                                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                <tbody
+                                    className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                 {data.map((item) => (
                                     <tr key={item.year} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-100">

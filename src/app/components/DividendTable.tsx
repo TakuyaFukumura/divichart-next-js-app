@@ -4,15 +4,15 @@ import {StockDividend} from '@/types/dividend';
 
 /**
  * 配当テーブルコンポーネント
- * 
+ *
  * 銘柄別の配当金を表形式で表示する
- * 
+ *
  * @param props - コンポーネントのプロパティ
  * @param props.data - 銘柄別配当データ
  */
 export default function DividendTable({
-    data,
-}: Readonly<{
+                                          data,
+                                      }: Readonly<{
     data: StockDividend[];
 }>) {
     if (data.length === 0) {
@@ -43,67 +43,67 @@ export default function DividendTable({
             <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-xl shadow">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead className="bg-gray-100 dark:bg-gray-700">
-                        <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                銘柄コード
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                銘柄名
-                            </th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                配当金額[円]
-                            </th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                割合[%]
-                            </th>
-                        </tr>
+                    <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                            銘柄コード
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                            銘柄名
+                        </th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                            配当金額[円]
+                        </th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                            割合[%]
+                        </th>
+                    </tr>
                     </thead>
                     <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                        {data.map((row, index) => (
-                            <tr
-                                key={`${row.stockCode || 'NO_CODE'}-${row.stockName}`}
-                                className={`${getRowBgClass(row, index)} hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors`}
+                    {data.map((row, index) => (
+                        <tr
+                            key={`${row.stockCode || 'NO_CODE'}-${row.stockName}`}
+                            className={`${getRowBgClass(row, index)} hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors`}
+                        >
+                            <td
+                                className={`px-6 py-4 whitespace-nowrap text-sm text-left ${
+                                    row.stockCode
+                                        ? 'font-medium text-gray-900 dark:text-gray-300'
+                                        : 'text-gray-500 dark:text-gray-500'
+                                } ${row.stockName === 'その他' ? 'italic' : ''}`}
                             >
-                                <td
-                                    className={`px-6 py-4 whitespace-nowrap text-sm text-left ${
-                                        row.stockCode
-                                            ? 'font-medium text-gray-900 dark:text-gray-300'
-                                            : 'text-gray-500 dark:text-gray-500'
-                                    } ${row.stockName === 'その他' ? 'italic' : ''}`}
-                                >
-                                    {row.stockCode || '-'}
-                                </td>
-                                <td
-                                    className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 ${
-                                        row.stockName === 'その他' ? 'italic font-medium' : ''
-                                    }`}
-                                >
-                                    {row.stockName}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right font-mono">
-                                    ¥{row.amount.toLocaleString()}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right font-mono">
-                                    {row.percentage.toFixed(1)}%
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                    <tfoot className="bg-gray-100 dark:bg-gray-700">
-                        <tr>
-                            {/* 銘柄コードと銘柄名の2列を結合 */}
-                            <td className="px-6 py-4 text-sm font-bold text-gray-900 dark:text-gray-200" colSpan={2}>
-                                合計
+                                {row.stockCode || '-'}
                             </td>
-                            <td className="px-6 py-4 text-sm font-bold text-gray-900 dark:text-gray-200 text-right font-mono">
-                                ¥{data.reduce((sum, row) => sum + row.amount, 0).toLocaleString()}
+                            <td
+                                className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 ${
+                                    row.stockName === 'その他' ? 'italic font-medium' : ''
+                                }`}
+                            >
+                                {row.stockName}
                             </td>
-                            <td className="px-6 py-4 text-sm font-bold text-gray-900 dark:text-gray-200 text-right font-mono">
-                                {data.length > 0 
-                                    ? data.reduce((sum, row) => sum + row.percentage, 0).toFixed(1) + '%'
-                                    : '-'}
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right font-mono">
+                                ¥{row.amount.toLocaleString()}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right font-mono">
+                                {row.percentage.toFixed(1)}%
                             </td>
                         </tr>
+                    ))}
+                    </tbody>
+                    <tfoot className="bg-gray-100 dark:bg-gray-700">
+                    <tr>
+                        {/* 銘柄コードと銘柄名の2列を結合 */}
+                        <td className="px-6 py-4 text-sm font-bold text-gray-900 dark:text-gray-200" colSpan={2}>
+                            合計
+                        </td>
+                        <td className="px-6 py-4 text-sm font-bold text-gray-900 dark:text-gray-200 text-right font-mono">
+                            ¥{data.reduce((sum, row) => sum + row.amount, 0).toLocaleString()}
+                        </td>
+                        <td className="px-6 py-4 text-sm font-bold text-gray-900 dark:text-gray-200 text-right font-mono">
+                            {data.length > 0
+                                ? data.reduce((sum, row) => sum + row.percentage, 0).toFixed(1) + '%'
+                                : '-'}
+                        </td>
+                    </tr>
                     </tfoot>
                 </table>
             </div>

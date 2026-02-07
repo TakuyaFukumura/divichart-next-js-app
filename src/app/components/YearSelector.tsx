@@ -2,19 +2,19 @@
 
 /**
  * 年度選択コンポーネント
- * 
+ *
  * 年度の表示と前年・次年への切り替えボタンを提供する
- * 
+ *
  * @param props - コンポーネントのプロパティ
  * @param props.currentYear - 現在表示中の年
  * @param props.availableYears - 利用可能な年のリスト
  * @param props.onYearChangeAction - 年度変更時のコールバック関数
  */
 export default function YearSelector({
-    currentYear,
-    availableYears,
-    onYearChangeAction,
-}: {
+                                         currentYear,
+                                         availableYears,
+                                         onYearChangeAction,
+                                     }: {
     readonly currentYear: number;
     readonly availableYears: number[];
     readonly onYearChangeAction: (year: number) => void;

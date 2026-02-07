@@ -69,7 +69,7 @@ describe('RootLayout', () => {
 
             const provider = screen.getByTestId('dark-mode-provider');
             const childContent = screen.getByTestId('child-content');
-            
+
             expect(provider).toContainElement(childContent);
         });
     });
@@ -94,7 +94,7 @@ describe('RootLayout', () => {
 
             const provider = screen.getByTestId('dark-mode-provider');
             const header = screen.getByTestId('header');
-            
+
             expect(provider).toContainElement(header);
         });
     });
@@ -136,7 +136,7 @@ describe('RootLayout', () => {
 
             const provider = screen.getByTestId('dark-mode-provider');
             const children = Array.from(provider.children);
-            
+
             // 最初の子要素がHeader、2番目が子コンポーネント
             expect(children[0]).toBe(screen.getByTestId('header'));
             expect(children[1]).toBe(screen.getByTestId('test-child'));

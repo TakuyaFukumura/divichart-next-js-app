@@ -27,12 +27,12 @@ const USD_TO_JPY_RATE = !isNaN(envRate) && envRate > 0 ? envRate : DEFAULT_USD_T
 /**
  * ホームページコンポーネント
  * 配当金データをCSVファイルから読み込み、年別に集計してグラフと表で表示する
- * 
+ *
  * @remarks
  * - CSVファイルはShift-JISエンコーディングで保存されている
  * - USドル建ての配当金は設定した為替レートで円換算される
  * - グラフは棒グラフで表示される
- * 
+ *
  * @returns 配当金グラフアプリケーションのメインページ
  */
 export default function Home() {
@@ -43,11 +43,11 @@ export default function Home() {
 
     /**
      * CSVデータから年別配当金データを計算する関数
-     * 
+     *
      * @param csvData - CSVファイルから読み込まれた配当金データの配列
      * @param exchangeRate - USドルから円への為替レート
      * @returns 年別に集計された配当金データの配列（年でソート済み）
-     * 
+     *
      * @remarks
      * - USドル建ての配当金は為替レートを使用して円に換算される
      * - 配当金額が"-"の場合は0として扱われる（税額表示用）
@@ -126,7 +126,7 @@ export default function Home() {
     /**
      * チャート用のカスタムツールチップコンポーネント
      * マウスホバー時に表示される配当金情報のツールチップをカスタマイズする
-     * 
+     *
      * @param props - ツールチップのプロパティ
      * @param props.active - ツールチップがアクティブ（表示中）かどうか
      * @param props.payload - 表示するデータの配列
@@ -225,7 +225,8 @@ export default function Home() {
                                 <tbody
                                     className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                 {data.map((row) => (
-                                    <tr key={row.year} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                    <tr key={row.year}
+                                        className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right">
                                             {row.year}
                                         </td>

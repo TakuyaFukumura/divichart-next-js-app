@@ -8,14 +8,26 @@
 import React from 'react';
 import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import '@testing-library/jest-dom';
+// コンポーネントのインポートはモック定義の後に行う
+import Home from '@/app/page';
 
 // PapaParse のモック - モジュール読み込み前に定義
 const mockPapaParse = jest.fn();
 jest.mock('papaparse', () => ({
     default: {
-        parse: (csvText: string, options: { header: boolean; skipEmptyLines: boolean; complete: (results: { data: unknown[] }) => void; error?: (error: Error) => void }) => mockPapaParse(csvText, options),
+        parse: (csvText: string, options: {
+            header: boolean;
+            skipEmptyLines: boolean;
+            complete: (results: { data: unknown[] }) => void;
+            error?: (error: Error) => void
+        }) => mockPapaParse(csvText, options),
     },
-    parse: (csvText: string, options: { header: boolean; skipEmptyLines: boolean; complete: (results: { data: unknown[] }) => void; error?: (error: Error) => void }) => mockPapaParse(csvText, options),
+    parse: (csvText: string, options: {
+        header: boolean;
+        skipEmptyLines: boolean;
+        complete: (results: { data: unknown[] }) => void;
+        error?: (error: Error) => void
+    }) => mockPapaParse(csvText, options),
 }));
 
 // Rechartsコンポーネントのモック（実際のレンダリングは重いため）
@@ -42,9 +54,6 @@ jest.mock('recharts', () => ({
     Line: () => <div data-testid="line"/>,
 }));
 
-// コンポーネントのインポートはモック定義の後に行う
-import Home from '@/app/page';
-
 // グローバルfetchのモック
 const mockFetch = jest.fn();
 global.fetch = mockFetch as jest.Mock;
@@ -69,10 +78,15 @@ const getParsedCSV = () => [
 
 // PapaParse モックの実装
 const setupPapaParseMock = () => {
-    mockPapaParse.mockImplementation((text: string, options: { header: boolean; skipEmptyLines: boolean; complete: (results: { data: unknown[] }) => void; error?: (error: Error) => void }) => {
+    mockPapaParse.mockImplementation((text: string, options: {
+        header: boolean;
+        skipEmptyLines: boolean;
+        complete: (results: { data: unknown[] }) => void;
+        error?: (error: Error) => void
+    }) => {
         setTimeout(() => {
             let data: Array<Record<string, string>> = [];
-            
+
             // CSVテキスト（text）の内容に基づいてモック用のパース結果データを返す
             // より長い/特定的なパターンを先にチェック（部分一致を避けるため）
             if (text.includes('2023/01/15') && text.includes('2024')) {
@@ -128,7 +142,7 @@ const setupPapaParseMock = () => {
                     {'入金日': '2023/06/15', '受取通貨': '円', '受取金額[円/現地通貨]': '-'},
                 ];
             }
-            
+
             options.complete({data});
         }, 0);
     });
@@ -138,9 +152,9 @@ const setupPapaParseMock = () => {
 const mockFetchSuccess = (csvContent: string) => {
     const encoder = new TextEncoder();
     const arrayBuffer = encoder.encode(csvContent).buffer;
-    
+
     setupPapaParseMock();
-    
+
     mockFetch.mockResolvedValueOnce({
         ok: true,
         arrayBuffer: () => Promise.resolve(arrayBuffer),
@@ -163,18 +177,20 @@ describe('Home Page', () => {
     describe('ローディング状態', () => {
         it('初期ローディング時にローディングメッセージが表示される', () => {
             // fetchをペンディング状態にする
-            mockFetch.mockImplementation(() => new Promise(() => {}));
-            
+            mockFetch.mockImplementation(() => new Promise(() => {
+            }));
+
             render(<Home/>);
-            
+
             expect(screen.getByText('読み込み中...')).toBeInTheDocument();
         });
 
         it('ローディング中はスピナーが表示される', () => {
-            mockFetch.mockImplementation(() => new Promise(() => {}));
-            
+            mockFetch.mockImplementation(() => new Promise(() => {
+            }));
+
             const {container} = render(<Home/>);
-            
+
             const spinner = container.querySelector('.animate-spin');
             expect(spinner).toBeInTheDocument();
         });
@@ -237,7 +253,7 @@ describe('Home Page', () => {
             await waitFor(() => {
                 // 2023年: 1,000 + 2,000 = 3,000円
                 expect(screen.getByText('¥3,000')).toBeInTheDocument();
-                
+
                 // 2024年: 3,000円 + (10ドル * 150) + (20ドル * 150) = 3,000 + 1,500 + 3,000 = 7,500円
                 expect(screen.getByText('¥7,500')).toBeInTheDocument();
             });
@@ -335,7 +351,7 @@ describe('Home Page', () => {
             }, {timeout: 3000});
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）');
-            
+
             act(() => {
                 fireEvent.change(input, {target: {value: '200'}});
             });
@@ -356,7 +372,7 @@ describe('Home Page', () => {
             }, {timeout: 3000});
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）') as HTMLInputElement;
-            
+
             act(() => {
                 fireEvent.change(input, {target: {value: '-100'}});
             });
@@ -377,7 +393,7 @@ describe('Home Page', () => {
             }, {timeout: 3000});
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）') as HTMLInputElement;
-            
+
             act(() => {
                 fireEvent.change(input, {target: {value: '0'}});
             });
@@ -397,10 +413,10 @@ describe('Home Page', () => {
             }, {timeout: 3000});
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）') as HTMLInputElement;
-            
+
             // 元の有効な値を記録
             const initialValue = input.value;
-            
+
             // 空の値を設定（数値入力フィールドで無効な入力をシミュレート）
             act(() => {
                 fireEvent.change(input, {target: {value: ''}});
@@ -428,7 +444,7 @@ describe('Home Page', () => {
             });
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）');
-            
+
             act(() => {
                 fireEvent.change(input, {target: {value: '155.5'}});
             });
@@ -473,7 +489,7 @@ describe('Home Page', () => {
 
             const barChart = screen.getByTestId('bar-chart');
             const chartData = JSON.parse(barChart.getAttribute('data-chart-data') || '[]');
-            
+
             // データが配列であることを確認（具体的な値は CSVのパースに依存するため確認しない）
             expect(Array.isArray(chartData)).toBe(true);
         });
@@ -635,7 +651,7 @@ describe('Home Page', () => {
             });
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）');
-            
+
             act(() => {
                 fireEvent.change(input, {target: {value: '200'}});
             });
@@ -689,7 +705,7 @@ describe('Home Page', () => {
             });
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）');
-            
+
             act(() => {
                 fireEvent.change(input, {target: {value: '200'}});
             });

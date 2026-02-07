@@ -16,11 +16,11 @@ export const metadata: Metadata = {
 /**
  * ルートレイアウトコンポーネント
  * アプリケーション全体の共通レイアウトを定義する
- * 
+ *
  * @param props - レイアウトのプロパティ
  * @param props.children - 子要素として表示されるページコンテンツ
  * @returns アプリケーション全体のレイアウト構造
- * 
+ *
  * @remarks
  * - DarkModeProviderでダークモード機能を提供
  * - Headerコンポーネントで共通のヘッダーを表示

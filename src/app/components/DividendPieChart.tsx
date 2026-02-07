@@ -5,9 +5,9 @@ import {StockDividend} from '@/types/dividend';
 
 /**
  * 配当円グラフコンポーネント
- * 
+ *
  * 銘柄別の配当金を円グラフで表示する
- * 
+ *
  * @param props - コンポーネントのプロパティ
  * @param props.data - 銘柄別配当データ
  */
@@ -21,10 +21,12 @@ interface CustomTooltipProps {
         payload: { percentage: number };
     }>;
 }
-export const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
+
+export const CustomTooltip = ({active, payload}: CustomTooltipProps) => {
     if (active && payload?.length) {
         return (
-            <div className="bg-white dark:bg-gray-800 p-3 border border-gray-300 dark:border-gray-600 rounded shadow-lg">
+            <div
+                className="bg-white dark:bg-gray-800 p-3 border border-gray-300 dark:border-gray-600 rounded shadow-lg">
                 <p className="text-gray-800 dark:text-gray-200 font-semibold">
                     {payload[0].name}
                 </p>
@@ -45,8 +47,8 @@ interface DividendPieChartProps {
 }
 
 export default function DividendPieChart({
-    data,
-}: DividendPieChartProps) {
+                                             data,
+                                         }: DividendPieChartProps) {
     // Rechartsのデフォルトカラーパレット
     const COLORS = [
         '#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8',
@@ -139,8 +141,8 @@ export default function DividendPieChart({
                         // Cellは非推奨なのでfillプロパティをデータに持たせる
                         // Pieコンポーネントがfillプロパティを参照する
                     />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Legend />
+                    <Tooltip content={<CustomTooltip/>}/>
+                    <Legend/>
                 </PieChart>
             </ResponsiveContainer>
         </div>

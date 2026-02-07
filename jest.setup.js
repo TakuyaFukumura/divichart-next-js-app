@@ -1,7 +1,7 @@
 /**
  * Jest用のセットアップファイル
  * Jestテストランナーのグローバル設定とモックを定義する
- * 
+ *
  * @remarks
  * - @testing-library/jest-domをインポートしてDOM操作用のマッチャーを提供
  * - TextEncoder/TextDecoderをグローバルに設定（Node.js環境用）

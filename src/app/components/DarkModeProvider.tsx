@@ -30,11 +30,11 @@ const DarkModeContext = createContext<DarkModeContextType | undefined>(undefined
 /**
  * ダークモードプロバイダーコンポーネント
  * アプリケーション全体にダークモード機能を提供する
- * 
+ *
  * @param props - プロバイダーのプロパティ
  * @param props.children - 子要素として表示されるコンポーネント
  * @returns ダークモード機能を提供するコンテキストプロバイダー
- * 
+ *
  * @remarks
  * - テーマ設定はlocalStorageに永続化される
  * - HTMLルート要素にdarkクラスを追加/削除してTailwind CSSのダークモードを制御
@@ -87,10 +87,10 @@ export function DarkModeProvider({children}: { readonly children: ReactNode }) {
 /**
  * ダークモードカスタムフック
  * ダークモードの状態と操作機能にアクセスするためのフック
- * 
+ *
  * @returns ダークモードのコンテキスト値（theme, setTheme, isDark）
  * @throws {Error} DarkModeProviderの外で使用された場合にエラーをスロー
- * 
+ *
  * @example
  * ```tsx
  * const { theme, setTheme, isDark } = useDarkMode();

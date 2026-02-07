@@ -4,10 +4,10 @@ import {loadCSV} from '@/lib/csvLoader';
 
 /**
  * 配当金データの読み込み状態を管理するカスタムフック
- * 
+ *
  * @param csvFilePath - CSVファイルのパス（デフォルト: '/data/dividendlist_20260205.csv'）
  * @returns 配当金データ、ローディング状態、エラー情報
- * 
+ *
  * @remarks
  * - CSVファイルは初回マウント時のみ読み込まれる
  * - CSVファイルはShift-JISエンコーディングで保存されている想定

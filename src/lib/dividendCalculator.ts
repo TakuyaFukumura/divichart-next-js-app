@@ -2,11 +2,11 @@ import {CSVRow, StockDividend, YearlyPortfolio} from '@/types/dividend';
 
 /**
  * 銘柄を一意に識別するためのキーを生成
- * 
+ *
  * @param stockCode - 銘柄コード
  * @param stockName - 銘柄名
  * @returns 一意な識別キー
- * 
+ *
  * @remarks
  * - 銘柄コードがある場合: "{銘柄コード}:{銘柄名}"
  * - 銘柄コードがない場合: "NO_CODE:{銘柄名}"
@@ -19,12 +19,12 @@ function generateStockKey(stockCode: string, stockName: string): string {
 
 /**
  * 指定年の銘柄別配当金を集計する
- * 
+ *
  * @param csvData - CSVから読み込んだ配当データ
  * @param targetYear - 集計対象年
  * @param exchangeRate - USドル→円の為替レート
  * @returns 銘柄別配当データの配列（降順ソート済み）
- * 
+ *
  * @remarks
  * - 同一銘柄（銘柄コード+銘柄名）の配当金を合算する
  * - USドル建ては為替換算する
@@ -97,11 +97,11 @@ export function calculateStockDividends(
 
 /**
  * 上位N件以外を「その他」に集約
- * 
+ *
  * @param stocks - 銘柄別配当データ（ソート済み）
  * @param topN - 個別表示する銘柄数（デフォルト: 10）
  * @returns 「その他」集約後の銘柄別配当データ
- * 
+ *
  * @remarks
  * - 銘柄数がtopN以下の場合は集約しない
  * - 「その他」は銘柄コードなし（空文字列）
@@ -137,7 +137,7 @@ export function aggregateOthers(
 
 /**
  * 年度別配当ポートフォリオデータを生成
- * 
+ *
  * @param csvData - CSVから読み込んだ配当データ
  * @param targetYear - 対象年
  * @param exchangeRate - USドル→円の為替レート
@@ -163,7 +163,7 @@ export function generateYearlyPortfolio(
 
 /**
  * 利用可能な年のリストを取得
- * 
+ *
  * @param csvData - CSVから読み込んだ配当データ
  * @returns 配当データが存在する年のリスト（昇順ソート済み）
  */
