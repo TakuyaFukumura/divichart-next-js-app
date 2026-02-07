@@ -8,16 +8,16 @@
  * @param props - コンポーネントのプロパティ
  * @param props.currentYear - 現在表示中の年
  * @param props.availableYears - 利用可能な年のリスト
- * @param props.onYearChange - 年度変更時のコールバック関数
+ * @param props.onYearChangeAction - 年度変更時のコールバック関数
  */
 export default function YearSelector({
     currentYear,
     availableYears,
-    onYearChange,
+    onYearChangeAction,
 }: {
-    currentYear: number;
-    availableYears: number[];
-    onYearChange: (year: number) => void;
+    readonly currentYear: number;
+    readonly availableYears: number[];
+    readonly onYearChangeAction: (year: number) => void;
 }) {
     const currentIndex = availableYears.indexOf(currentYear);
     const hasPrevYear = currentIndex > 0;
@@ -25,13 +25,13 @@ export default function YearSelector({
 
     const handlePrevYear = () => {
         if (hasPrevYear) {
-            onYearChange(availableYears[currentIndex - 1]);
+            onYearChangeAction(availableYears[currentIndex - 1]);
         }
     };
 
     const handleNextYear = () => {
         if (hasNextYear) {
-            onYearChange(availableYears[currentIndex + 1]);
+            onYearChangeAction(availableYears[currentIndex + 1]);
         }
     };
 
@@ -49,7 +49,7 @@ export default function YearSelector({
             >
                 &lt; 前年
             </button>
-            <div className="text-2xl font-bold text-gray-800 dark:text-gray-200 min-w-[120px] text-center">
+            <div className="text-2xl font-bold text-gray-800 dark:text-gray-200 min-w-30 text-center">
                 {currentYear}年
             </div>
             <button

@@ -131,7 +131,7 @@ function PortfolioContent() {
                     <YearSelector
                         currentYear={currentYear}
                         availableYears={availableYears}
-                        onYearChange={handleYearChange}
+                        onYearChangeAction={handleYearChange}
                     />
 
                     {portfolioData && (
