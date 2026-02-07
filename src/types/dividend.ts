@@ -38,6 +38,8 @@ export type CSVRow = {
  * 銘柄別配当データ
  */
 export type StockDividend = {
+    /** 銘柄コード（ティッカーシンボル等、空の場合は空文字列） */
+    stockCode: string;
     /** 銘柄名 */
     stockName: string;
     /** 配当金額（税引き後）[円] */
