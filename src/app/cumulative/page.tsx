@@ -1,7 +1,6 @@
 'use client';
 
 import {useCallback, useEffect, useState} from 'react';
-import Papa from 'papaparse';
 import {
     CartesianGrid,
     Legend,
@@ -13,6 +12,7 @@ import {
     YAxis
 } from 'recharts';
 import {CSVRow, CumulativeDividendData} from '@/types/dividend';
+import {useDividendData} from '@/hooks/useDividendData';
 
 // 為替レート設定（1ドル=150円）
 // 環境変数から読み込み、未設定の場合はデフォルト値を使用
@@ -34,12 +34,10 @@ const USD_TO_JPY_RATE = !isNaN(envRate) && envRate > 0 ? envRate : DEFAULT_USD_T
  * @returns 累計配当グラフアプリケーションのページ
  */
 export default function CumulativeDividendPage() {
+    const {data: rawData, loading, error} = useDividendData();
     const [data, setData] = useState<CumulativeDividendData[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
     const [usdToJpyRate, setUsdToJpyRate] = useState<number>(USD_TO_JPY_RATE);
     const [inputValue, setInputValue] = useState<string>(String(USD_TO_JPY_RATE));
-    const [rawData, setRawData] = useState<CSVRow[]>([]);
 
     /**
      * CSVデータから累計配当金データを計算する関数
@@ -99,41 +97,6 @@ export default function CumulativeDividendPage() {
         });
 
         return cumulativeData;
-    }, []);
-
-    useEffect(() => {
-        const loadCSV = async () => {
-            try {
-                const response = await fetch('/data/dividendlist_20260205.csv');
-                if (!response.ok) {
-                    throw new Error('CSVファイルの読み込みに失敗しました');
-                }
-
-                // SHIFT_JIS エンコーディングを処理するため、arrayBufferとして取得
-                const arrayBuffer = await response.arrayBuffer();
-                const decoder = new TextDecoder('shift-jis');
-                const csvText = decoder.decode(arrayBuffer);
-
-                Papa.parse<CSVRow>(csvText, {
-                    header: true,
-                    skipEmptyLines: true,
-                    complete: (results) => {
-                        setRawData(results.data);
-                        setLoading(false);
-                    },
-                    error: (error: Error) => {
-                        setError(error.message);
-                        setLoading(false);
-                    },
-                });
-            } catch (err) {
-                setError(err instanceof Error ? err.message : '予期しないエラーが発生しました');
-                setLoading(false);
-            }
-        };
-
-        loadCSV();
-        // CSVは初回マウント時のみ読み込む
     }, []);
 
     // 為替レートが変更されたときにデータを再計算

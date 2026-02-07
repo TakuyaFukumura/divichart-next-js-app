@@ -1,7 +1,6 @@
 'use client';
 
 import {useCallback, useEffect, useState} from 'react';
-import Papa from 'papaparse';
 import {
     Bar,
     BarChart,
@@ -12,6 +11,8 @@ import {
     XAxis,
     YAxis
 } from 'recharts';
+import {useDividendData} from '@/hooks/useDividendData';
+import {CSVRow} from '@/types/dividend';
 
 /**
  * 配当金データの型定義
@@ -22,19 +23,6 @@ type DividendData = {
     year: string;
     /** 年間配当金合計（税引き後）[円] */
     totalDividend: number;
-};
-
-/**
- * CSVファイルの行データ型定義
- * 配当金リストのCSVファイルから読み込まれるデータの形式
- */
-type CSVRow = {
-    /** 入金日（YYYY/MM/DD形式） */
-    '入金日': string;
-    /** 受取通貨（例: "円", "USドル"） */
-    '受取通貨': string;
-    /** 受取金額（現地通貨）の文字列表現 */
-    '受取金額[円/現地通貨]': string;
 };
 
 // 為替レート設定（1ドル=150円）
@@ -57,12 +45,10 @@ const USD_TO_JPY_RATE = !isNaN(envRate) && envRate > 0 ? envRate : DEFAULT_USD_T
  * @returns 配当金グラフアプリケーションのメインページ
  */
 export default function Home() {
+    const {data: rawData, loading, error} = useDividendData();
     const [data, setData] = useState<DividendData[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
     const [usdToJpyRate, setUsdToJpyRate] = useState<number>(USD_TO_JPY_RATE);
     const [inputValue, setInputValue] = useState<string>(String(USD_TO_JPY_RATE));
-    const [rawData, setRawData] = useState<CSVRow[]>([]);
 
     /**
      * CSVデータから年別配当金データを計算する関数
@@ -115,41 +101,6 @@ export default function Home() {
             }));
 
         return chartData;
-    }, []);
-
-    useEffect(() => {
-        const loadCSV = async () => {
-            try {
-                const response = await fetch('/data/dividendlist_20260205.csv');
-                if (!response.ok) {
-                    throw new Error('CSVファイルの読み込みに失敗しました');
-                }
-
-                // SHIFT_JIS エンコーディングを処理するため、arrayBufferとして取得
-                const arrayBuffer = await response.arrayBuffer();
-                const decoder = new TextDecoder('shift-jis');
-                const csvText = decoder.decode(arrayBuffer);
-
-                Papa.parse<CSVRow>(csvText, {
-                    header: true,
-                    skipEmptyLines: true,
-                    complete: (results) => {
-                        setRawData(results.data);
-                        setLoading(false);
-                    },
-                    error: (error: Error) => {
-                        setError(error.message);
-                        setLoading(false);
-                    },
-                });
-            } catch (err) {
-                setError(err instanceof Error ? err.message : '予期しないエラーが発生しました');
-                setLoading(false);
-            }
-        };
-
-        loadCSV();
-        // CSVは初回マウント時のみ読み込む
     }, []);
 
     // 為替レートが変更されたときにデータを再計算

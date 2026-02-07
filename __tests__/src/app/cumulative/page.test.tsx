@@ -177,4 +177,97 @@ describe('CumulativeDividendPage', () => {
             expect(screen.getByText(/このグラフは、配当金データから年別に税引き後の配当金を累計して表示しています。/)).toBeInTheDocument();
         });
     });
+
+    test('CSV読み込み時のHTTPエラー（response.ok=false）が適切に処理される', async () => {
+        mockFetch.mockResolvedValueOnce({
+            ok: false,
+            status: 404,
+            arrayBuffer: async () => new ArrayBuffer(0),
+        });
+
+        render(<CumulativeDividendPage/>);
+
+        await waitFor(() => {
+            expect(screen.getByText(/エラー:/)).toBeInTheDocument();
+            expect(screen.getByText(/CSVファイルの読み込みに失敗しました/)).toBeInTheDocument();
+        });
+    });
+
+    test('Papa.parseのerrorコールバックが呼ばれた場合にエラーが表示される', async () => {
+        mockPapaParse.mockImplementation((text: string, options: PapaParseOptions) => {
+            setTimeout(() => {
+                if (options.error) {
+                    options.error(new Error('CSV解析エラー'));
+                }
+            }, 0);
+        });
+
+        render(<CumulativeDividendPage/>);
+
+        await waitFor(() => {
+            expect(screen.getByText(/エラー:/)).toBeInTheDocument();
+            expect(screen.getByText(/CSV解析エラー/)).toBeInTheDocument();
+        });
+    });
+
+    test('無効な配当金額（"-"）が0として処理される', async () => {
+        mockPapaParse.mockImplementation((text: string, options: PapaParseOptions) => {
+            setTimeout(() => {
+                const data = [
+                    {'入金日': '2020/01/15', '受取通貨': '円', '受取金額[円/現地通貨]': '-'},
+                    {'入金日': '2020/06/15', '受取通貨': '円', '受取金額[円/現地通貨]': '10000'},
+                ];
+                options.complete({data});
+            }, 0);
+        });
+
+        render(<CumulativeDividendPage/>);
+
+        await waitFor(() => {
+            // "-" は0として扱われるので、累計は10000のみ
+            const values = screen.getAllByText('¥10,000');
+            expect(values.length).toBeGreaterThan(0);
+        });
+    });
+
+    test('無効な行（必須フィールド欠損）がスキップされる', async () => {
+        mockPapaParse.mockImplementation((text: string, options: PapaParseOptions) => {
+            setTimeout(() => {
+                const data = [
+                    {'入金日': '', '受取通貨': '円', '受取金額[円/現地通貨]': '10000'}, // 入金日が空
+                    {'入金日': '2020/06/15', '受取通貨': '円', '受取金額[円/現地通貨]': ''}, // 金額が空
+                    {'入金日': '2020/06/15', '受取通貨': '円', '受取金額[円/現地通貨]': '15000'}, // 正常
+                ];
+                options.complete({data});
+            }, 0);
+        });
+
+        render(<CumulativeDividendPage/>);
+
+        await waitFor(() => {
+            // 正常な行のみが処理される
+            const values = screen.getAllByText('¥15,000');
+            expect(values.length).toBeGreaterThan(0);
+        });
+    });
+
+    test('無効な金額（数値変換失敗）がスキップされる', async () => {
+        mockPapaParse.mockImplementation((text: string, options: PapaParseOptions) => {
+            setTimeout(() => {
+                const data = [
+                    {'入金日': '2020/01/15', '受取通貨': '円', '受取金額[円/現地通貨]': 'invalid'},
+                    {'入金日': '2020/06/15', '受取通貨': '円', '受取金額[円/現地通貨]': '20000'},
+                ];
+                options.complete({data});
+            }, 0);
+        });
+
+        render(<CumulativeDividendPage/>);
+
+        await waitFor(() => {
+            // 無効な金額はスキップされ、有効な金額のみ処理される
+            const values = screen.getAllByText('¥20,000');
+            expect(values.length).toBeGreaterThan(0);
+        });
+    });
 });
