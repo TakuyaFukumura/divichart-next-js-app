@@ -153,12 +153,10 @@ const COLORS = [
 ```jsx
 <XAxis 
     dataKey="year"
-    tick={{fill: '#6b7280'}}
-    className="dark:fill-gray-400"
+    className="fill-gray-500 dark:fill-gray-400"
 />
 <YAxis 
-    tick={{fill: '#6b7280'}}
-    className="dark:fill-gray-400"
+    className="fill-gray-500 dark:fill-gray-400"
 />
 ```
 
