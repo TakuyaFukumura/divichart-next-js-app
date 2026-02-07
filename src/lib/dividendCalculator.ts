@@ -53,7 +53,7 @@ export function calculateStockDividends(
         if (year !== targetYear) return;
 
         // 金額を数値に変換
-        const amountValue = amountStr === '-' ? 0 : Number.parseFloat(amountStr.replace(/,/g, ''));
+        const amountValue = amountStr === '-' ? 0 : Number.parseFloat(amountStr.replaceAll(',', ''));
         if (Number.isNaN(amountValue)) return;
 
         // USドルの場合は円に換算
