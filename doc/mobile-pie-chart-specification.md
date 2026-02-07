@@ -440,11 +440,37 @@ export default function DividendPieChart({ data }: { data: StockDividend[] }) {
 
     // ... データ処理ロジック
 
-    const renderLabel = (entry: any) => {
+    const renderLabel = (
+        {
+            name,
+            percentage,
+            cx,
+            cy,
+        }: {
+            name: string;
+            percentage: number;
+            cx: number;
+            cy: number;
+        }
+    ) => {
         if (!chartConfig.showLabels) return null;
-        if (entry.percentage < chartConfig.labelThreshold) return null;
+        if (percentage < chartConfig.labelThreshold) return null;
 
-        // ... ラベル描画ロジック
+        // ラベルを円グラフの外側に表示するシンプルな実装例
+        const offset = 16;
+        const y = cy - chartConfig.outerRadius - offset;
+
+        return (
+            <text
+                x={cx}
+                y={y}
+                textAnchor="middle"
+                dominantBaseline="central"
+                className={`fill-gray-800 dark:fill-gray-100 ${chartConfig.labelFontSize}`}
+            >
+                {`${name} ${percentage.toFixed(1)}%`}
+            </text>
+        );
     };
 
     return (
