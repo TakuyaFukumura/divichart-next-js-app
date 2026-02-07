@@ -58,8 +58,10 @@ describe('dividendCalculator', () => {
             const result = calculateStockDividends(mockCSVData, 2026, 150);
 
             expect(result).toHaveLength(2);
+            expect(result[0].stockCode).toBe('MSFT');
             expect(result[0].stockName).toBe('Microsoft Corp');
             expect(result[0].amount).toBe(810); // 5.4 * 150 = 810
+            expect(result[1].stockCode).toBe('AAPL');
             expect(result[1].stockName).toBe('Apple Inc');
             expect(result[1].amount).toBe(675); // 4.5 * 150 = 675
         });
@@ -68,6 +70,7 @@ describe('dividendCalculator', () => {
             const result = calculateStockDividends(mockCSVData, 2025, 150);
 
             expect(result).toHaveLength(1);
+            expect(result[0].stockCode).toBe('1234');
             expect(result[0].stockName).toBe('テスト株式会社');
             expect(result[0].amount).toBe(900);
         });
@@ -85,13 +88,78 @@ describe('dividendCalculator', () => {
 
             expect(result).toHaveLength(0);
         });
+
+        it('銘柄コードがない場合は空文字列として扱う', () => {
+            const dataWithoutCode: CSVRow[] = [
+                {
+                    '入金日': '2026/01/15',
+                    '商品': '投資信託',
+                    '口座': '旧NISA',
+                    '銘柄コード': '',
+                    '銘柄': 'テスト投資信託',
+                    '受取通貨': '円',
+                    '単価[円/現地通貨]': '100',
+                    '数量[株/口]': '10',
+                    '配当・分配金合計（税引前）[円/現地通貨]': '1000',
+                    '税額合計[円/現地通貨]': '100',
+                    '受取金額[円/現地通貨]': '900',
+                },
+            ];
+
+            const result = calculateStockDividends(dataWithoutCode, 2026, 150);
+
+            expect(result).toHaveLength(1);
+            expect(result[0].stockCode).toBe('');
+            expect(result[0].stockName).toBe('テスト投資信託');
+        });
+
+        it('同一銘柄名でも銘柄コードが異なる場合は別銘柄として扱う', () => {
+            const dataWithSameName: CSVRow[] = [
+                {
+                    '入金日': '2026/01/15',
+                    '商品': '米国株式',
+                    '口座': '旧NISA',
+                    '銘柄コード': 'AAPL',
+                    '銘柄': 'Apple Inc',
+                    '受取通貨': '円',
+                    '単価[円/現地通貨]': '100',
+                    '数量[株/口]': '10',
+                    '配当・分配金合計（税引前）[円/現地通貨]': '1000',
+                    '税額合計[円/現地通貨]': '100',
+                    '受取金額[円/現地通貨]': '500',
+                },
+                {
+                    '入金日': '2026/02/15',
+                    '商品': '米国株式',
+                    '口座': '旧NISA',
+                    '銘柄コード': 'GOOGL',
+                    '銘柄': 'Apple Inc',
+                    '受取通貨': '円',
+                    '単価[円/現地通貨]': '100',
+                    '数量[株/口]': '10',
+                    '配当・分配金合計（税引前）[円/現地通貨]': '1000',
+                    '税額合計[円/現地通貨]': '100',
+                    '受取金額[円/現地通貨]': '300',
+                },
+            ];
+
+            const result = calculateStockDividends(dataWithSameName, 2026, 150);
+
+            expect(result).toHaveLength(2);
+            expect(result[0].stockCode).toBe('AAPL');
+            expect(result[0].stockName).toBe('Apple Inc');
+            expect(result[0].amount).toBe(500);
+            expect(result[1].stockCode).toBe('GOOGL');
+            expect(result[1].stockName).toBe('Apple Inc');
+            expect(result[1].amount).toBe(300);
+        });
     });
 
     describe('aggregateOthers', () => {
         it('銘柄数がtopN以下の場合は集約しない', () => {
             const stocks = [
-                {stockName: 'Stock A', amount: 1000, percentage: 50},
-                {stockName: 'Stock B', amount: 1000, percentage: 50},
+                {stockCode: 'A', stockName: 'Stock A', amount: 1000, percentage: 50},
+                {stockCode: 'B', stockName: 'Stock B', amount: 1000, percentage: 50},
             ];
 
             const result = aggregateOthers(stocks, 10);
@@ -102,6 +170,7 @@ describe('dividendCalculator', () => {
 
         it('銘柄数がtopNより多い場合は上位topN件と「その他」に集約する', () => {
             const stocks = Array.from({length: 15}, (_, i) => ({
+                stockCode: `CODE${i}`,
                 stockName: `Stock ${i}`,
                 amount: 100 - i,
                 percentage: (100 - i) / 10,
@@ -110,6 +179,7 @@ describe('dividendCalculator', () => {
             const result = aggregateOthers(stocks, 10);
 
             expect(result).toHaveLength(11);
+            expect(result[10].stockCode).toBe('');
             expect(result[10].stockName).toBe('その他');
         });
     });

@@ -1,6 +1,23 @@
 import {CSVRow, StockDividend, YearlyPortfolio} from '@/types/dividend';
 
 /**
+ * 銘柄を一意に識別するためのキーを生成
+ * 
+ * @param stockCode - 銘柄コード
+ * @param stockName - 銘柄名
+ * @returns 一意な識別キー
+ * 
+ * @remarks
+ * - 銘柄コードがある場合: "{銘柄コード}:{銘柄名}"
+ * - 銘柄コードがない場合: "NO_CODE:{銘柄名}"
+ * - これにより、同じ銘柄名でも銘柄コードが異なる場合は別銘柄として扱われる
+ */
+function generateStockKey(stockCode: string, stockName: string): string {
+    const code = stockCode.trim();
+    return code ? `${code}:${stockName}` : `NO_CODE:${stockName}`;
+}
+
+/**
  * 指定年の銘柄別配当金を集計する
  * 
  * @param csvData - CSVから読み込んだ配当データ
@@ -9,7 +26,7 @@ import {CSVRow, StockDividend, YearlyPortfolio} from '@/types/dividend';
  * @returns 銘柄別配当データの配列（降順ソート済み）
  * 
  * @remarks
- * - 同一銘柄の配当金を合算する
+ * - 同一銘柄（銘柄コード+銘柄名）の配当金を合算する
  * - USドル建ては為替換算する
  * - 金額の降順でソートする
  * - 合計金額から割合を計算する
@@ -19,11 +36,12 @@ export function calculateStockDividends(
     targetYear: number,
     exchangeRate: number
 ): StockDividend[] {
-    // 1. 指定年のデータをフィルタリングし、銘柄名でグループ化
-    const stockAmounts: { [stockName: string]: number } = {};
+    // 1. 指定年のデータをフィルタリングし、銘柄コード+銘柄名でグループ化
+    const stockData: Map<string, { stockCode: string; stockName: string; amount: number }> = new Map();
 
     csvData.forEach((row) => {
         const dateStr = row['入金日'];
+        const stockCode = (row['銘柄コード'] || '').trim();
         const stockName = row['銘柄'];
         const currency = row['受取通貨'];
         const amountStr = row['受取金額[円/現地通貨]'];
@@ -44,14 +62,27 @@ export function calculateStockDividends(
             amountInYen = amountValue * exchangeRate;
         }
 
-        // 銘柄名でグループ化して合算
-        stockAmounts[stockName] = (stockAmounts[stockName] || 0) + amountInYen;
+        // 一意なキーを生成
+        const key = generateStockKey(stockCode, stockName);
+
+        // 銘柄別に集計
+        const existing = stockData.get(key);
+        if (existing) {
+            existing.amount += amountInYen;
+        } else {
+            stockData.set(key, {
+                stockCode,
+                stockName,
+                amount: amountInYen,
+            });
+        }
     });
 
     // 2. StockDividend配列に変換し、金額の降順でソート
-    const roundedStocks = Object.entries(stockAmounts).map(([stockName, amount]) => ({
-        stockName,
-        amount: Math.round(amount),
+    const roundedStocks = Array.from(stockData.values()).map((stock) => ({
+        stockCode: stock.stockCode,
+        stockName: stock.stockName,
+        amount: Math.round(stock.amount),
     }));
 
     const totalRoundedAmount = roundedStocks.reduce((sum, stock) => sum + stock.amount, 0);
@@ -75,6 +106,7 @@ export function calculateStockDividends(
  * 
  * @remarks
  * - 銘柄数がtopN以下の場合は集約しない
+ * - 「その他」は銘柄コードなし（空文字列）
  * - 「その他」はグレー系の色で表示
  */
 export function aggregateOthers(
@@ -96,6 +128,7 @@ export function aggregateOthers(
     return [
         ...topStocks,
         {
+            stockCode: '', // 「その他」は銘柄コードなし
             stockName: 'その他',
             amount: otherAmount,
             percentage: otherPercentage,

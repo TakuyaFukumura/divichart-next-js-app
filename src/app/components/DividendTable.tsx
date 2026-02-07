@@ -35,6 +35,9 @@ export default function DividendTable({
                     <thead className="bg-gray-100 dark:bg-gray-700">
                         <tr>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                銘柄コード
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                 銘柄名
                             </th>
                             <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
@@ -48,13 +51,24 @@ export default function DividendTable({
                     <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                         {data.map((row, index) => (
                             <tr
-                                key={`${row.stockName}-${index}`}
+                                key={`${row.stockCode || 'NO_CODE'}-${row.stockName}`}
                                 className={`${
-                                    index % 2 === 0
+                                    row.stockName === 'その他'
+                                        ? 'bg-gray-50 dark:bg-gray-700'
+                                        : index % 2 === 0
                                         ? 'bg-white dark:bg-gray-800'
                                         : 'bg-gray-50 dark:bg-gray-700'
                                 } hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors`}
                             >
+                                <td
+                                    className={`px-6 py-4 whitespace-nowrap text-sm text-left ${
+                                        row.stockCode
+                                            ? 'font-medium text-gray-900 dark:text-gray-300'
+                                            : 'text-gray-500 dark:text-gray-500'
+                                    } ${row.stockName === 'その他' ? 'italic' : ''}`}
+                                >
+                                    {row.stockCode || '-'}
+                                </td>
                                 <td
                                     className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 ${
                                         row.stockName === 'その他' ? 'italic font-medium' : ''
@@ -73,7 +87,8 @@ export default function DividendTable({
                     </tbody>
                     <tfoot className="bg-gray-100 dark:bg-gray-700">
                         <tr>
-                            <td className="px-6 py-4 text-sm font-bold text-gray-900 dark:text-gray-200">
+                            {/* 銘柄コードと銘柄名の2列を結合 */}
+                            <td className="px-6 py-4 text-sm font-bold text-gray-900 dark:text-gray-200" colSpan={2}>
                                 合計
                             </td>
                             <td className="px-6 py-4 text-sm font-bold text-gray-900 dark:text-gray-200 text-right font-mono">
