@@ -213,7 +213,7 @@ const COLORS = [
        index % 2 === 0
            ? 'bg-white dark:bg-gray-800'
            : 'bg-gray-50 dark:bg-gray-700'
-   } hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors`}
+   } hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors`}
    ```
 
 3. **数値の右揃え**：
