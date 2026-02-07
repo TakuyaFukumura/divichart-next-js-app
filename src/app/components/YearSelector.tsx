@@ -49,7 +49,7 @@ export default function YearSelector({
             >
                 &lt; 前年
             </button>
-            <div className="text-2xl font-bold text-gray-800 dark:text-gray-200 min-w-30 text-center">
+            <div className="text-2xl font-bold text-gray-800 dark:text-gray-200 min-w-[120px] text-center">
                 {currentYear}年
             </div>
             <button
