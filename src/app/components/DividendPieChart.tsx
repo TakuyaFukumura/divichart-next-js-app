@@ -1,6 +1,6 @@
 'use client';
 
-import {Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip} from 'recharts';
+import {Legend, Pie, PieChart, ResponsiveContainer, Tooltip} from 'recharts';
 import {StockDividend} from '@/types/dividend';
 
 /**
@@ -11,11 +11,42 @@ import {StockDividend} from '@/types/dividend';
  * @param props - コンポーネントのプロパティ
  * @param props.data - 銘柄別配当データ
  */
+
+// CustomTooltipを親コンポーネント外に移動
+interface CustomTooltipProps {
+    active?: boolean;
+    payload?: Array<{
+        name: string;
+        value: number;
+        payload: { percentage: number };
+    }>;
+}
+export const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
+    if (active && payload?.length) {
+        return (
+            <div className="bg-white dark:bg-gray-800 p-3 border border-gray-300 dark:border-gray-600 rounded shadow-lg">
+                <p className="text-gray-800 dark:text-gray-200 font-semibold">
+                    {payload[0].name}
+                </p>
+                <p className="text-blue-600 dark:text-blue-400">
+                    金額: ¥{payload[0].value.toLocaleString()}
+                </p>
+                <p className="text-gray-600 dark:text-gray-400">
+                    割合: {payload[0].payload.percentage.toFixed(1)}%
+                </p>
+            </div>
+        );
+    }
+    return null;
+};
+
+interface DividendPieChartProps {
+    readonly data: readonly StockDividend[];
+}
+
 export default function DividendPieChart({
     data,
-}: {
-    data: StockDividend[];
-}) {
+}: DividendPieChartProps) {
     // Rechartsのデフォルトカラーパレット
     const COLORS = [
         '#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8',
@@ -29,39 +60,6 @@ export default function DividendPieChart({
         percentage: item.percentage,
         fill: item.color || COLORS[index % COLORS.length],
     }));
-
-    /**
-     * カスタムツールチップ
-     * マウスホバー時に詳細情報を表示
-     */
-    const CustomTooltip = ({
-        active,
-        payload,
-    }: {
-        active?: boolean;
-        payload?: Array<{
-            name: string;
-            value: number;
-            payload: { percentage: number };
-        }>;
-    }) => {
-        if (active && payload && payload.length) {
-            return (
-                <div className="bg-white dark:bg-gray-800 p-3 border border-gray-300 dark:border-gray-600 rounded shadow-lg">
-                    <p className="text-gray-800 dark:text-gray-200 font-semibold">
-                        {payload[0].name}
-                    </p>
-                    <p className="text-blue-600 dark:text-blue-400">
-                        金額: ¥{payload[0].value.toLocaleString()}
-                    </p>
-                    <p className="text-gray-600 dark:text-gray-400">
-                        割合: {payload[0].payload.percentage.toFixed(1)}%
-                    </p>
-                </div>
-            );
-        }
-        return null;
-    };
 
     /**
      * カスタムラベル
@@ -115,7 +113,7 @@ export default function DividendPieChart({
 
     if (data.length === 0) {
         return (
-            <div className="flex items-center justify-center h-[400px] bg-gray-50 dark:bg-gray-900 rounded-xl">
+            <div className="flex items-center justify-center h-100 bg-gray-50 dark:bg-gray-900 rounded-xl">
                 <p className="text-gray-500 dark:text-gray-400">
                     表示する配当データがありません
                 </p>
@@ -135,12 +133,12 @@ export default function DividendPieChart({
                         label={renderLabel}
                         outerRadius={140}
                         fill="#8884d8"
+                        nameKey="name"
+                        // 各データのfillプロパティで色を指定
                         dataKey="value"
-                    >
-                        {chartData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.fill} />
-                        ))}
-                    </Pie>
+                        // Cellは非推奨なのでfillプロパティをデータに持たせる
+                        // Pieコンポーネントがfillプロパティを参照する
+                    />
                     <Tooltip content={<CustomTooltip />} />
                     <Legend />
                 </PieChart>
