@@ -243,29 +243,32 @@ export function formatYAxisValue(value: number): string {
     // 1千円以上1万円未満の場合は千円単位で表示（オプション）
     if (value >= 1000) {
         const rawSenValue = value / 1000;
-        // 小数第2位で四捨五入して1桁までに揃える
-        const senValue = Math.round(rawSenValue * 10) / 10;
+    const sign = value < 0 ? '-' : '';
+    const absValue = Math.abs(value);
 
-        // 丸めの結果が10以上になった場合は、万円単位に切り替える（例: 9999円 → 1万円）
-        if (senValue >= 10) {
-            const rawManValue = value / 10000;
-            const manValue = Math.round(rawManValue * 10) / 10;
-            if (Number.isInteger(manValue)) {
-                return `${manValue}万円`;
-            } else {
-                return `${manValue.toFixed(1).replace(/\.0$/, '')}万円`;
-            }
-        }
-
-        if (Number.isInteger(senValue)) {
-            return `${senValue}千円`;
+    // 1万円以上の場合は万円単位で表示
+    if (absValue >= 10000) {
+        const manValue = absValue / 10000;
+        // 小数点以下が0の場合は整数表示、それ以外は小数点1桁表示
+        if (manValue % 1 === 0) {
+            return `${sign}${manValue}万円`;
         } else {
-            return `${senValue.toFixed(1).replace(/\.0$/, '')}千円`;
+            return `${sign}${manValue.toFixed(1)}万円`;
+        }
+    }
+
+    // 1千円以上1万円未満の場合は千円単位で表示（オプション）
+    if (absValue >= 1000) {
+        const senValue = absValue / 1000;
+        if (senValue % 1 === 0) {
+            return `${sign}${senValue}千円`;
+        } else {
+            return `${sign}${senValue.toFixed(1)}千円`;
         }
     }
 
     // 1千円未満の場合は円単位で表示
-    return `${value}円`;
+    return `${sign}${absValue}円`;
 }
 ```
 
