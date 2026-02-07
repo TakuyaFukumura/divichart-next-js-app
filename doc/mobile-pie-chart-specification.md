@@ -823,7 +823,39 @@ useEffect(() => {
 ```tsx
 // __tests__/src/app/components/DividendPieChart.test.tsx
 
+import React from 'react';
 import { render, screen, act } from '@testing-library/react';
+
+// Recharts をモックして jsdom 環境でのテストを軽量化
+// ※ DividendPieChart の import より前に定義すること
+jest.mock('recharts', () => {
+    const OriginalRecharts = jest.requireActual('recharts');
+
+    const MockResponsiveContainer = ({
+        children,
+    }: {
+        children: React.ReactNode;
+    }) => <div data-testid="mock-responsive-container">{children}</div>;
+
+    const MockPieChart = ({ children }: { children: React.ReactNode }) => (
+        <div data-testid="mock-pie-chart">{children}</div>
+    );
+
+    const MockPie = () => <div data-testid="mock-pie" />;
+    const MockCell = () => <div data-testid="mock-cell" />;
+    const MockTooltip = () => <div data-testid="mock-tooltip" />;
+    const MockLegend = () => <div data-testid="mock-legend" />;
+
+    return {
+        ...OriginalRecharts,
+        ResponsiveContainer: MockResponsiveContainer,
+        PieChart: MockPieChart,
+        Pie: MockPie,
+        Cell: MockCell,
+        Tooltip: MockTooltip,
+        Legend: MockLegend,
+    };
+});
 import DividendPieChart from '@/app/components/DividendPieChart';
 
 describe('DividendPieChart - Responsive Design', () => {
