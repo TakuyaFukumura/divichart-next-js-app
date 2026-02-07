@@ -49,11 +49,13 @@ export default function DividendTable({
                         </tr>
                     </thead>
                     <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                        {data.map((row, index) => (
+                        {data.map((row) => (
                             <tr
-                                key={`${row.stockCode}-${row.stockName}-${index}`}
+                                key={`${row.stockCode || 'NO_CODE'}-${row.stockName}`}
                                 className={`${
-                                    index % 2 === 0
+                                    row.stockName === 'その他'
+                                        ? 'bg-gray-50 dark:bg-gray-700'
+                                        : data.indexOf(row) % 2 === 0
                                         ? 'bg-white dark:bg-gray-800'
                                         : 'bg-gray-50 dark:bg-gray-700'
                                 } hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors`}
@@ -85,6 +87,7 @@ export default function DividendTable({
                     </tbody>
                     <tfoot className="bg-gray-100 dark:bg-gray-700">
                         <tr>
+                            {/* 銘柄コードと銘柄名の2列を結合 */}
                             <td className="px-6 py-4 text-sm font-bold text-gray-900 dark:text-gray-200" colSpan={2}>
                                 合計
                             </td>
