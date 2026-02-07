@@ -252,11 +252,11 @@ export default function CumulativeDividendPage() {
  * @param props - ツールチップのプロパティ
  * @returns カスタマイズされたツールチップのJSX要素、または非表示の場合はnull
  */
-export function CustomTooltip({active, payload}: {
+export function CustomTooltip({active, payload}: Readonly<{
     active?: boolean;
     payload?: Array<{ payload: CumulativeDividendData; value: number }>;
-}) {
-    if (active && payload && payload.length) {
+}>) {
+    if (active?.valueOf() && payload?.length) {
         return (
             <div
                 className="bg-white dark:bg-gray-800 p-3 border border-gray-300 dark:border-gray-600 rounded shadow-lg">
