@@ -270,7 +270,7 @@ import {formatYAxisValue} from '@/lib/formatYAxisValue';
 ```tsx
 import {formatYAxisValue} from '@/lib/formatYAxisValue';
 
-// YAxisコンポーネントを更新（既存のtickerFormatterを置き換え）
+// YAxisコンポーネントを更新（既存のtickFormatterを置き換え）
 <YAxis
     tick={{fill: '#6b7280'}}
     className="dark:fill-gray-400"
