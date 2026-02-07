@@ -236,16 +236,20 @@ import { StockDividend } from '@/types/dividend';
 import { useState, useEffect } from 'react';
 
 export default function DividendPieChart({ data }: { data: StockDividend[] }) {
-    // ウィンドウサイズを監視
-    const [windowWidth, setWindowWidth] = useState<number>(
-        typeof window !== 'undefined' ? window.innerWidth : 1024
-    );
+    // ウィンドウサイズを監視（初期値は固定値にして hydration mismatch を回避）
+    const [windowWidth, setWindowWidth] = useState<number>(1024);
 
     useEffect(() => {
+        if (typeof window === 'undefined') {
+            return;
+        }
+
         const handleResize = () => {
             setWindowWidth(window.innerWidth);
         };
 
+        // 初回に 1 回だけ実行してクライアントの実際の幅と同期する
+        handleResize();
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
