@@ -55,7 +55,7 @@
 |------|-------------|-------------|--------------|
 | 背景（ページ） | `#f9fafb` - `#eef2ff` | `#111827` - `#1f2937` | `from-blue-50 to-indigo-100` / `dark:from-gray-900 dark:to-gray-800` |
 | 背景（カード） | `#ffffff` | `#1f2937` | `bg-white` / `dark:bg-gray-800` |
-| 背景（グラフ） | `#f9fafb` | `#030712` | `bg-gray-50` / `dark:bg-gray-900` |
+| 背景（グラフ） | `#f9fafb` | `#111827` | `bg-gray-50` / `dark:bg-gray-900` |
 | テキスト（主） | `#1f2937` | `#f3f4f6` | `text-gray-800` / `dark:text-gray-200` |
 | テキスト（副） | `#6b7280` | `#9ca3af` | `text-gray-600` / `dark:text-gray-400` |
 | ボーダー | `#e5e7eb` | `#374151` | `border-gray-200` / `dark:border-gray-700` |
