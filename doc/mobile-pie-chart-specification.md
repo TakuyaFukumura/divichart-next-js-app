@@ -438,9 +438,10 @@ export default function DividendPieChart({ data }: { data: StockDividend[] }) {
     const chartConfig = {
         outerRadius: isMobile ? 80 : isTablet ? 120 : 140,
         height: isMobile ? 350 : isTablet ? 400 : 450,
-        labelThreshold: isMobile ? 5 : 3,
-        labelFontSize: isMobile ? 'text-[10px]' : 'text-xs',
-        showLabels: !isMobile, // モバイルではラベルを非表示にする選択肢も
+        // ラベル改善案A: ラベル設定はPC/タブレット向けを基準とし、モバイルではデフォルトで非表示
+        labelThreshold: 3,
+        labelFontSize: 'text-xs',
+        showLabels: !isMobile, // モバイルではラベルを非表示にする。モバイルでラベルを表示したい場合は true に変更し、上記値を調整する
     };
 
     // ... データ処理ロジック
