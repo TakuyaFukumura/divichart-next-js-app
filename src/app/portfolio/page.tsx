@@ -62,7 +62,7 @@ function PortfolioContent() {
 
         // データがない年の場合は最新年を使用
         if (!availableYears.includes(targetYear)) {
-            targetYear = availableYears[availableYears.length - 1];
+            targetYear = availableYears.at(-1)!;
         }
 
         setCurrentYear(targetYear);
