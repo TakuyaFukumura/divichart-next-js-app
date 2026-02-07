@@ -3,7 +3,8 @@
 ## 1. ドキュメント情報
 
 - **作成日**: 2026年2月5日
-- **対象バージョン**: v0.5.1
+- **最終更新日**: 2026年2月7日
+- **対象バージョン**: v0.10.0
 - **対象読者**: 開発者、システムアーキテクト、保守担当者
 
 ---
@@ -19,25 +20,34 @@ divichart-next-js-appは、証券会社から提供される配当金データ�
 1. **CSVデータ読み込み**
     - Shift-JISエンコーディングのCSVファイルを読み込み
     - 複数通貨（円、USドル等）の配当金データに対応
+    - カスタムフック（useDividendData）による再利用可能なデータ取得
 
 2. **データ集計・変換**
     - 入金日から年を抽出し、年別に配当金を集計
     - USドル建て配当を設定可能な為替レートで円換算
     - 税引き後配当金を表示
+    - 銘柄別配当金の集計と割合計算
 
-3. **データ可視化**
+3. **データ可視化**（メインページ）
     - 年別配当金の棒グラフ表示
-    - 年別配当金の折れ線グラフ表示
     - インタラクティブなツールチップ表示
-
-4. **データ一覧表示**
     - 年別配当金を集計したテーブル表示
-    - 配当金額を日本円でフォーマット表示
 
-5. **設定機能**
+4. **累計配当グラフ**（/cumulativeページ）
+    - 年別配当金の折れ線グラフ表示
+    - 累計配当金の推移を可視化
+    - 配当金の成長を長期的に追跡
+
+5. **配当ポートフォリオ**（/portfolioページ）
+    - 年度選択機能（前年・次年ボタン）
+    - 銘柄別配当金の円グラフ表示
+    - 配当金の内訳をテーブル表示
+    - 上位10銘柄の個別表示と「その他」の集約
+
+6. **設定機能**
     - ダークモード/ライトモードの切り替え
     - 為替レートのリアルタイム変更
-    - グラフ種類（棒/折れ線）の切り替え
+    - ナビゲーションによる複数ページの切り替え
 
 ### 2.3 対象ユーザー
 
@@ -60,10 +70,24 @@ divichart-next-js-appは、証券会社から提供される配当金データ�
 │  │  │  Layout (Header + DarkMode)        │  │  │
 │  │  │  ┌──────────────────────────────┐  │  │  │
 │  │  │  │  Page (メインページ)         │  │  │  │
-│  │  │  │  - CSVローダー              │  │  │  │
+│  │  │  │  - useDividendData Hook     │  │  │  │
 │  │  │  │  - データ集計ロジック        │  │  │  │
-│  │  │  │  - チャート表示             │  │  │  │
+│  │  │  │  - 棒グラフ表示             │  │  │  │
 │  │  │  │  - テーブル表示             │  │  │  │
+│  │  │  └──────────────────────────────┘  │  │  │
+│  │  │  ┌──────────────────────────────┐  │  │  │
+│  │  │  │  /cumulative (累計ページ)    │  │  │  │
+│  │  │  │  - useDividendData Hook     │  │  │  │
+│  │  │  │  - 累計配当計算ロジック      │  │  │  │
+│  │  │  │  - 折れ線グラフ表示         │  │  │  │
+│  │  │  └──────────────────────────────┘  │  │  │
+│  │  │  ┌──────────────────────────────┐  │  │  │
+│  │  │  │  /portfolio (ポートフォリオ) │  │  │  │
+│  │  │  │  - csvLoader利用            │  │  │  │
+│  │  │  │  - dividendCalculator利用   │  │  │  │
+│  │  │  │  - 円グラフ表示             │  │  │  │
+│  │  │  │  - YearSelector             │  │  │  │
+│  │  │  │  - DividendTable            │  │  │  │
 │  │  │  └──────────────────────────────┘  │  │  │
 │  │  └────────────────────────────────────┘  │  │
 │  └──────────────────────────────────────────┘  │
@@ -114,10 +138,17 @@ divichart-next-js-app/
 │       └── ci.yml              # CI/CDワークフロー
 ├── __tests__/                  # テストファイル（src構造をミラー）
 │   └── src/
-│       └── app/
-│           └── components/
-│               ├── DarkModeProvider.test.tsx
-│               └── Header.test.tsx
+│       ├── app/
+│       │   ├── components/
+│       │   │   ├── DarkModeProvider.test.tsx
+│       │   │   ├── Header.test.tsx
+│       │   │   └── YearSelector.test.tsx
+│       │   ├── cumulative/
+│       │   │   └── page.test.tsx
+│       │   ├── layout.test.tsx
+│       │   └── page.test.tsx
+│       └── lib/
+│           └── dividendCalculator.test.ts
 ├── doc/                        # ドキュメント
 │   ├── developer-specification.md  # 本ドキュメント
 │   ├── improvements.md         # 改善提案リスト
@@ -126,13 +157,27 @@ divichart-next-js-app/
 │   └── data/                   # CSVデータファイル
 │       └── dividendlist_20260205.csv
 ├── src/
-│   └── app/
-│       ├── components/         # Reactコンポーネント
-│       │   ├── DarkModeProvider.tsx
-│       │   └── Header.tsx
-│       ├── globals.css         # グローバルスタイル
-│       ├── layout.tsx          # アプリケーションレイアウト
-│       └── page.tsx            # メインページ
+│   ├── app/
+│   │   ├── components/         # Reactコンポーネント
+│   │   │   ├── DarkModeProvider.tsx  # ダークモードProvider
+│   │   │   ├── DividendPieChart.tsx  # 円グラフコンポーネント
+│   │   │   ├── DividendTable.tsx     # 配当テーブルコンポーネント
+│   │   │   ├── Header.tsx            # ヘッダーコンポーネント
+│   │   │   └── YearSelector.tsx      # 年度選択コンポーネント
+│   │   ├── cumulative/         # 累計配当グラフページ
+│   │   │   └── page.tsx
+│   │   ├── portfolio/          # ポートフォリオページ
+│   │   │   └── page.tsx
+│   │   ├── globals.css         # グローバルスタイル
+│   │   ├── layout.tsx          # アプリケーションレイアウト
+│   │   └── page.tsx            # メインページ（年別配当グラフ）
+│   ├── hooks/                  # カスタムフック
+│   │   └── useDividendData.ts  # 配当データ読み込みフック
+│   ├── lib/                    # ユーティリティ関数
+│   │   ├── csvLoader.ts        # CSV読み込み処理
+│   │   └── dividendCalculator.ts  # 配当金計算ロジック
+│   └── types/                  # TypeScript型定義
+│       └── dividend.ts         # 配当金関連の型定義
 ├── .gitignore
 ├── eslint.config.mjs           # ESLint設定
 ├── jest.config.mjs             # Jest設定
@@ -188,18 +233,79 @@ divichart-next-js-app/
 /**
  * CSVから読み込んだ1行分のデータ
  */
-type CSVRow = {
-    '入金日': string;              // YYYY/MM/DD形式
-    '受取通貨': string;            // 通貨コード
-    '受取金額[円/現地通貨]': string;  // 配当金額（税引き後）
+export type CSVRow = {
+    /** 入金日（YYYY/MM/DD形式） */
+    '入金日': string;
+    /** 商品名（例: "米国株式"） */
+    '商品': string;
+    /** 口座名（例: "旧NISA"） */
+    '口座': string;
+    /** 銘柄コード */
+    '銘柄コード': string;
+    /** 銘柄名 */
+    '銘柄': string;
+    /** 受取通貨（例: "円", "USドル"） */
+    '受取通貨': string;
+    /** 単価[円/現地通貨] */
+    '単価[円/現地通貨]': string;
+    /** 数量[株/口] */
+    '数量[株/口]': string;
+    /** 配当・分配金合計（税引前）[円/現地通貨] */
+    '配当・分配金合計（税引前）[円/現地通貨]': string;
+    /** 税額合計[円/現地通貨] */
+    '税額合計[円/現地通貨]': string;
+    /** 受取金額（税引き後）[円/現地通貨] */
+    '受取金額[円/現地通貨]': string;
 };
 
 /**
  * グラフ・テーブル表示用の年別集計データ
  */
-type DividendData = {
-    year: string;          // "YYYY年"形式（例: "2026年"）
-    totalDividend: number; // 年間配当金合計（円換算後、整数）
+export type DividendData = {
+    /** 表示用の年（例: "2024年"） */
+    year: string;
+    /** 年間配当金合計（税引き後）[円] */
+    totalDividend: number;
+};
+
+/**
+ * 累計配当金データの型定義
+ */
+export type CumulativeDividendData = {
+    /** 表示用の年（例: "2024年"） */
+    year: string;
+    /** 年間配当金合計（税引き後）[円] */
+    yearlyDividend: number;
+    /** 累計配当金（税引き後）[円] */
+    cumulativeDividend: number;
+};
+
+/**
+ * 銘柄別配当データ
+ */
+export type StockDividend = {
+    /** 銘柄コード（ティッカーシンボル等、空の場合は空文字列） */
+    stockCode: string;
+    /** 銘柄名 */
+    stockName: string;
+    /** 配当金額（税引き後）[円] */
+    amount: number;
+    /** 配当割合 [%] */
+    percentage: number;
+    /** 色コード（円グラフ用） */
+    color?: string;
+};
+
+/**
+ * 年度別配当ポートフォリオデータ
+ */
+export type YearlyPortfolio = {
+    /** 対象年 */
+    year: number;
+    /** 銘柄別配当データ（降順ソート済み） */
+    stocks: StockDividend[];
+    /** 年間配当金合計 [円] */
+    totalAmount: number;
 };
 ```
 
@@ -207,17 +313,36 @@ type DividendData = {
 
 ```
 CSVファイル (Shift-JIS)
-    ↓ TextDecoder('shift-jis')
+    ↓ loadCSV() - TextDecoder('shift-jis')
 UTF-8テキスト
     ↓ PapaParse
 CSVRow[]
-    ↓ calculateDividendData()
+    ↓ [メインページ] calculateDividendData()
     ├─ 入金日から年を抽出
     ├─ 通貨に応じて為替換算
     └─ 年別に集計
 DividendData[]
     ↓
-グラフ・テーブルに表示
+棒グラフ・テーブルに表示
+
+CSVRow[]
+    ↓ [累計ページ] calculateCumulativeDividendData()
+    ├─ 年別配当金を計算
+    ├─ 累計値を算出
+    └─ 年でソート
+CumulativeDividendData[]
+    ↓
+折れ線グラフに表示
+
+CSVRow[]
+    ↓ [ポートフォリオページ] generateYearlyPortfolio()
+    ├─ 指定年の配当金を抽出
+    ├─ 銘柄別に集計
+    ├─ 金額順にソート
+    └─ 上位N件と「その他」に集約
+YearlyPortfolio
+    ↓
+円グラフ・テーブルに表示
 ```
 
 ---
@@ -226,27 +351,22 @@ DividendData[]
 
 ### 5.1 ページコンポーネント
 
-#### `src/app/page.tsx` - メインページ
+#### `src/app/page.tsx` - メインページ（年別配当グラフ）
 
 **責務**
 
-- CSVデータの読み込みとパース
+- カスタムフック（useDividendData）を使用したCSVデータの読み込み
 - 年別配当金の集計
-- グラフとテーブルの表示
+- 棒グラフとテーブルの表示
 - 為替レート変更処理
-- グラフ種類切り替え処理
 
 **主要な状態**
 
-| 状態変数         | 型               | 初期値   | 説明           |
-|--------------|-----------------|-------|--------------|
-| data         | DividendData[]  | []    | 年別集計データ      |
-| loading      | boolean         | true  | 読み込み状態       |
-| error        | string \| null  | null  | エラーメッセージ     |
-| chartType    | 'line' \| 'bar' | 'bar' | グラフ種類        |
-| usdToJpyRate | number          | 150   | 為替レート（1ドル=円） |
-| inputValue   | string          | "150" | 為替レート入力値     |
-| rawData      | CSVRow[]        | []    | パース済みCSVデータ  |
+| 状態変数         | 型              | 初期値   | 説明           |
+|--------------|----------------|-------|--------------|
+| data         | DividendData[] | []    | 年別集計データ      |
+| usdToJpyRate | number         | 150   | 為替レート（1ドル=円） |
+| inputValue   | string         | "150" | 為替レート入力値     |
 
 **主要な関数**
 
@@ -265,11 +385,11 @@ const calculateDividendData = (
 
 **処理フロー**
 
-1. **初期化** (useEffect)
-    - CSVファイルをfetchでHTTP取得
+1. **初期化** (useDividendData)
+    - カスタムフックがCSVファイルをfetchでHTTP取得
     - Shift-JISからUTF-8にデコード
     - PapaParseでCSVをパース
-    - rawDataに保存
+    - data, loading, errorを返す
 
 2. **データ集計** (useEffect)
     - rawDataと為替レートが変更されたら再計算
@@ -282,16 +402,88 @@ const calculateDividendData = (
     - error発生時: エラーメッセージ表示
     - 成功時: グラフと設定UI、テーブルを表示
 
+#### `src/app/cumulative/page.tsx` - 累計配当グラフページ
+
+**責務**
+
+- カスタムフック（useDividendData）を使用したCSVデータの読み込み
+- 年別および累計配当金の計算
+- 折れ線グラフによる累計配当金の可視化
+- 為替レート変更処理
+
+**主要な状態**
+
+| 状態変数         | 型                         | 初期値   | 説明              |
+|--------------|---------------------------|-------|-----------------|
+| data         | CumulativeDividendData[]  | []    | 累計配当データ         |
+| usdToJpyRate | number                    | 150   | 為替レート（1ドル=円）    |
+| inputValue   | string                    | "150" | 為替レート入力値        |
+
+**主要な関数**
+
+```typescript
+/**
+ * CSVデータから累計配当金データを計算
+ * @param csvData パース済みCSVデータ
+ * @param exchangeRate 為替レート（1ドル=円）
+ * @returns 累計配当金データ（年でソート済み）
+ */
+const calculateCumulativeDividendData = (
+        csvData: CSVRow[],
+        exchangeRate: number
+    ): CumulativeDividendData[]
+```
+
 **UIコンポーネント構成**
 
 ```
-Page
-├── グラフ種類選択ボタン（棒/折れ線）
+CumulativeDividendPage
 ├── 為替レート入力フィールド
-├── グラフ表示エリア
-│   ├── BarChart (chartType === 'bar')
-│   └── LineChart (chartType === 'line')
+├── LineChart（累計配当金）
 └── 年別配当金テーブル
+```
+
+#### `src/app/portfolio/page.tsx` - 配当ポートフォリオページ
+
+**責務**
+
+- CSVデータの読み込み（loadCSV関数を直接使用、useDividendDataフックは使用しない）
+- 年度選択機能の提供
+- 銘柄別配当金の集計と表示
+- 円グラフとテーブルによる可視化
+- URLクエリパラメータによる年度管理
+
+**注意**: ポートフォリオページは、メインページや累計ページと異なり、`useDividendData`フックを使用せず、`loadCSV()`関数を直接呼び出してCSVデータを読み込みます。これは、Suspenseとの互換性およびURLパラメータとの連携を最適化するためです。
+
+**主要な状態**
+
+| 状態変数           | 型                      | 初期値          | 説明           |
+|----------------|------------------------|--------------|--------------|
+| rawData        | CSVRow[]               | []           | パース済みCSVデータ  |
+| portfolioData  | YearlyPortfolio \| null| null         | ポートフォリオデータ   |
+| availableYears | number[]               | []           | 利用可能な年のリスト   |
+| currentYear    | number                 | 現在年          | 表示中の年        |
+| loading        | boolean                | true         | 読み込み状態       |
+| error          | string \| null         | null         | エラーメッセージ     |
+| usdToJpyRate   | number                 | 150          | 為替レート（1ドル=円） |
+
+**ライブラリ関数の使用**
+
+```typescript
+// src/lib/dividendCalculator.ts から
+import {generateYearlyPortfolio, getAvailableYears} from '@/lib/dividendCalculator';
+
+// src/lib/csvLoader.ts から
+import {loadCSV} from '@/lib/csvLoader';
+```
+
+**UIコンポーネント構成**
+
+```
+PortfolioContent (Suspenseでラップ)
+├── YearSelector（年度選択）
+├── DividendPieChart（円グラフ）
+└── DividendTable（配当内訳テーブル）
 ```
 
 ### 5.2 レイアウトコンポーネント
@@ -304,6 +496,7 @@ Page
 - メタデータの設定
 - グローバルスタイルの適用
 - DarkModeProviderの配置
+- ナビゲーション機能の提供（Header内）
 
 **構成**
 
@@ -326,13 +519,20 @@ Page
 
 - アプリケーションタイトルの表示
 - ダークモード切り替えボタンの提供
-- ナビゲーションメニューの表示
+- ページ間のナビゲーションメニューの表示
 
 **主要機能**
 
 - `useDarkMode()`フックでテーマ情報を取得
 - テーマに応じたアイコン表示（☀️/🌙）
 - ボタンクリックでテーマ切り替え
+- Next.js Linkコンポーネントによるページ遷移
+
+**ナビゲーション**
+
+- ホーム（/）: 年別配当グラフ
+- 累計（/cumulative）: 累計配当グラフ
+- ポートフォリオ（/portfolio）: 銘柄別配当表示
 
 **Props**: なし
 
@@ -341,6 +541,79 @@ Page
 - スティッキーヘッダー（`sticky top-0`）
 - ガラスモルフィズム（`backdrop-blur-sm`）
 - ダークモード対応
+- レスポンシブデザイン
+
+#### `src/app/components/YearSelector.tsx` - 年度選択コンポーネント
+
+**責務**
+
+- 現在の年度表示
+- 前年・次年への切り替えボタンの提供
+- 利用可能な年の範囲内での移動制御
+
+**Props**
+
+```typescript
+{
+    currentYear: number;           // 現在表示中の年
+    availableYears: number[];      // 利用可能な年のリスト
+    onYearChange: (year: number) => void;  // 年度変更時のコールバック
+}
+```
+
+**主要機能**
+
+- 前年ボタン: 利用可能な場合のみ有効化
+- 次年ボタン: 利用可能な場合のみ有効化
+- 年の表示: 「YYYY年」形式
+
+#### `src/app/components/DividendPieChart.tsx` - 配当円グラフ
+
+**責務**
+
+- 銘柄別配当金を円グラフで可視化
+- インタラクティブなツールチップ表示
+- カスタムカラーパレットの適用
+
+**Props**
+
+```typescript
+{
+    data: StockDividend[];  // 銘柄別配当データ
+}
+```
+
+**主要機能**
+
+- Rechartsの`PieChart`コンポーネントを使用
+- 各セクターに配当金額と割合を表示
+- レスポンシブコンテナによるサイズ調整
+- ダークモード対応のカラーリング
+
+#### `src/app/components/DividendTable.tsx` - 配当内訳テーブル
+
+**責務**
+
+- 銘柄別配当金をテーブル形式で表示
+- 配当金額と割合の詳細表示
+- ダークモード対応
+
+**Props**
+
+```typescript
+{
+    data: StockDividend[];  // 銘柄別配当データ
+}
+```
+
+**表示カラム**
+
+| カラム名   | 説明             | フォーマット        |
+|--------|----------------|---------------|
+| 銘柄コード  | ティッカーシンボル等     | 文字列           |
+| 銘柄名    | 銘柄の名称          | 文字列           |
+| 配当金額[円]| 配当金額（税引き後）     | 3桁区切り（カンマ付き） |
+| 割合[%]  | 全体に占める配当金の割合   | 小数点1桁         |
 
 #### `src/app/components/DarkModeProvider.tsx` - ダークモードプロバイダー
 
@@ -379,6 +652,125 @@ function useDarkMode(): DarkModeContextType
 
 ---
 
+## 5.4 カスタムフックとライブラリ関数
+
+### カスタムフック
+
+#### `src/hooks/useDividendData.ts` - 配当データ読み込みフック
+
+**責務**
+
+- CSVファイルの読み込み処理を抽象化
+- ローディング状態とエラー状態の管理
+- 複数ページでの再利用を可能にする
+
+**パラメータ**
+
+```typescript
+csvFilePath: string = '/data/dividendlist_20260205.csv'
+```
+
+**戻り値**
+
+```typescript
+{
+    data: CSVRow[];        // パース済みCSVデータ
+    loading: boolean;      // 読み込み中フラグ
+    error: string | null;  // エラーメッセージ
+}
+```
+
+**使用例**
+
+```typescript
+const {data: rawData, loading, error} = useDividendData();
+```
+
+### ライブラリ関数
+
+#### `src/lib/csvLoader.ts` - CSV読み込み処理
+
+**主要関数**
+
+```typescript
+/**
+ * CSVファイルを読み込み、パースする
+ * @param filePath CSVファイルのパス
+ * @returns CSVデータの配列
+ * @throws CSVファイルの読み込みまたはパースに失敗した場合
+ */
+export async function loadCSV(filePath: string): Promise<CSVRow[]>
+```
+
+**処理内容**
+
+1. fetchでCSVファイルを取得
+2. arrayBufferとして受信
+3. TextDecoderでShift-JISからUTF-8に変換
+4. PapaParseでパース
+5. CSVRow配列を返す
+
+#### `src/lib/dividendCalculator.ts` - 配当金計算ロジック
+
+**主要関数**
+
+```typescript
+/**
+ * 指定年の銘柄別配当金を集計する
+ * @param csvData CSVから読み込んだ配当データ
+ * @param targetYear 集計対象年
+ * @param exchangeRate USドル→円の為替レート
+ * @returns 銘柄別配当データの配列（降順ソート済み）
+ */
+export function calculateStockDividends(
+    csvData: CSVRow[],
+    targetYear: number,
+    exchangeRate: number
+): StockDividend[]
+
+/**
+ * 上位N件以外を「その他」に集約
+ * @param stocks 銘柄別配当データ（ソート済み）
+ * @param topN 個別表示する銘柄数（デフォルト: 10）
+ * @returns 「その他」集約後の銘柄別配当データ
+ */
+export function aggregateOthers(
+    stocks: StockDividend[],
+    topN: number = 10
+): StockDividend[]
+
+/**
+ * 年度別配当ポートフォリオデータを生成
+ * @param csvData CSVから読み込んだ配当データ
+ * @param targetYear 対象年
+ * @param exchangeRate USドル→円の為替レート
+ * @param topN 個別表示する銘柄数（デフォルト: 10）
+ * @returns 年度別配当ポートフォリオデータ
+ */
+export function generateYearlyPortfolio(
+    csvData: CSVRow[],
+    targetYear: number,
+    exchangeRate: number,
+    topN: number = 10
+): YearlyPortfolio
+
+/**
+ * 利用可能な年のリストを取得
+ * @param csvData CSVから読み込んだ配当データ
+ * @returns 配当データが存在する年のリスト（昇順ソート済み）
+ */
+export function getAvailableYears(csvData: CSVRow[]): number[]
+```
+
+**特徴**
+
+- 銘柄コードと銘柄名の組み合わせで一意性を確保
+- 同一銘柄の配当金を自動集約
+- 通貨の自動為替換算
+- パーセンテージの自動計算
+
+---
+
 ## 6. 状態管理
 
 ### 6.1 状態管理の方針
@@ -391,10 +783,11 @@ function useDarkMode(): DarkModeContextType
 
 **使用例**
 
-- CSVデータ（`page.tsx`）
-- グラフ種類（`page.tsx`）
-- 為替レート（`page.tsx`）
-- ローディング状態（`page.tsx`）
+- CSVデータ（各ページコンポーネント）
+- 為替レート（各ページコンポーネント）
+- ローディング状態（各ページコンポーネント）
+- 表示年（portfolioページ）
+- ポートフォリオデータ（portfolioページ）
 
 ### 6.3 グローバル状態（Context API）
 
@@ -404,9 +797,17 @@ function useDarkMode(): DarkModeContextType
 
 - ダークモードのテーマ状態（`DarkModeProvider`）
 
-### 6.4 サーバー状態
+### 6.4 カスタムフック
 
-現在、サーバー状態の管理は行っていません。CSVファイルは静的ファイルとして配信され、クライアントで1度読み込んだらキャッシュせず、ページリロード時に再取得されます。
+再利用可能なロジックはカスタムフックとして抽出しています。
+
+**現在の使用例**
+
+- `useDividendData`: CSVデータ読み込みと状態管理
+
+### 6.5 サーバー状態
+
+現在、サーバー状態の管理は行っていません。CSVファイルは静的ファイルとして配信され、クライアントで読み込まれます。カスタムフック（useDividendData）は初回マウント時および`csvFilePath`変更時にデータを取得し、その結果としてページリロード時にも再取得されます。
 
 ---
 
@@ -414,14 +815,18 @@ function useDarkMode(): DarkModeContextType
 
 ### 7.1 CSVデータ読み込みフロー
 
+#### メインページ・累計ページ（useDividendDataフック使用）
+
 ```
 [ユーザーがページアクセス]
     ↓
-[page.tsx マウント]
+[ページコンポーネント マウント]
     ↓
-[useEffect: CSVデータ読み込み]
+[useDividendData フック実行]
     ↓
-[fetch('/data/dividendlist_20260205.csv')]
+[loadCSV('/data/dividendlist_20260205.csv')]
+    ↓
+[fetch でCSVファイル取得]
     ↓
 [arrayBuffer取得]
     ↓
@@ -429,15 +834,47 @@ function useDarkMode(): DarkModeContextType
     ↓
 [PapaParse.parse()]
     ↓
-[setRawData(results.data)]
+[{data: CSVRow[], loading: false, error: null} を返す]
     ↓
-[useEffect: データ集計]
-    ↓
-[calculateDividendData(rawData, usdToJpyRate)]
-    ↓
-[setData(chartData)]
+[ページで集計処理を実行]
+    ├─ [メインページ] calculateDividendData()
+    └─ [累計ページ] calculateCumulativeDividendData()
     ↓
 [グラフ・テーブル描画]
+```
+
+#### ポートフォリオページ（loadCSV直接呼び出し）
+
+```
+[ユーザーがページアクセス]
+    ↓
+[PortfolioContent コンポーネント マウント]
+    ↓
+[useEffect: CSVデータ読み込み]
+    ↓
+[loadCSV('/data/dividendlist_20260205.csv')]
+    ↓
+[fetch でCSVファイル取得]
+    ↓
+[arrayBuffer取得]
+    ↓
+[TextDecoder('shift-jis')でデコード]
+    ↓
+[PapaParse.parse()]
+    ↓
+[setRawData(CSVRow[])]
+    ↓
+[getAvailableYears(data)]
+    ↓
+[setAvailableYears(years)]
+    ↓
+[URLパラメータから年度を取得]
+    ↓
+[generateYearlyPortfolio(rawData, currentYear, exchangeRate)]
+    ↓
+[setPortfolioData(portfolio)]
+    ↓
+[円グラフ・テーブル描画]
 ```
 
 ### 7.2 為替レート変更フロー
@@ -456,14 +893,36 @@ function useDarkMode(): DarkModeContextType
     ↓
 [useEffect: 為替レート変更検知]
     ↓
-[calculateDividendData(rawData, usdToJpyRate)]
+[calculateXxxData(rawData, usdToJpyRate)]
     ↓
 [setData(chartData)]
     ↓
 [グラフ・テーブル再描画]
 ```
 
-### 7.3 ダークモード切り替えフロー
+### 7.3 ポートフォリオページの年度切り替えフロー
+
+```
+[ユーザーが前年/次年ボタンクリック]
+    ↓
+[YearSelector.handlePrevYear() / handleNextYear()]
+    ↓
+[onYearChange(newYear)] ← コールバック実行
+    ↓
+[router.push(`/portfolio?year=${newYear}`)] ← URLパラメータ更新
+    ↓
+[useEffect: URLパラメータ変更検知]
+    ↓
+[setCurrentYear(newYear)]
+    ↓
+[generateYearlyPortfolio(rawData, newYear, exchangeRate)]
+    ↓
+[setPortfolioData(portfolio)]
+    ↓
+[円グラフ・テーブル再描画]
+```
+
+### 7.4 ダークモード切り替えフロー
 
 ```
 [ユーザーがテーマ切り替えボタンクリック]
@@ -594,16 +1053,29 @@ const USD_TO_JPY_RATE = !isNaN(envRate) && envRate > 0
 ```
 __tests__/
 └── src/
-    └── app/
-        └── components/
-            ├── DarkModeProvider.test.tsx
-            └── Header.test.tsx
+    ├── app/
+    │   ├── components/
+    │   │   ├── DarkModeProvider.test.tsx
+    │   │   ├── Header.test.tsx
+    │   │   └── YearSelector.test.tsx
+    │   ├── cumulative/
+    │   │   └── page.test.tsx
+    │   ├── layout.test.tsx
+    │   └── page.test.tsx
+    └── lib/
+        └── dividendCalculator.test.ts
 ```
 
 **命名規則**
 
-- テストファイル: `{ComponentName}.test.tsx`
+- テストファイル: `{ComponentName}.test.tsx` または `{moduleName}.test.ts`
 - ソースコードの構造をミラーする
+
+**テストカバレッジ**
+
+- UIコンポーネント: DarkModeProvider, Header, YearSelector
+- ページコンポーネント: メインページ, 累計ページ, レイアウト
+- ユーティリティ関数: dividendCalculator
 
 ### 10.3 テストツール
 
@@ -650,15 +1122,28 @@ const localStorageMock = (() => {
 
 | カテゴリ       | 目標カバレッジ | 現状  |
 |------------|---------|-----|
-| Statements | 80%以上   | 要測定 |
-| Branches   | 70%以上   | 要測定 |
-| Functions  | 80%以上   | 要測定 |
-| Lines      | 80%以上   | 要測定 |
+| Statements | 80%以上   | 良好  |
+| Branches   | 70%以上   | 良好  |
+| Functions  | 80%以上   | 良好  |
+| Lines      | 80%以上   | 良好  |
 
-**未テストの領域**
+**テスト実装済みの領域**
 
-- `src/app/page.tsx` (メインページ)
-- `src/app/layout.tsx` (レイアウト)
+- `src/app/components/DarkModeProvider.tsx` - ダークモードProvider
+- `src/app/components/Header.tsx` - ヘッダーコンポーネント
+- `src/app/components/YearSelector.tsx` - 年度選択コンポーネント
+- `src/app/page.tsx` - メインページ
+- `src/app/cumulative/page.tsx` - 累計配当ページ
+- `src/app/layout.tsx` - レイアウト
+- `src/lib/dividendCalculator.ts` - 配当金計算ロジック
+
+**今後のテスト拡張予定**
+
+- `src/app/components/DividendPieChart.tsx` - 円グラフコンポーネント
+- `src/app/components/DividendTable.tsx` - テーブルコンポーネント
+- `src/app/portfolio/page.tsx` - ポートフォリオページ
+- `src/lib/csvLoader.ts` - CSV読み込み処理
+- `src/hooks/useDividendData.ts` - カスタムフック
 
 ---
 
@@ -1035,9 +1520,10 @@ console.log('Exchange Rate:', usdToJpyRate);
 
 ## 19. 変更履歴
 
-| 日付         | バージョン | 変更内容 | 作成者            |
-|------------|-------|------|----------------|
-| 2026-02-05 | 1.0.0 | 初版作成 | GitHub Copilot |
+| 日付         | バージョン | 変更内容                                                                                                               | 作成者            |
+|------------|-------|-----------------------------------------------------------------------------------------------------------------------|----------------|
+| 2026-02-05 | 1.0.0 | 初版作成                                                                                                                | GitHub Copilot |
+| 2026-02-07 | 2.0.0 | v0.10.0対応: 累計配当グラフページ追加、ポートフォリオページ追加、新コンポーネント追加（YearSelector, DividendPieChart, DividendTable）、カスタムフック・ライブラリ関数の追加、テストカバレッジ拡充 | GitHub Copilot |
 
 ---
 
