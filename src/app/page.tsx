@@ -1,16 +1,7 @@
 'use client';
 
 import {useCallback, useEffect, useState} from 'react';
-import {
-    Bar,
-    BarChart,
-    CartesianGrid,
-    Legend,
-    ResponsiveContainer,
-    Tooltip,
-    XAxis,
-    YAxis
-} from 'recharts';
+import {Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis} from 'recharts';
 import {useDividendData} from '@/hooks/useDividendData';
 import {CSVRow} from '@/types/dividend';
 
@@ -36,12 +27,12 @@ const USD_TO_JPY_RATE = !isNaN(envRate) && envRate > 0 ? envRate : DEFAULT_USD_T
 /**
  * ホームページコンポーネント
  * 配当金データをCSVファイルから読み込み、年別に集計してグラフと表で表示する
- * 
+ *
  * @remarks
  * - CSVファイルはShift-JISエンコーディングで保存されている
  * - USドル建ての配当金は設定した為替レートで円換算される
  * - グラフは棒グラフで表示される
- * 
+ *
  * @returns 配当金グラフアプリケーションのメインページ
  */
 export default function Home() {
@@ -52,11 +43,11 @@ export default function Home() {
 
     /**
      * CSVデータから年別配当金データを計算する関数
-     * 
+     *
      * @param csvData - CSVファイルから読み込まれた配当金データの配列
      * @param exchangeRate - USドルから円への為替レート
      * @returns 年別に集計された配当金データの配列（年でソート済み）
-     * 
+     *
      * @remarks
      * - USドル建ての配当金は為替レートを使用して円に換算される
      * - 配当金額が"-"の場合は0として扱われる（税額表示用）
@@ -93,14 +84,12 @@ export default function Home() {
         });
 
         // グラフ用のデータに変換（年でソート）
-        const chartData: DividendData[] = Object.keys(yearlyDividends)
+        return Object.keys(yearlyDividends)
             .sort()
             .map((year) => ({
                 year: `${year}年`,
                 totalDividend: Math.round(yearlyDividends[year]),
             }));
-
-        return chartData;
     }, []);
 
     // 為替レートが変更されたときにデータを再計算
@@ -114,7 +103,7 @@ export default function Home() {
     if (loading) {
         return (
             <div
-                className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+                className="flex items-center justify-center min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
                 <div className="flex items-center justify-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                     <span className="ml-2 text-gray-600 dark:text-gray-400">読み込み中...</span>
@@ -126,7 +115,7 @@ export default function Home() {
     if (error) {
         return (
             <div
-                className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+                className="flex items-center justify-center min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
                 <div className="text-red-600 dark:text-red-400 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
                     エラー: {error}
                 </div>
@@ -137,7 +126,7 @@ export default function Home() {
     /**
      * チャート用のカスタムツールチップコンポーネント
      * マウスホバー時に表示される配当金情報のツールチップをカスタマイズする
-     * 
+     *
      * @param props - ツールチップのプロパティ
      * @param props.active - ツールチップがアクティブ（表示中）かどうか
      * @param props.payload - 表示するデータの配列
@@ -163,7 +152,7 @@ export default function Home() {
 
     return (
         <div
-            className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-8">
+            className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-8">
             <div className="max-w-6xl mx-auto">
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
                     <h1 className="text-4xl font-bold mb-6 text-gray-800 dark:text-gray-200">
@@ -236,7 +225,8 @@ export default function Home() {
                                 <tbody
                                     className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                 {data.map((row) => (
-                                    <tr key={row.year} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                    <tr key={row.year}
+                                        className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right">
                                             {row.year}
                                         </td>

@@ -3,8 +3,8 @@
  */
 
 import {
-    calculateStockDividends,
     aggregateOthers,
+    calculateStockDividends,
     generateYearlyPortfolio,
     getAvailableYears,
 } from '@/lib/dividendCalculator';

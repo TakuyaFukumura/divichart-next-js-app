@@ -3,11 +3,11 @@ import {CSVRow} from '@/types/dividend';
 
 /**
  * CSVファイルを読み込み、パースする
- * 
+ *
  * @param filePath - CSVファイルのパス（publicディレクトリからの相対パス）
  * @returns CSVデータの配列
  * @throws CSVファイルの読み込みまたはパースに失敗した場合
- * 
+ *
  * @remarks
  * - CSVファイルはShift-JISエンコーディングで保存されている想定
  * - 空行はスキップされる
@@ -39,8 +39,8 @@ export async function loadCSV(filePath: string): Promise<CSVRow[]> {
         });
     } catch (error) {
         throw new Error(
-            error instanceof Error 
-                ? error.message 
+            error instanceof Error
+                ? error.message
                 : 'CSVファイルの読み込み中に予期しないエラーが発生しました'
         );
     }

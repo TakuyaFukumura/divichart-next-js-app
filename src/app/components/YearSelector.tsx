@@ -2,22 +2,22 @@
 
 /**
  * 年度選択コンポーネント
- * 
+ *
  * 年度の表示と前年・次年への切り替えボタンを提供する
- * 
+ *
  * @param props - コンポーネントのプロパティ
  * @param props.currentYear - 現在表示中の年
  * @param props.availableYears - 利用可能な年のリスト
- * @param props.onYearChange - 年度変更時のコールバック関数
+ * @param props.onYearChangeAction - 年度変更時のコールバック関数
  */
 export default function YearSelector({
-    currentYear,
-    availableYears,
-    onYearChange,
-}: {
-    currentYear: number;
-    availableYears: number[];
-    onYearChange: (year: number) => void;
+                                         currentYear,
+                                         availableYears,
+                                         onYearChangeAction,
+                                     }: {
+    readonly currentYear: number;
+    readonly availableYears: number[];
+    readonly onYearChangeAction: (year: number) => void;
 }) {
     const currentIndex = availableYears.indexOf(currentYear);
     const hasPrevYear = currentIndex > 0;
@@ -25,13 +25,13 @@ export default function YearSelector({
 
     const handlePrevYear = () => {
         if (hasPrevYear) {
-            onYearChange(availableYears[currentIndex - 1]);
+            onYearChangeAction(availableYears[currentIndex - 1]);
         }
     };
 
     const handleNextYear = () => {
         if (hasNextYear) {
-            onYearChange(availableYears[currentIndex + 1]);
+            onYearChangeAction(availableYears[currentIndex + 1]);
         }
     };
 

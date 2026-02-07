@@ -13,8 +13,8 @@ import DividendTable from '@/app/components/DividendTable';
 const DEFAULT_USD_TO_JPY_RATE = 150;
 const envRate = process.env.NEXT_PUBLIC_USD_TO_JPY_RATE
     ? Number(process.env.NEXT_PUBLIC_USD_TO_JPY_RATE)
-    : NaN;
-const USD_TO_JPY_RATE = !isNaN(envRate) && envRate > 0 ? envRate : DEFAULT_USD_TO_JPY_RATE;
+    : Number.NaN;
+const USD_TO_JPY_RATE = !Number.isNaN(envRate) && envRate > 0 ? envRate : DEFAULT_USD_TO_JPY_RATE;
 
 /**
  * 配当ポートフォリオコンポーネント（内部実装）
@@ -58,11 +58,11 @@ function PortfolioContent() {
         if (availableYears.length === 0) return;
 
         const yearParam = searchParams.get('year');
-        let targetYear = yearParam ? parseInt(yearParam, 10) : new Date().getFullYear();
+        let targetYear = yearParam ? Number.parseInt(yearParam, 10) : new Date().getFullYear();
 
         // データがない年の場合は最新年を使用
         if (!availableYears.includes(targetYear)) {
-            targetYear = availableYears[availableYears.length - 1];
+            targetYear = availableYears.at(-1)!;
         }
 
         setCurrentYear(targetYear);
@@ -84,7 +84,8 @@ function PortfolioContent() {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+            <div
+                className="flex items-center justify-center min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
                 <div className="flex items-center justify-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                     <span className="ml-2 text-gray-600 dark:text-gray-400">読み込み中...</span>
@@ -95,7 +96,8 @@ function PortfolioContent() {
 
     if (error) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+            <div
+                className="flex items-center justify-center min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
                 <div className="text-red-600 dark:text-red-400 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
                     エラー: {error}
                 </div>
@@ -105,7 +107,8 @@ function PortfolioContent() {
 
     if (availableYears.length === 0) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-8">
+            <div
+                className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-8">
                 <div className="max-w-6xl mx-auto">
                     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
                         <h1 className="text-4xl font-bold mb-6 text-gray-800 dark:text-gray-200">
@@ -121,7 +124,8 @@ function PortfolioContent() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-8">
+        <div
+            className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-8">
             <div className="max-w-6xl mx-auto">
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
                     <h1 className="text-4xl font-bold mb-6 text-gray-800 dark:text-gray-200">
@@ -131,14 +135,14 @@ function PortfolioContent() {
                     <YearSelector
                         currentYear={currentYear}
                         availableYears={availableYears}
-                        onYearChange={handleYearChange}
+                        onYearChangeAction={handleYearChange}
                     />
 
                     {portfolioData && (
                         <>
-                            <DividendPieChart data={portfolioData.stocks} />
+                            <DividendPieChart data={portfolioData.stocks}/>
 
-                            <DividendTable data={portfolioData.stocks} />
+                            <DividendTable data={portfolioData.stocks}/>
 
                             <div className="mt-6 text-sm text-gray-500 dark:text-gray-400">
                                 <p>
@@ -161,11 +165,11 @@ function PortfolioContent() {
 
 /**
  * 配当ポートフォリオページ
- * 
+ *
  * 指定した年の配当金を銘柄別に円グラフと表で表示する
- * 
+ *
  * @returns 配当ポートフォリオページのJSX要素
- * 
+ *
  * @remarks
  * - URLクエリパラメータで年度を指定可能（例: /portfolio?year=2026）
  * - 年度が指定されていない場合は現在年を表示
@@ -175,14 +179,15 @@ function PortfolioContent() {
 export default function PortfolioPage() {
     return (
         <Suspense fallback={
-            <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+            <div
+                className="flex items-center justify-center min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
                 <div className="flex items-center justify-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                     <span className="ml-2 text-gray-600 dark:text-gray-400">読み込み中...</span>
                 </div>
             </div>
         }>
-            <PortfolioContent />
+            <PortfolioContent/>
         </Suspense>
     );
 }

@@ -1,16 +1,7 @@
 'use client';
 
 import {useCallback, useEffect, useState} from 'react';
-import {
-    CartesianGrid,
-    Legend,
-    Line,
-    LineChart,
-    ResponsiveContainer,
-    Tooltip,
-    XAxis,
-    YAxis
-} from 'recharts';
+import {CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from 'recharts';
 import {CSVRow, CumulativeDividendData} from '@/types/dividend';
 import {useDividendData} from '@/hooks/useDividendData';
 
@@ -19,18 +10,18 @@ import {useDividendData} from '@/hooks/useDividendData';
 const DEFAULT_USD_TO_JPY_RATE = 150;
 const envRate = process.env.NEXT_PUBLIC_USD_TO_JPY_RATE
     ? Number(process.env.NEXT_PUBLIC_USD_TO_JPY_RATE)
-    : NaN;
-const USD_TO_JPY_RATE = !isNaN(envRate) && envRate > 0 ? envRate : DEFAULT_USD_TO_JPY_RATE;
+    : Number.NaN;
+const USD_TO_JPY_RATE = !Number.isNaN(envRate) && envRate > 0 ? envRate : DEFAULT_USD_TO_JPY_RATE;
 
 /**
  * 累計配当グラフページコンポーネント
  * 配当金データをCSVファイルから読み込み、年別に累計して表示する
- * 
+ *
  * @remarks
  * - CSVファイルはShift-JISエンコーディングで保存されている
  * - USドル建ての配当金は設定した為替レートで円換算される
  * - グラフは折れ線グラフで累計配当金を表示する
- * 
+ *
  * @returns 累計配当グラフアプリケーションのページ
  */
 export default function CumulativeDividendPage() {
@@ -41,11 +32,11 @@ export default function CumulativeDividendPage() {
 
     /**
      * CSVデータから累計配当金データを計算する関数
-     * 
+     *
      * @param csvData - CSVファイルから読み込まれた配当金データの配列
      * @param exchangeRate - USドルから円への為替レート
      * @returns 年別に集計された累計配当金データの配列（年でソート済み）
-     * 
+     *
      * @remarks
      * - USドル建ての配当金は為替レートを使用して円に換算される
      * - 配当金額が"-"の場合は0として扱われる（税額表示用）
@@ -68,8 +59,8 @@ export default function CumulativeDividendPage() {
 
             // 金額を数値に変換（カンマを除去）
             // NOTE: CSVデータでは税額が"-"で表示されることがあり、その場合は0として扱う
-            const amountValue = amountStr === '-' ? 0 : parseFloat(amountStr.replace(/,/g, ''));
-            if (isNaN(amountValue)) return;
+            const amountValue = amountStr === '-' ? 0 : Number.parseFloat(amountStr.replaceAll(',', ''));
+            if (Number.isNaN(amountValue)) return;
 
             // USドルの場合は円に換算、円の場合はそのまま
             let amountInYen = amountValue;
@@ -82,11 +73,11 @@ export default function CumulativeDividendPage() {
         });
 
         // 年でソート
-        const sortedYears = Object.keys(yearlyDividends).sort();
+        const sortedYears = Object.keys(yearlyDividends).sort((a, b) => a.localeCompare(b));
 
         // 累計配当金を計算
         let cumulative = 0;
-        const cumulativeData: CumulativeDividendData[] = sortedYears.map((year) => {
+        return sortedYears.map((year) => {
             const yearlyAmount = yearlyDividends[year];
             cumulative += yearlyAmount;
             return {
@@ -95,8 +86,6 @@ export default function CumulativeDividendPage() {
                 cumulativeDividend: Math.round(cumulative),
             };
         });
-
-        return cumulativeData;
     }, []);
 
     // 為替レートが変更されたときにデータを再計算
@@ -110,7 +99,7 @@ export default function CumulativeDividendPage() {
     if (loading) {
         return (
             <div
-                className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+                className="flex items-center justify-center min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
                 <div className="flex items-center justify-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                     <span className="ml-2 text-gray-600 dark:text-gray-400">読み込み中...</span>
@@ -122,7 +111,7 @@ export default function CumulativeDividendPage() {
     if (error) {
         return (
             <div
-                className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+                className="flex items-center justify-center min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
                 <div className="text-red-600 dark:text-red-400 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
                     エラー: {error}
                 </div>
@@ -130,39 +119,9 @@ export default function CumulativeDividendPage() {
         );
     }
 
-    /**
-     * チャート用のカスタムツールチップコンポーネント
-     * マウスホバー時に表示される配当金情報のツールチップをカスタマイズする
-     * 
-     * @param props - ツールチップのプロパティ
-     * @param props.active - ツールチップがアクティブ（表示中）かどうか
-     * @param props.payload - 表示するデータの配列
-     * @returns カスタマイズされたツールチップのJSX要素、または非表示の場合はnull
-     */
-    const CustomTooltip = ({active, payload}: {
-        active?: boolean;
-        payload?: Array<{ payload: CumulativeDividendData; value: number }>
-    }) => {
-        if (active && payload && payload.length) {
-            return (
-                <div
-                    className="bg-white dark:bg-gray-800 p-3 border border-gray-300 dark:border-gray-600 rounded shadow-lg">
-                    <p className="text-gray-800 dark:text-gray-200 font-semibold">{payload[0].payload.year}</p>
-                    <p className="text-blue-600 dark:text-blue-400">
-                        年間配当金: ¥{payload[0].payload.yearlyDividend.toLocaleString()}
-                    </p>
-                    <p className="text-blue-600 dark:text-blue-400 font-semibold">
-                        累計配当金: ¥{payload[0].value.toLocaleString()}
-                    </p>
-                </div>
-            );
-        }
-        return null;
-    };
-
     return (
         <div
-            className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-8">
+            className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-8">
             <div className="max-w-6xl mx-auto">
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
                     <h1 className="text-4xl font-bold mb-6 text-gray-800 dark:text-gray-200">
@@ -185,8 +144,8 @@ export default function CumulativeDividendPage() {
                                     const value = e.target.value;
                                     setInputValue(value);
 
-                                    const numValue = parseFloat(value);
-                                    if (!isNaN(numValue) && numValue > 0) {
+                                    const numValue = Number.parseFloat(value);
+                                    if (!Number.isNaN(numValue) && numValue > 0) {
                                         setUsdToJpyRate(numValue);
                                     }
                                 }}
@@ -194,7 +153,7 @@ export default function CumulativeDividendPage() {
                                     // フォーカスが外れたときに、無効な入力を現在の有効な値にリセット
                                     setInputValue(String(usdToJpyRate));
                                 }}
-                                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent w-[150px]"
+                                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent w-37.5"
                             />
                             <span className="text-gray-600 dark:text-gray-400">円</span>
                         </div>
@@ -258,7 +217,8 @@ export default function CumulativeDividendPage() {
                                     </th>
                                 </tr>
                                 </thead>
-                                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                <tbody
+                                    className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                 {data.map((item) => (
                                     <tr key={item.year} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-100">
@@ -285,4 +245,31 @@ export default function CumulativeDividendPage() {
             </div>
         </div>
     );
+}
+
+/**
+ * チャート用のカスタムツールチップコンポーネント
+ * マウスホバー時に表示される配当金情報のツールチップをカスタマイズする
+ * @param props - ツールチップのプロパティ
+ * @returns カスタマイズされたツールチップのJSX要素、または非表示の場合はnull
+ */
+export function CustomTooltip({active, payload}: Readonly<{
+    active?: boolean;
+    payload?: Array<{ payload: CumulativeDividendData; value: number }>;
+}>) {
+    if (active && payload?.length) {
+        return (
+            <div
+                className="bg-white dark:bg-gray-800 p-3 border border-gray-300 dark:border-gray-600 rounded shadow-lg">
+                <p className="text-gray-800 dark:text-gray-200 font-semibold">{payload[0].payload.year}</p>
+                <p className="text-blue-600 dark:text-blue-400">
+                    年間配当金: ¥{payload[0].payload.yearlyDividend.toLocaleString()}
+                </p>
+                <p className="text-blue-600 dark:text-blue-400 font-semibold">
+                    累計配当金: ¥{payload[0].value.toLocaleString()}
+                </p>
+            </div>
+        );
+    }
+    return null;
 }

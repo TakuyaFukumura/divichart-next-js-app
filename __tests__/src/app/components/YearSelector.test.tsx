@@ -20,7 +20,7 @@ describe('YearSelector', () => {
                 <YearSelector
                     currentYear={2026}
                     availableYears={[2024, 2025, 2026]}
-                    onYearChange={mockOnYearChange}
+                    onYearChangeAction={mockOnYearChange}
                 />
             );
 
@@ -32,7 +32,7 @@ describe('YearSelector', () => {
                 <YearSelector
                     currentYear={2026}
                     availableYears={[2024, 2025, 2026]}
-                    onYearChange={mockOnYearChange}
+                    onYearChangeAction={mockOnYearChange}
                 />
             );
 
@@ -44,7 +44,7 @@ describe('YearSelector', () => {
                 <YearSelector
                     currentYear={2026}
                     availableYears={[2024, 2025, 2026]}
-                    onYearChange={mockOnYearChange}
+                    onYearChangeAction={mockOnYearChange}
                 />
             );
 
@@ -58,7 +58,7 @@ describe('YearSelector', () => {
                 <YearSelector
                     currentYear={2024}
                     availableYears={[2024, 2025, 2026]}
-                    onYearChange={mockOnYearChange}
+                    onYearChangeAction={mockOnYearChange}
                 />
             );
 
@@ -71,7 +71,7 @@ describe('YearSelector', () => {
                 <YearSelector
                     currentYear={2026}
                     availableYears={[2024, 2025, 2026]}
-                    onYearChange={mockOnYearChange}
+                    onYearChangeAction={mockOnYearChange}
                 />
             );
 
@@ -84,7 +84,7 @@ describe('YearSelector', () => {
                 <YearSelector
                     currentYear={2025}
                     availableYears={[2024, 2025, 2026]}
-                    onYearChange={mockOnYearChange}
+                    onYearChangeAction={mockOnYearChange}
                 />
             );
 
@@ -102,7 +102,7 @@ describe('YearSelector', () => {
                 <YearSelector
                     currentYear={2025}
                     availableYears={[2024, 2025, 2026]}
-                    onYearChange={mockOnYearChange}
+                    onYearChangeAction={mockOnYearChange}
                 />
             );
 
@@ -120,7 +120,7 @@ describe('YearSelector', () => {
                 <YearSelector
                     currentYear={2025}
                     availableYears={[2024, 2025, 2026]}
-                    onYearChange={mockOnYearChange}
+                    onYearChangeAction={mockOnYearChange}
                 />
             );
 
@@ -138,7 +138,7 @@ describe('YearSelector', () => {
                 <YearSelector
                     currentYear={2024}
                     availableYears={[2024, 2025, 2026]}
-                    onYearChange={mockOnYearChange}
+                    onYearChangeAction={mockOnYearChange}
                 />
             );
 
@@ -155,7 +155,7 @@ describe('YearSelector', () => {
                 <YearSelector
                     currentYear={2026}
                     availableYears={[2024, 2025, 2026]}
-                    onYearChange={mockOnYearChange}
+                    onYearChangeAction={mockOnYearChange}
                 />
             );
 
@@ -174,7 +174,7 @@ describe('YearSelector', () => {
                 <YearSelector
                     currentYear={2026}
                     availableYears={[2026]}
-                    onYearChange={mockOnYearChange}
+                    onYearChangeAction={mockOnYearChange}
                 />
             );
 
