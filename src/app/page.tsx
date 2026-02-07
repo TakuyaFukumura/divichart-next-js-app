@@ -1,16 +1,7 @@
 'use client';
 
 import {useCallback, useEffect, useState} from 'react';
-import {
-    Bar,
-    BarChart,
-    CartesianGrid,
-    Legend,
-    ResponsiveContainer,
-    Tooltip,
-    XAxis,
-    YAxis
-} from 'recharts';
+import {Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis} from 'recharts';
 import {useDividendData} from '@/hooks/useDividendData';
 import {CSVRow} from '@/types/dividend';
 
@@ -93,14 +84,12 @@ export default function Home() {
         });
 
         // グラフ用のデータに変換（年でソート）
-        const chartData: DividendData[] = Object.keys(yearlyDividends)
+        return Object.keys(yearlyDividends)
             .sort()
             .map((year) => ({
                 year: `${year}年`,
                 totalDividend: Math.round(yearlyDividends[year]),
             }));
-
-        return chartData;
     }, []);
 
     // 為替レートが変更されたときにデータを再計算
