@@ -254,7 +254,7 @@ export function formatYAxisValue(value: number): string {
         }
     }
 
-    // 1千円以上1万円未満の場合は千円単位で表示（オプション）
+    // 1千円以上1万円未満の場合は千円単位で表示
     if (absValue >= 1000) {
         const rawSenValue = absValue / 1000;
         // 小数第2位で四捨五入して1桁までに揃える
