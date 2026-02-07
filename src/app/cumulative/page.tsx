@@ -19,8 +19,8 @@ import {useDividendData} from '@/hooks/useDividendData';
 const DEFAULT_USD_TO_JPY_RATE = 150;
 const envRate = process.env.NEXT_PUBLIC_USD_TO_JPY_RATE
     ? Number(process.env.NEXT_PUBLIC_USD_TO_JPY_RATE)
-    : NaN;
-const USD_TO_JPY_RATE = !isNaN(envRate) && envRate > 0 ? envRate : DEFAULT_USD_TO_JPY_RATE;
+    : Number.NaN;
+const USD_TO_JPY_RATE = !Number.isNaN(envRate) && envRate > 0 ? envRate : DEFAULT_USD_TO_JPY_RATE;
 
 /**
  * 累計配当グラフページコンポーネント
@@ -68,8 +68,8 @@ export default function CumulativeDividendPage() {
 
             // 金額を数値に変換（カンマを除去）
             // NOTE: CSVデータでは税額が"-"で表示されることがあり、その場合は0として扱う
-            const amountValue = amountStr === '-' ? 0 : parseFloat(amountStr.replace(/,/g, ''));
-            if (isNaN(amountValue)) return;
+            const amountValue = amountStr === '-' ? 0 : Number.parseFloat(amountStr.replace(/,/g, ''));
+            if (Number.isNaN(amountValue)) return;
 
             // USドルの場合は円に換算、円の場合はそのまま
             let amountInYen = amountValue;
@@ -185,8 +185,8 @@ export default function CumulativeDividendPage() {
                                     const value = e.target.value;
                                     setInputValue(value);
 
-                                    const numValue = parseFloat(value);
-                                    if (!isNaN(numValue) && numValue > 0) {
+                                    const numValue = Number.parseFloat(value);
+                                    if (!Number.isNaN(numValue) && numValue > 0) {
                                         setUsdToJpyRate(numValue);
                                     }
                                 }}
