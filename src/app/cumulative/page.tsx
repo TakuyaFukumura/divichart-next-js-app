@@ -73,7 +73,7 @@ export default function CumulativeDividendPage() {
         });
 
         // 年でソート
-        const sortedYears = Object.keys(yearlyDividends).sort();
+        const sortedYears = Object.keys(yearlyDividends).sort((a, b) => a.localeCompare(b));
 
         // 累計配当金を計算
         let cumulative = 0;
