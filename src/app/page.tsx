@@ -236,7 +236,7 @@ export default function Home() {
                                 <tbody
                                     className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                 {data.map((row) => (
-                                    <tr key={row.year}>
+                                    <tr key={row.year} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right">
                                             {row.year}
                                         </td>

@@ -200,7 +200,7 @@ export default function CumulativeDividendPage() {
                         </div>
                     </div>
 
-                    <div className="mb-8">
+                    <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-6 mb-8">
                         <ResponsiveContainer width="100%" height={400}>
                             <LineChart data={data}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb"
