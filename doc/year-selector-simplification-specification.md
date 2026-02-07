@@ -40,22 +40,22 @@
 
 #### 変更前
 ```tsx
-<button>
+<button aria-label="前年">
     &lt; 前年
 </button>
 
-<button>
+<button aria-label="次年">
     次年 &gt;
 </button>
 ```
 
 #### 変更後（案）
 ```tsx
-<button>
+<button aria-label="前年">
     &lt;
 </button>
 
-<button>
+<button aria-label="次年">
     &gt;
 </button>
 ```
