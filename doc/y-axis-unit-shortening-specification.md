@@ -503,28 +503,6 @@ if (value >= 100000000) {
 }
 ```
 
-#### 国際化対応（i18n）
-
-将来的に英語などの他言語対応が必要な場合は、以下のように拡張可能：
-
-```typescript
-export function formatYAxisValue(value: number, locale: string = 'ja'): string {
-    if (locale === 'en') {
-        // 英語の場合は K, M 表記（通貨記号は付与しない。通貨・記号は別要件で扱う）
-        if (value >= 1000000) {
-            return `${(value / 1000000).toFixed(1)}M`;
-        }
-        if (value >= 1000) {
-            return `${(value / 1000).toFixed(0)}K`;
-        }
-        return `${value}`;
-    }
-
-    // 日本語の場合（現在の実装）
-    // ...
-}
-```
-
 ### 9.2 参考情報
 
 #### Rechartsのドキュメント
