@@ -87,14 +87,12 @@ export function calculateStockDividends(
 
     const totalRoundedAmount = roundedStocks.reduce((sum, stock) => sum + stock.amount, 0);
 
-    const stocks: StockDividend[] = roundedStocks
+    return roundedStocks
         .map((stock) => ({
             ...stock,
             percentage: totalRoundedAmount === 0 ? 0 : (stock.amount / totalRoundedAmount) * 100,
         }))
         .sort((a, b) => b.amount - a.amount);
-
-    return stocks;
 }
 
 /**
