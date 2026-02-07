@@ -73,6 +73,12 @@ export default function Header() {
                                 年別配当
                             </Link>
                             <Link
+                                href="/cumulative"
+                                className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                            >
+                                累計配当
+                            </Link>
+                            <Link
                                 href="/portfolio"
                                 className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                             >

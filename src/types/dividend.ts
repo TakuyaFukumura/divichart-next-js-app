@@ -70,3 +70,16 @@ export type DividendData = {
     /** 年間配当金合計（税引き後）[円] */
     totalDividend: number;
 };
+
+/**
+ * 累計配当金データの型定義
+ * グラフ表示に使用される年別累計配当金の集計データ
+ */
+export type CumulativeDividendData = {
+    /** 表示用の年（例: "2024年"） */
+    year: string;
+    /** 年間配当金合計（税引き後）[円] */
+    yearlyDividend: number;
+    /** 累計配当金（税引き後）[円] */
+    cumulativeDividend: number;
+};

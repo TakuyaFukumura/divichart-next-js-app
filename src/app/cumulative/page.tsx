@@ -2,28 +2,17 @@
 
 import {useCallback, useEffect, useState} from 'react';
 import {
-    Bar,
-    BarChart,
     CartesianGrid,
     Legend,
+    Line,
+    LineChart,
     ResponsiveContainer,
     Tooltip,
     XAxis,
     YAxis
 } from 'recharts';
+import {CSVRow, CumulativeDividendData} from '@/types/dividend';
 import {useDividendData} from '@/hooks/useDividendData';
-import {CSVRow} from '@/types/dividend';
-
-/**
- * 配当金データの型定義
- * グラフ表示に使用される年別配当金の集計データ
- */
-type DividendData = {
-    /** 表示用の年（例: "2024年"） */
-    year: string;
-    /** 年間配当金合計（税引き後）[円] */
-    totalDividend: number;
-};
 
 // 為替レート設定（1ドル=150円）
 // 環境変数から読み込み、未設定の場合はデフォルト値を使用
@@ -34,35 +23,35 @@ const envRate = process.env.NEXT_PUBLIC_USD_TO_JPY_RATE
 const USD_TO_JPY_RATE = !isNaN(envRate) && envRate > 0 ? envRate : DEFAULT_USD_TO_JPY_RATE;
 
 /**
- * ホームページコンポーネント
- * 配当金データをCSVファイルから読み込み、年別に集計してグラフと表で表示する
+ * 累計配当グラフページコンポーネント
+ * 配当金データをCSVファイルから読み込み、年別に累計して表示する
  * 
  * @remarks
  * - CSVファイルはShift-JISエンコーディングで保存されている
  * - USドル建ての配当金は設定した為替レートで円換算される
- * - グラフは棒グラフで表示される
+ * - グラフは折れ線グラフで累計配当金を表示する
  * 
- * @returns 配当金グラフアプリケーションのメインページ
+ * @returns 累計配当グラフアプリケーションのページ
  */
-export default function Home() {
+export default function CumulativeDividendPage() {
     const {data: rawData, loading, error} = useDividendData();
-    const [data, setData] = useState<DividendData[]>([]);
+    const [data, setData] = useState<CumulativeDividendData[]>([]);
     const [usdToJpyRate, setUsdToJpyRate] = useState<number>(USD_TO_JPY_RATE);
     const [inputValue, setInputValue] = useState<string>(String(USD_TO_JPY_RATE));
 
     /**
-     * CSVデータから年別配当金データを計算する関数
+     * CSVデータから累計配当金データを計算する関数
      * 
      * @param csvData - CSVファイルから読み込まれた配当金データの配列
      * @param exchangeRate - USドルから円への為替レート
-     * @returns 年別に集計された配当金データの配列（年でソート済み）
+     * @returns 年別に集計された累計配当金データの配列（年でソート済み）
      * 
      * @remarks
      * - USドル建ての配当金は為替レートを使用して円に換算される
      * - 配当金額が"-"の場合は0として扱われる（税額表示用）
-     * - 年別に集計し、最終的に円単位で四捨五入される
+     * - 年別に集計し、累計を計算し、最終的に円単位で四捨五入される
      */
-    const calculateDividendData = useCallback((csvData: CSVRow[], exchangeRate: number): DividendData[] => {
+    const calculateCumulativeDividendData = useCallback((csvData: CSVRow[], exchangeRate: number): CumulativeDividendData[] => {
         // 年別に配当金を集計
         const yearlyDividends: { [year: string]: number } = {};
 
@@ -92,24 +81,31 @@ export default function Home() {
             yearlyDividends[year] = (yearlyDividends[year] || 0) + amountInYen;
         });
 
-        // グラフ用のデータに変換（年でソート）
-        const chartData: DividendData[] = Object.keys(yearlyDividends)
-            .sort()
-            .map((year) => ({
-                year: `${year}年`,
-                totalDividend: Math.round(yearlyDividends[year]),
-            }));
+        // 年でソート
+        const sortedYears = Object.keys(yearlyDividends).sort();
 
-        return chartData;
+        // 累計配当金を計算
+        let cumulative = 0;
+        const cumulativeData: CumulativeDividendData[] = sortedYears.map((year) => {
+            const yearlyAmount = yearlyDividends[year];
+            cumulative += yearlyAmount;
+            return {
+                year: `${year}年`,
+                yearlyDividend: Math.round(yearlyAmount),
+                cumulativeDividend: Math.round(cumulative),
+            };
+        });
+
+        return cumulativeData;
     }, []);
 
     // 為替レートが変更されたときにデータを再計算
     useEffect(() => {
         if (rawData.length > 0) {
-            const chartData = calculateDividendData(rawData, usdToJpyRate);
+            const chartData = calculateCumulativeDividendData(rawData, usdToJpyRate);
             setData(chartData);
         }
-    }, [usdToJpyRate, rawData, calculateDividendData]);
+    }, [usdToJpyRate, rawData, calculateCumulativeDividendData]);
 
     if (loading) {
         return (
@@ -145,7 +141,7 @@ export default function Home() {
      */
     const CustomTooltip = ({active, payload}: {
         active?: boolean;
-        payload?: Array<{ payload: DividendData; value: number }>
+        payload?: Array<{ payload: CumulativeDividendData; value: number }>
     }) => {
         if (active && payload && payload.length) {
             return (
@@ -153,7 +149,10 @@ export default function Home() {
                     className="bg-white dark:bg-gray-800 p-3 border border-gray-300 dark:border-gray-600 rounded shadow-lg">
                     <p className="text-gray-800 dark:text-gray-200 font-semibold">{payload[0].payload.year}</p>
                     <p className="text-blue-600 dark:text-blue-400">
-                        配当金: ¥{payload[0].value.toLocaleString()}
+                        年間配当金: ¥{payload[0].payload.yearlyDividend.toLocaleString()}
+                    </p>
+                    <p className="text-blue-600 dark:text-blue-400 font-semibold">
+                        累計配当金: ¥{payload[0].value.toLocaleString()}
                     </p>
                 </div>
             );
@@ -167,7 +166,7 @@ export default function Home() {
             <div className="max-w-6xl mx-auto">
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
                     <h1 className="text-4xl font-bold mb-6 text-gray-800 dark:text-gray-200">
-                        年別配当グラフ
+                        累計配当グラフ
                     </h1>
 
                     <div className="mb-6">
@@ -201,50 +200,75 @@ export default function Home() {
                         </div>
                     </div>
 
-                    <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-6">
+                    <div className="mb-8">
                         <ResponsiveContainer width="100%" height={400}>
-                            <BarChart data={data}>
-                                <CartesianGrid strokeDasharray="3 3"/>
-                                <XAxis dataKey="year"/>
-                                <YAxis/>
+                            <LineChart data={data}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb"
+                                               className="dark:stroke-gray-600"/>
+                                <XAxis
+                                    dataKey="year"
+                                    tick={{fill: '#6b7280'}}
+                                    className="dark:fill-gray-400"
+                                />
+                                <YAxis
+                                    tick={{fill: '#6b7280'}}
+                                    className="dark:fill-gray-400"
+                                    tickFormatter={(value: number) =>
+                                        value < 1000
+                                            ? `¥${value.toLocaleString()}`
+                                            : `¥${(value / 1000).toFixed(0)}K`
+                                    }
+                                />
                                 <Tooltip content={<CustomTooltip/>}/>
-                                <Legend/>
-                                <Bar dataKey="totalDividend" fill="#3b82f6" name="配当金（税引き後）[円]"/>
-                            </BarChart>
+                                <Legend
+                                    wrapperStyle={{
+                                        paddingTop: '20px',
+                                    }}
+                                />
+                                <Line
+                                    type="monotone"
+                                    dataKey="cumulativeDividend"
+                                    stroke="#3b82f6"
+                                    strokeWidth={2}
+                                    name="累計配当金（税引き後）[円]"
+                                    dot={{fill: '#3b82f6', r: 4}}
+                                    activeDot={{r: 6}}
+                                />
+                            </LineChart>
                         </ResponsiveContainer>
                     </div>
 
-                    <div className="mt-8">
+                    <div className="mb-6">
                         <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
-                            年別配当金集計
+                            年別累計配当金集計
                         </h2>
                         <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <table
+                                className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700">
                                 <thead className="bg-gray-100 dark:bg-gray-700">
                                 <tr>
                                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                         年
                                     </th>
                                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                        税引後配当合計[円]
+                                        税引後年間配当[円]
                                     </th>
                                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                                        月平均配当[円]
+                                        税引後累計配当[円]
                                     </th>
                                 </tr>
                                 </thead>
-                                <tbody
-                                    className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                {data.map((row) => (
-                                    <tr key={row.year}>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right">
-                                            {row.year}
+                                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                {data.map((item) => (
+                                    <tr key={item.year} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-100">
+                                            {item.year}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right">
-                                            ¥{row.totalDividend.toLocaleString()}
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-100">
+                                            ¥{item.yearlyDividend.toLocaleString()}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right">
-                                            ¥{Math.floor(row.totalDividend / 12).toLocaleString()}
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900 dark:text-gray-100">
+                                            ¥{item.cumulativeDividend.toLocaleString()}
                                         </td>
                                     </tr>
                                 ))}
@@ -253,13 +277,9 @@ export default function Home() {
                         </div>
                     </div>
 
-                    <div className="mt-6 text-sm text-gray-500 dark:text-gray-400">
-                        <p>
-                            このグラフは、配当金データから年別に税引き後の配当金を集計して表示しています。
-                        </p>
-                        <p className="mt-1">
-                            ※ USドル建ての配当金は1ドル={usdToJpyRate}円で換算しています。
-                        </p>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                        <p>このグラフは、配当金データから年別に税引き後の配当金を累計して表示しています。</p>
+                        <p>※ USドル建ての配当金は1ドル={usdToJpyRate}円で換算しています。</p>
                     </div>
                 </div>
             </div>
