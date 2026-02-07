@@ -250,7 +250,11 @@ export default function CumulativeDividendPage() {
                                 <YAxis
                                     tick={{fill: '#6b7280'}}
                                     className="dark:fill-gray-400"
-                                    tickFormatter={(value) => `¥${(value / 1000).toFixed(0)}K`}
+                                    tickFormatter={(value: number) =>
+                                        value < 1000
+                                            ? `¥${value.toLocaleString()}`
+                                            : `¥${(value / 1000).toFixed(0)}K`
+                                    }
                                 />
                                 <Tooltip content={<CustomTooltip/>}/>
                                 <Legend
