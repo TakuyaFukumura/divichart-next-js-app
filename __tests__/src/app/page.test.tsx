@@ -8,8 +8,6 @@
 import React from 'react';
 import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import '@testing-library/jest-dom';
-// コンポーネントのインポートはモック定義の後に行う
-import Home from '@/app/page';
 
 // PapaParse のモック - モジュール読み込み前に定義
 const mockPapaParse = jest.fn();
@@ -57,6 +55,12 @@ jest.mock('recharts', () => ({
 // グローバルfetchのモック
 const mockFetch = jest.fn();
 global.fetch = mockFetch as jest.Mock;
+
+// コンポーネントのインポート
+// Note: Jest（next/jest）はトランスパイル時にjest.mock()を自動的に先頭に巻き上げるため、
+// このimport文の位置に関わらずモックが適用されます。
+// このファイルはCJS変換前提で実行されており、純粋なESMとしては動作しません。
+import Home from '@/app/page';
 
 // サンプルCSVデータとそのパース結果
 const createMockCSV = () => {
