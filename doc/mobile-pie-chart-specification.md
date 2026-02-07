@@ -403,7 +403,7 @@ export default function DividendPieChart({ data }: { data: StockDividend[] }) {
 - メンテナンス性がやや低下する
 - バンドルサイズがわずかに増加する
 
-### 5.4 実装案3: CSS変数とcalcを使用した動的サイズ（推奨）
+### 5.4 実装案3: ウィンドウサイズ監視と設定オブジェクトによる動的サイズ（推奨）
 
 #### 実装方法
 
@@ -695,7 +695,17 @@ useEffect(() => {
 #### リサイズイベントのパフォーマンス最適化
 
 ```tsx
-import { debounce } from 'lodash'; // または自作のdebounce関数
+// 自作のdebounce関数（lodashを使わない場合）
+const debounce = <T extends (...args: any[]) => any>(
+    func: T,
+    wait: number
+): ((...args: Parameters<T>) => void) => {
+    let timeout: NodeJS.Timeout | null = null;
+    return (...args: Parameters<T>) => {
+        if (timeout) clearTimeout(timeout);
+        timeout = setTimeout(() => func(...args), wait);
+    };
+};
 
 useEffect(() => {
     const handleResize = debounce(() => {
@@ -705,11 +715,12 @@ useEffect(() => {
 
     window.addEventListener('resize', handleResize);
     return () => {
-        handleResize.cancel();
         window.removeEventListener('resize', handleResize);
     };
 }, []);
 ```
+
+**注記**: 上記は追加依存なしで実装する場合の例です。もし lodash を導入する場合は `import { debounce } from 'lodash'` を使用できますが、バンドルサイズへの影響を考慮してください。
 
 ---
 
@@ -792,7 +803,7 @@ useEffect(() => {
 ```tsx
 // __tests__/src/app/components/DividendPieChart.test.tsx
 
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import DividendPieChart from '@/app/components/DividendPieChart';
 
 describe('DividendPieChart - Responsive Design', () => {
@@ -803,13 +814,22 @@ describe('DividendPieChart - Responsive Design', () => {
     ];
 
     test('モバイルサイズでレンダリングされる', () => {
-        // モバイルサイズをシミュレート
-        global.innerWidth = 375;
-        global.dispatchEvent(new Event('resize'));
+        // innerWidthを書き換え可能にする
+        Object.defineProperty(window, 'innerWidth', {
+            writable: true,
+            configurable: true,
+            value: 375,
+        });
 
         render(<DividendPieChart data={mockData} />);
+        
+        // リサイズイベントを発火
+        act(() => {
+            window.dispatchEvent(new Event('resize'));
+        });
+
         // グラフが表示されることを確認
-        expect(screen.getByText(/表示する配当データがありません/)).not.toBeInTheDocument();
+        expect(screen.queryByText('表示する配当データがありません')).not.toBeInTheDocument();
     });
 
     test('データがない場合、適切なメッセージが表示される', () => {
@@ -818,6 +838,8 @@ describe('DividendPieChart - Responsive Design', () => {
     });
 });
 ```
+
+**注記**: jsdom では `window.innerWidth` が読み取り専用のため、`Object.defineProperty` で書き換え可能にする必要があります。また、resize イベントは render 後に `act()` でラップして発火させることで、useEffect の処理が確実に実行されます。
 
 ---
 
