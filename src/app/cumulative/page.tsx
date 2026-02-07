@@ -1,16 +1,7 @@
 'use client';
 
 import {useCallback, useEffect, useState} from 'react';
-import {
-    CartesianGrid,
-    Legend,
-    Line,
-    LineChart,
-    ResponsiveContainer,
-    Tooltip,
-    XAxis,
-    YAxis
-} from 'recharts';
+import {CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from 'recharts';
 import {CSVRow, CumulativeDividendData} from '@/types/dividend';
 import {useDividendData} from '@/hooks/useDividendData';
 
@@ -86,7 +77,7 @@ export default function CumulativeDividendPage() {
 
         // 累計配当金を計算
         let cumulative = 0;
-        const cumulativeData: CumulativeDividendData[] = sortedYears.map((year) => {
+        return sortedYears.map((year) => {
             const yearlyAmount = yearlyDividends[year];
             cumulative += yearlyAmount;
             return {
@@ -95,8 +86,6 @@ export default function CumulativeDividendPage() {
                 cumulativeDividend: Math.round(cumulative),
             };
         });
-
-        return cumulativeData;
     }, []);
 
     // 為替レートが変更されたときにデータを再計算
