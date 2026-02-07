@@ -731,6 +731,8 @@ useEffect(() => {
         setIsTablet(window.innerWidth >= 640 && window.innerWidth < 1024);
     }, 200); // 200ms のデバウンス
 
+    // 初期レンダリング時に一度実行して状態を現在の画面幅と同期
+    handleResize();
     window.addEventListener('resize', handleResize);
     return () => {
         window.removeEventListener('resize', handleResize);
