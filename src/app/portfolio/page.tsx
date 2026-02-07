@@ -13,8 +13,8 @@ import DividendTable from '@/app/components/DividendTable';
 const DEFAULT_USD_TO_JPY_RATE = 150;
 const envRate = process.env.NEXT_PUBLIC_USD_TO_JPY_RATE
     ? Number(process.env.NEXT_PUBLIC_USD_TO_JPY_RATE)
-    : NaN;
-const USD_TO_JPY_RATE = !isNaN(envRate) && envRate > 0 ? envRate : DEFAULT_USD_TO_JPY_RATE;
+    : Number.NaN;
+const USD_TO_JPY_RATE = !Number.isNaN(envRate) && envRate > 0 ? envRate : DEFAULT_USD_TO_JPY_RATE;
 
 /**
  * 配当ポートフォリオコンポーネント（内部実装）
@@ -58,7 +58,7 @@ function PortfolioContent() {
         if (availableYears.length === 0) return;
 
         const yearParam = searchParams.get('year');
-        let targetYear = yearParam ? parseInt(yearParam, 10) : new Date().getFullYear();
+        let targetYear = yearParam ? Number.parseInt(yearParam, 10) : new Date().getFullYear();
 
         // データがない年の場合は最新年を使用
         if (!availableYears.includes(targetYear)) {
