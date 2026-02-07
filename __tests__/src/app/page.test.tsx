@@ -56,7 +56,10 @@ jest.mock('recharts', () => ({
 const mockFetch = jest.fn();
 global.fetch = mockFetch as jest.Mock;
 
-// コンポーネントのインポートはモック定義の後に行う
+// コンポーネントのインポート
+// Note: Jest（next/jest）はトランスパイル時にjest.mock()を自動的に先頭に巻き上げるため、
+// このimport文の位置に関わらずモックが適用されます。
+// このファイルはCJS変換前提で実行されており、純粋なESMとしては動作しません。
 import Home from '@/app/page';
 
 // サンプルCSVデータとそのパース結果
