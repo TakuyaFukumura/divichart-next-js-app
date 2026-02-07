@@ -115,7 +115,7 @@ export default function DividendPieChart({
 
     if (data.length === 0) {
         return (
-            <div className="flex items-center justify-center h-100 bg-gray-50 dark:bg-gray-900 rounded-xl">
+            <div className="flex items-center justify-center h-[400px] bg-gray-50 dark:bg-gray-900 rounded-xl">
                 <p className="text-gray-500 dark:text-gray-400">
                     表示する配当データがありません
                 </p>
