@@ -36,7 +36,7 @@ describe('YearSelector', () => {
                 />
             );
 
-            expect(screen.getByText('< 前年')).toBeInTheDocument();
+            expect(screen.getByText('<')).toBeInTheDocument();
         });
 
         it('次年ボタンが表示される', () => {
@@ -48,7 +48,7 @@ describe('YearSelector', () => {
                 />
             );
 
-            expect(screen.getByText('次年 >')).toBeInTheDocument();
+            expect(screen.getByText('>')).toBeInTheDocument();
         });
     });
 
@@ -62,7 +62,7 @@ describe('YearSelector', () => {
                 />
             );
 
-            const prevButton = screen.getByText('< 前年').closest('button');
+            const prevButton = screen.getByText('<').closest('button');
             expect(prevButton).toBeDisabled();
         });
 
@@ -75,7 +75,7 @@ describe('YearSelector', () => {
                 />
             );
 
-            const nextButton = screen.getByText('次年 >').closest('button');
+            const nextButton = screen.getByText('>').closest('button');
             expect(nextButton).toBeDisabled();
         });
 
@@ -88,8 +88,8 @@ describe('YearSelector', () => {
                 />
             );
 
-            const prevButton = screen.getByText('< 前年').closest('button');
-            const nextButton = screen.getByText('次年 >').closest('button');
+            const prevButton = screen.getByText('<').closest('button');
+            const nextButton = screen.getByText('>').closest('button');
 
             expect(prevButton).not.toBeDisabled();
             expect(nextButton).not.toBeDisabled();
@@ -106,7 +106,7 @@ describe('YearSelector', () => {
                 />
             );
 
-            const prevButton = screen.getByText('< 前年').closest('button');
+            const prevButton = screen.getByText('<').closest('button');
             if (prevButton) {
                 fireEvent.click(prevButton);
             }
@@ -124,7 +124,7 @@ describe('YearSelector', () => {
                 />
             );
 
-            const nextButton = screen.getByText('次年 >').closest('button');
+            const nextButton = screen.getByText('>').closest('button');
             if (nextButton) {
                 fireEvent.click(nextButton);
             }
@@ -142,7 +142,7 @@ describe('YearSelector', () => {
                 />
             );
 
-            const prevButton = screen.getByText('< 前年').closest('button');
+            const prevButton = screen.getByText('<').closest('button');
             if (prevButton) {
                 fireEvent.click(prevButton);
             }
@@ -159,7 +159,7 @@ describe('YearSelector', () => {
                 />
             );
 
-            const nextButton = screen.getByText('次年 >').closest('button');
+            const nextButton = screen.getByText('>').closest('button');
             if (nextButton) {
                 fireEvent.click(nextButton);
             }
@@ -178,8 +178,8 @@ describe('YearSelector', () => {
                 />
             );
 
-            const prevButton = screen.getByText('< 前年').closest('button');
-            const nextButton = screen.getByText('次年 >').closest('button');
+            const prevButton = screen.getByText('<').closest('button');
+            const nextButton = screen.getByText('>').closest('button');
 
             expect(prevButton).toBeDisabled();
             expect(nextButton).toBeDisabled();

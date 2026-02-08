@@ -47,7 +47,7 @@ export default function YearSelector({
                 }`}
                 aria-label="前年"
             >
-                &lt; 前年
+                &lt;
             </button>
             <div className="text-2xl font-bold text-gray-800 dark:text-gray-200 min-w-[120px] text-center">
                 {currentYear}年
@@ -62,7 +62,7 @@ export default function YearSelector({
                 }`}
                 aria-label="次年"
             >
-                次年 &gt;
+                &gt;
             </button>
         </div>
     );
