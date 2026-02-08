@@ -43,10 +43,10 @@
 - カスタムフックの作成:
   - `useDividendData`: データ読み込み用カスタムフック
 - ビジネスロジックの分離:
-  - `lib/dividendCalculator.ts`: 配当金計算ロジック
-  - `lib/csvLoader.ts`: CSV読み込みロジック
+  - `src/lib/dividendCalculator.ts`: 配当金計算ロジック
+  - `src/lib/csvLoader.ts`: CSV読み込みロジック
 - 型定義の整理:
-  - `types/dividend.ts`: 配当金関連の型定義
+  - `src/types/dividend.ts`: 配当金関連の型定義
 
 **成果**:
 - page.tsxが293行から258行に削減
