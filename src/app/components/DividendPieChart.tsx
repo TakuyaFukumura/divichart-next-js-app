@@ -50,9 +50,17 @@ interface DividendPieChartProps {
 export default function DividendPieChart({
                                              data,
                                          }: DividendPieChartProps) {
-    // デバイス判定用のステート
-    const [isMobile, setIsMobile] = useState(false);
-    const [isTablet, setIsTablet] = useState(false);
+    // デバイス判定用のステート (lazy initializer で初期値を正確に設定)
+    const [isMobile, setIsMobile] = useState(() => {
+        if (typeof window === 'undefined') return false;
+        return window.matchMedia('(max-width: 639px)').matches;
+    });
+    const [isTablet, setIsTablet] = useState(() => {
+        if (typeof window === 'undefined') return false;
+        const isMobileMatch = window.matchMedia('(max-width: 639px)').matches;
+        const isTabletMatch = window.matchMedia('(min-width: 640px) and (max-width: 1023px)').matches;
+        return !isMobileMatch && isTabletMatch;
+    });
 
     useEffect(() => {
         const mobileQuery = window.matchMedia('(max-width: 639px)');

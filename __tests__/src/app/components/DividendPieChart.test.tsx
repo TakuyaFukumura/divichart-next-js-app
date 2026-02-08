@@ -59,6 +59,9 @@ describe('DividendPieChart', () => {
         {stockCode: 'BLV', stockName: 'VA L-TERM BOND', amount: 411, percentage: 1.6},
     ];
 
+    // matchMedia のモックリスナーを保持
+    let mediaQueryListeners: { [key: string]: Array<(e: MediaQueryListEvent) => void> } = {};
+
     // matchMedia のモックを設定するヘルパー関数
     const mockMatchMedia = (width: number) => {
         const mobileMatches = width < 640;
@@ -74,22 +77,35 @@ describe('DividendPieChart', () => {
                     matches = tabletMatches;
                 }
 
-                return {
+                const mql = {
                     matches,
                     media: query,
                     onchange: null,
                     addListener: jest.fn(),
                     removeListener: jest.fn(),
-                    addEventListener: jest.fn(),
+                    addEventListener: jest.fn((event: string, handler: (e: MediaQueryListEvent) => void) => {
+                        if (!mediaQueryListeners[query]) {
+                            mediaQueryListeners[query] = [];
+                        }
+                        mediaQueryListeners[query].push(handler);
+                    }),
                     removeEventListener: jest.fn(),
-                    dispatchEvent: jest.fn(),
+                    dispatchEvent: jest.fn((event: MediaQueryListEvent) => {
+                        if (mediaQueryListeners[query]) {
+                            mediaQueryListeners[query].forEach(handler => handler(event));
+                        }
+                        return true;
+                    }),
                 };
+
+                return mql;
             }),
         });
     };
 
     beforeEach(() => {
         // デフォルトでデスクトップサイズに設定
+        mediaQueryListeners = {};
         mockMatchMedia(1024);
     });
 
@@ -211,13 +227,16 @@ describe('DividendPieChart', () => {
     });
 
     describe('ウィンドウリサイズ', () => {
-        it('メディアクエリが変更されると、設定が更新される', () => {
+        it('メディアクエリのchangeイベントリスナーが登録される', () => {
             // 初期状態はデスクトップ
             mockMatchMedia(1920);
             render(<DividendPieChart data={mockData}/>);
 
-            const pieElement = screen.getByTestId('mock-pie');
-            expect(pieElement).toHaveAttribute('data-outer-radius', '140');
+            // メディアクエリのリスナーが登録されていることを確認
+            expect(mediaQueryListeners['(max-width: 639px)']).toBeDefined();
+            expect(mediaQueryListeners['(max-width: 639px)'].length).toBeGreaterThan(0);
+            expect(mediaQueryListeners['(min-width: 640px) and (max-width: 1023px)']).toBeDefined();
+            expect(mediaQueryListeners['(min-width: 640px) and (max-width: 1023px)'].length).toBeGreaterThan(0);
         });
     });
 });
