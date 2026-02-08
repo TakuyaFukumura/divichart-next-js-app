@@ -2,6 +2,7 @@
 
 import {Legend, Pie, PieChart, ResponsiveContainer, Tooltip} from 'recharts';
 import {StockDividend} from '@/types/dividend';
+import {useEffect, useState} from 'react';
 
 /**
  * 配当円グラフコンポーネント
@@ -46,9 +47,57 @@ interface DividendPieChartProps {
     readonly data: readonly StockDividend[];
 }
 
+// メディアクエリの定数定義
+const MOBILE_QUERY = '(max-width: 639px)';
+const TABLET_QUERY = '(min-width: 640px) and (max-width: 1023px)';
+
 export default function DividendPieChart({
                                              data,
                                          }: DividendPieChartProps) {
+    // デバイス判定用のステート (lazy initializer で初期値を正確に設定)
+    const [isMobile, setIsMobile] = useState(() => {
+        if (typeof window === 'undefined') return false;
+        return window.matchMedia(MOBILE_QUERY).matches;
+    });
+    const [isTablet, setIsTablet] = useState(() => {
+        if (typeof window === 'undefined') return false;
+        const isMobileMatch = window.matchMedia(MOBILE_QUERY).matches;
+        const isTabletMatch = window.matchMedia(TABLET_QUERY).matches;
+        return !isMobileMatch && isTabletMatch;
+    });
+
+    useEffect(() => {
+        const mobileQuery = window.matchMedia(MOBILE_QUERY);
+        const tabletQuery = window.matchMedia(TABLET_QUERY);
+
+        const updateFromMediaQueries = () => {
+            const isMobileMatch = mobileQuery.matches;
+            const isTabletMatch = tabletQuery.matches;
+
+            setIsMobile(isMobileMatch);
+            setIsTablet(!isMobileMatch && isTabletMatch);
+        };
+
+        // 初期判定
+        updateFromMediaQueries();
+
+        mobileQuery.addEventListener('change', updateFromMediaQueries);
+        tabletQuery.addEventListener('change', updateFromMediaQueries);
+
+        return () => {
+            mobileQuery.removeEventListener('change', updateFromMediaQueries);
+            tabletQuery.removeEventListener('change', updateFromMediaQueries);
+        };
+    }, []);
+
+    // デバイスに応じたチャート設定
+    const chartConfig = {
+        outerRadius: isMobile ? 80 : isTablet ? 120 : 140,
+        height: isMobile ? 350 : isTablet ? 400 : 450,
+        labelThreshold: 3,
+        showLabels: !isMobile, // モバイルではラベルを非表示
+    };
+
     // Rechartsのデフォルトカラーパレット
     const COLORS = [
         '#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8',
@@ -89,8 +138,13 @@ export default function DividendPieChart({
             return null;
         }
 
+        // モバイルではラベルを非表示
+        if (!chartConfig.showLabels) {
+            return null;
+        }
+
         // 割合が小さい場合は表示しない
-        if (entry.percentage < 3) {
+        if (entry.percentage < chartConfig.labelThreshold) {
             return null;
         }
 
@@ -115,7 +169,10 @@ export default function DividendPieChart({
 
     if (data.length === 0) {
         return (
-            <div className="flex items-center justify-center h-[400px] bg-gray-50 dark:bg-gray-900 rounded-xl">
+            <div
+                className="flex items-center justify-center bg-gray-50 dark:bg-gray-900 rounded-xl"
+                style={{ height: `${chartConfig.height}px` }}
+            >
                 <p className="text-gray-500 dark:text-gray-400">
                     表示する配当データがありません
                 </p>
@@ -124,8 +181,8 @@ export default function DividendPieChart({
     }
 
     return (
-        <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-6">
-            <ResponsiveContainer width="100%" height={400}>
+        <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 md:p-6">
+            <ResponsiveContainer width="100%" height={chartConfig.height}>
                 <PieChart>
                     <Pie
                         data={chartData}
@@ -133,7 +190,7 @@ export default function DividendPieChart({
                         cy="50%"
                         labelLine={false}
                         label={renderLabel}
-                        outerRadius={140}
+                        outerRadius={chartConfig.outerRadius}
                         fill="#8884d8"
                         nameKey="name"
                         // 各データのfillプロパティで色を指定
@@ -142,7 +199,15 @@ export default function DividendPieChart({
                         // Pieコンポーネントがfillプロパティを参照する
                     />
                     <Tooltip content={<CustomTooltip/>}/>
-                    <Legend/>
+                    <Legend
+                        layout={isMobile ? "horizontal" : "vertical"}
+                        align={isMobile ? "center" : "right"}
+                        verticalAlign={isMobile ? "bottom" : "middle"}
+                        wrapperStyle={{
+                            fontSize: isMobile ? '11px' : '14px',
+                            paddingTop: isMobile ? '10px' : '0',
+                        }}
+                    />
                 </PieChart>
             </ResponsiveContainer>
         </div>
