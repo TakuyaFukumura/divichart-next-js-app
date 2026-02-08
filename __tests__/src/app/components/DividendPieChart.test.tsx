@@ -5,7 +5,6 @@
 import React from 'react';
 import {render, screen} from '@testing-library/react';
 import DividendPieChart from '@/app/components/DividendPieChart';
-import '@testing-library/jest-dom';
 import {StockDividend} from '@/types/dividend';
 
 // Recharts をモックして jsdom 環境でのテストを軽量化
