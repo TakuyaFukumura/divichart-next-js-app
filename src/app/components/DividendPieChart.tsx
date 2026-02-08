@@ -55,14 +55,43 @@ export default function DividendPieChart({
     const [isTablet, setIsTablet] = useState(false);
 
     useEffect(() => {
-        const checkDevice = () => {
-            setIsMobile(window.innerWidth < 640);
-            setIsTablet(window.innerWidth >= 640 && window.innerWidth < 1024);
+        const mobileQuery = window.matchMedia('(max-width: 639px)');
+        const tabletQuery = window.matchMedia('(min-width: 640px) and (max-width: 1023px)');
+
+        const updateFromMediaQueries = () => {
+            const isMobileMatch = mobileQuery.matches;
+            const isTabletMatch = tabletQuery.matches;
+
+            setIsMobile(isMobileMatch);
+            setIsTablet(!isMobileMatch && isTabletMatch);
         };
 
-        checkDevice();
-        window.addEventListener('resize', checkDevice);
-        return () => window.removeEventListener('resize', checkDevice);
+        // 初期判定
+        updateFromMediaQueries();
+
+        const handleMobileChange = (event: MediaQueryListEvent) => {
+            const isMobileMatch = event.matches;
+            const isTabletMatch = tabletQuery.matches;
+
+            setIsMobile(isMobileMatch);
+            setIsTablet(!isMobileMatch && isTabletMatch);
+        };
+
+        const handleTabletChange = (event: MediaQueryListEvent) => {
+            const isTabletMatch = event.matches;
+            const isMobileMatch = mobileQuery.matches;
+
+            setIsMobile(isMobileMatch);
+            setIsTablet(!isMobileMatch && isTabletMatch);
+        };
+
+        mobileQuery.addEventListener('change', handleMobileChange);
+        tabletQuery.addEventListener('change', handleTabletChange);
+
+        return () => {
+            mobileQuery.removeEventListener('change', handleMobileChange);
+            tabletQuery.removeEventListener('change', handleTabletChange);
+        };
     }, []);
 
     // デバイスに応じたチャート設定
