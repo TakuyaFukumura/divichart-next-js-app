@@ -47,24 +47,28 @@ interface DividendPieChartProps {
     readonly data: readonly StockDividend[];
 }
 
+// メディアクエリの定数定義
+const MOBILE_QUERY = '(max-width: 639px)';
+const TABLET_QUERY = '(min-width: 640px) and (max-width: 1023px)';
+
 export default function DividendPieChart({
                                              data,
                                          }: DividendPieChartProps) {
     // デバイス判定用のステート (lazy initializer で初期値を正確に設定)
     const [isMobile, setIsMobile] = useState(() => {
         if (typeof window === 'undefined') return false;
-        return window.matchMedia('(max-width: 639px)').matches;
+        return window.matchMedia(MOBILE_QUERY).matches;
     });
     const [isTablet, setIsTablet] = useState(() => {
         if (typeof window === 'undefined') return false;
-        const isMobileMatch = window.matchMedia('(max-width: 639px)').matches;
-        const isTabletMatch = window.matchMedia('(min-width: 640px) and (max-width: 1023px)').matches;
+        const isMobileMatch = window.matchMedia(MOBILE_QUERY).matches;
+        const isTabletMatch = window.matchMedia(TABLET_QUERY).matches;
         return !isMobileMatch && isTabletMatch;
     });
 
     useEffect(() => {
-        const mobileQuery = window.matchMedia('(max-width: 639px)');
-        const tabletQuery = window.matchMedia('(min-width: 640px) and (max-width: 1023px)');
+        const mobileQuery = window.matchMedia(MOBILE_QUERY);
+        const tabletQuery = window.matchMedia(TABLET_QUERY);
 
         const updateFromMediaQueries = () => {
             const isMobileMatch = mobileQuery.matches;

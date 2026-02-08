@@ -58,6 +58,10 @@ describe('DividendPieChart', () => {
         {stockCode: 'BLV', stockName: 'VA L-TERM BOND', amount: 411, percentage: 1.6},
     ];
 
+    // メディアクエリの定数定義 (DividendPieChart.tsxと同じ値)
+    const MOBILE_QUERY = '(max-width: 639px)';
+    const TABLET_QUERY = '(min-width: 640px) and (max-width: 1023px)';
+
     // matchMedia のモックリスナーを保持
     let mediaQueryListeners: { [key: string]: Array<(e: MediaQueryListEvent) => void> } = {};
 
@@ -70,9 +74,9 @@ describe('DividendPieChart', () => {
             writable: true,
             value: jest.fn().mockImplementation((query: string) => {
                 let matches = false;
-                if (query === '(max-width: 639px)') {
+                if (query === MOBILE_QUERY) {
                     matches = mobileMatches;
-                } else if (query === '(min-width: 640px) and (max-width: 1023px)') {
+                } else if (query === TABLET_QUERY) {
                     matches = tabletMatches;
                 }
 
@@ -232,10 +236,10 @@ describe('DividendPieChart', () => {
             render(<DividendPieChart data={mockData}/>);
 
             // メディアクエリのリスナーが登録されていることを確認
-            expect(mediaQueryListeners['(max-width: 639px)']).toBeDefined();
-            expect(mediaQueryListeners['(max-width: 639px)'].length).toBeGreaterThan(0);
-            expect(mediaQueryListeners['(min-width: 640px) and (max-width: 1023px)']).toBeDefined();
-            expect(mediaQueryListeners['(min-width: 640px) and (max-width: 1023px)'].length).toBeGreaterThan(0);
+            expect(mediaQueryListeners[MOBILE_QUERY]).toBeDefined();
+            expect(mediaQueryListeners[MOBILE_QUERY].length).toBeGreaterThan(0);
+            expect(mediaQueryListeners[TABLET_QUERY]).toBeDefined();
+            expect(mediaQueryListeners[TABLET_QUERY].length).toBeGreaterThan(0);
         });
     });
 });
