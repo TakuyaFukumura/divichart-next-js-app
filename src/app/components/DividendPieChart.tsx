@@ -69,28 +69,12 @@ export default function DividendPieChart({
         // 初期判定
         updateFromMediaQueries();
 
-        const handleMobileChange = (event: MediaQueryListEvent) => {
-            const isMobileMatch = event.matches;
-            const isTabletMatch = tabletQuery.matches;
-
-            setIsMobile(isMobileMatch);
-            setIsTablet(!isMobileMatch && isTabletMatch);
-        };
-
-        const handleTabletChange = (event: MediaQueryListEvent) => {
-            const isTabletMatch = event.matches;
-            const isMobileMatch = mobileQuery.matches;
-
-            setIsMobile(isMobileMatch);
-            setIsTablet(!isMobileMatch && isTabletMatch);
-        };
-
-        mobileQuery.addEventListener('change', handleMobileChange);
-        tabletQuery.addEventListener('change', handleTabletChange);
+        mobileQuery.addEventListener('change', updateFromMediaQueries);
+        tabletQuery.addEventListener('change', updateFromMediaQueries);
 
         return () => {
-            mobileQuery.removeEventListener('change', handleMobileChange);
-            tabletQuery.removeEventListener('change', handleTabletChange);
+            mobileQuery.removeEventListener('change', updateFromMediaQueries);
+            tabletQuery.removeEventListener('change', updateFromMediaQueries);
         };
     }, []);
 
