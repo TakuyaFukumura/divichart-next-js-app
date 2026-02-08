@@ -19,23 +19,36 @@ interface CustomTooltipProps {
     payload?: Array<{
         name: string;
         value: number;
-        payload: { percentage: number };
+        payload: {
+            percentage: number;
+            stockCode: string;
+            stockName: string;
+        };
     }>;
 }
 
 export const CustomTooltip = ({active, payload}: CustomTooltipProps) => {
     if (active && payload?.length) {
+        const data = payload[0];
+        const { stockCode, stockName } = data.payload;
+        
+        // 銘柄コードが存在する場合は、銘柄コードと銘柄名の両方を表示
+        // 銘柄コードが存在しない場合は、銘柄名のみを表示
+        const displayTitle = stockCode 
+            ? `${stockCode} - ${stockName}`
+            : stockName;
+        
         return (
             <div
                 className="bg-white dark:bg-gray-800 p-3 border border-gray-300 dark:border-gray-600 rounded shadow-lg">
                 <p className="text-gray-800 dark:text-gray-200 font-semibold">
-                    {payload[0].name}
+                    {displayTitle}
                 </p>
                 <p className="text-blue-600 dark:text-blue-400">
-                    金額: ¥{payload[0].value.toLocaleString()}
+                    金額: ¥{data.value.toLocaleString()}
                 </p>
                 <p className="text-gray-600 dark:text-gray-400">
-                    割合: {payload[0].payload.percentage.toFixed(1)}%
+                    割合: {data.payload.percentage.toFixed(1)}%
                 </p>
             </div>
         );
@@ -106,7 +119,11 @@ export default function DividendPieChart({
 
     // データを円グラフ用の形式に変換
     const chartData = data.map((item, index) => ({
-        name: item.stockName,
+        // 銘柄コードが存在する場合は銘柄コード、なければ銘柄名を使用
+        name: item.stockCode || item.stockName,
+        // ツールチップで詳細情報を表示するために、両方の情報を保持
+        stockCode: item.stockCode,
+        stockName: item.stockName,
         value: item.amount,
         percentage: item.percentage,
         fill: item.color || COLORS[index % COLORS.length],
