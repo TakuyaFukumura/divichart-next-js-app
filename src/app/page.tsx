@@ -4,6 +4,7 @@ import {useCallback, useEffect, useState} from 'react';
 import {Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis} from 'recharts';
 import {useDividendData} from '@/hooks/useDividendData';
 import {CSVRow} from '@/types/dividend';
+import {formatYAxisValue} from '@/lib/formatYAxisValue';
 
 /**
  * 配当金データの型定義
@@ -195,7 +196,7 @@ export default function Home() {
                             <BarChart data={data}>
                                 <CartesianGrid strokeDasharray="3 3"/>
                                 <XAxis dataKey="year"/>
-                                <YAxis/>
+                                <YAxis tickFormatter={formatYAxisValue}/>
                                 <Tooltip content={<CustomTooltip/>}/>
                                 <Legend/>
                                 <Bar dataKey="totalDividend" fill="#3b82f6" name="配当金（税引き後）[円]"/>
