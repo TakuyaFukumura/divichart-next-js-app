@@ -32,6 +32,7 @@ export function formatYAxisValue(value: number): string {
         return `${sign}${senValue}千円`;
     }
 
-    // 1千円未満の場合は円単位で表示
-    return `${sign}${absValue}円`;
+    // 1千円未満の場合は円単位で表示（小数点なし）
+    const yenValue = Math.floor(absValue);
+    return `${sign}${yenValue}円`;
 }
