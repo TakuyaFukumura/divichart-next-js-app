@@ -21,8 +21,8 @@
 const DEFAULT_USD_TO_JPY_RATE = 150;
 const envRate = process.env.NEXT_PUBLIC_USD_TO_JPY_RATE
     ? Number(process.env.NEXT_PUBLIC_USD_TO_JPY_RATE)
-    : NaN;
-const USD_TO_JPY_RATE = !isNaN(envRate) && envRate > 0 ? envRate : DEFAULT_USD_TO_JPY_RATE;
+    : Number.NaN;
+const USD_TO_JPY_RATE = !Number.isNaN(envRate) && envRate > 0 ? envRate : DEFAULT_USD_TO_JPY_RATE;
 
 // コンポーネント内で使用
 const [usdToJpyRate, setUsdToJpyRate] = useState<number>(USD_TO_JPY_RATE);
