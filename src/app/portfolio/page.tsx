@@ -8,13 +8,10 @@ import {CSVRow, YearlyPortfolio} from '@/types/dividend';
 import YearSelector from '@/app/components/YearSelector';
 import DividendPieChart from '@/app/components/DividendPieChart';
 import DividendTable from '@/app/components/DividendTable';
+import {getUsdToJpyRate} from '@/lib/exchangeRate';
 
 // 為替レート設定（1ドル=150円）
-const DEFAULT_USD_TO_JPY_RATE = 150;
-const envRate = process.env.NEXT_PUBLIC_USD_TO_JPY_RATE
-    ? Number(process.env.NEXT_PUBLIC_USD_TO_JPY_RATE)
-    : Number.NaN;
-const USD_TO_JPY_RATE = !Number.isNaN(envRate) && envRate > 0 ? envRate : DEFAULT_USD_TO_JPY_RATE;
+const USD_TO_JPY_RATE = getUsdToJpyRate();
 
 /**
  * 配当ポートフォリオコンポーネント（内部実装）

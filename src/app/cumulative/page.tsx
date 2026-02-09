@@ -5,14 +5,11 @@ import {CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XA
 import {CSVRow, CumulativeDividendData} from '@/types/dividend';
 import {useDividendData} from '@/hooks/useDividendData';
 import {formatYAxisValue} from '@/lib/formatYAxisValue';
+import {getUsdToJpyRate} from '@/lib/exchangeRate';
 
 // 為替レート設定（1ドル=150円）
 // 環境変数から読み込み、未設定の場合はデフォルト値を使用
-const DEFAULT_USD_TO_JPY_RATE = 150;
-const envRate = process.env.NEXT_PUBLIC_USD_TO_JPY_RATE
-    ? Number(process.env.NEXT_PUBLIC_USD_TO_JPY_RATE)
-    : Number.NaN;
-const USD_TO_JPY_RATE = !Number.isNaN(envRate) && envRate > 0 ? envRate : DEFAULT_USD_TO_JPY_RATE;
+const USD_TO_JPY_RATE = getUsdToJpyRate();
 
 /**
  * 累計配当グラフページコンポーネント
