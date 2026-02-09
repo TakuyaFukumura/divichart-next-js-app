@@ -244,7 +244,7 @@ describe('DividendPieChart', () => {
     });
 
     describe('銘柄コード表示', () => {
-        it('銘柄コードが存在する場合、CustomTooltipに銘柄コードと銘柄名が表示される', () => {
+        it('銘柄コードが存在する場合、CustomTooltipに銘柄コードが表示される', () => {
             const testData: StockDividend[] = [
                 {stockCode: 'BLV', stockName: 'VA L-TERM BOND', amount: 50000, percentage: 100.0},
             ];
