@@ -8,13 +8,11 @@ import {CSVRow, YearlyPortfolio} from '@/types/dividend';
 import YearSelector from '@/app/components/YearSelector';
 import DividendPieChart from '@/app/components/DividendPieChart';
 import DividendTable from '@/app/components/DividendTable';
+import {getUsdToJpyRate} from '@/lib/exchangeRate';
+import {LoadingScreen, ErrorScreen} from '@/app/components/LoadingState';
 
 // 為替レート設定（1ドル=150円）
-const DEFAULT_USD_TO_JPY_RATE = 150;
-const envRate = process.env.NEXT_PUBLIC_USD_TO_JPY_RATE
-    ? Number(process.env.NEXT_PUBLIC_USD_TO_JPY_RATE)
-    : Number.NaN;
-const USD_TO_JPY_RATE = !Number.isNaN(envRate) && envRate > 0 ? envRate : DEFAULT_USD_TO_JPY_RATE;
+const USD_TO_JPY_RATE = getUsdToJpyRate();
 
 /**
  * 配当ポートフォリオコンポーネント（内部実装）
@@ -82,28 +80,8 @@ function PortfolioContent() {
         router.push(`/portfolio?year=${year}`);
     }, [router]);
 
-    if (loading) {
-        return (
-            <div
-                className="flex items-center justify-center min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-                <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                    <span className="ml-2 text-gray-600 dark:text-gray-400">読み込み中...</span>
-                </div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div
-                className="flex items-center justify-center min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-                <div className="text-red-600 dark:text-red-400 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
-                    エラー: {error}
-                </div>
-            </div>
-        );
-    }
+    if (loading) return <LoadingScreen />;
+    if (error) return <ErrorScreen error={error} />;
 
     if (availableYears.length === 0) {
         return (
@@ -178,15 +156,7 @@ function PortfolioContent() {
  */
 export default function PortfolioPage() {
     return (
-        <Suspense fallback={
-            <div
-                className="flex items-center justify-center min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-                <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                    <span className="ml-2 text-gray-600 dark:text-gray-400">読み込み中...</span>
-                </div>
-            </div>
-        }>
+        <Suspense fallback={<LoadingScreen />}>
             <PortfolioContent/>
         </Suspense>
     );
