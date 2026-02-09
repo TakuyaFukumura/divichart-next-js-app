@@ -317,8 +317,8 @@ function isValidExchangeRate(value: number): boolean {
 
 ### データ移行
 
-- localStorageに保存された為替レート設定は新しい実装でも引き続き使用される
-- 既存のlocalStorageキーと互換性を持たせる
+- 為替レート設定は新規に `usdToJpyRate` という localStorage キーで保存する
+- 現行コードでは為替レートを localStorage に保存していないため、既存キーからの移行は不要
 
 ## リスクと対策
 
