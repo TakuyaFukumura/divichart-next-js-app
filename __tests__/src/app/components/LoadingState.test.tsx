@@ -16,7 +16,7 @@ describe('LoadingState', () => {
 
         it('正しいスタイルクラスが適用されている', () => {
             const { container } = render(<LoadingScreen />);
-            const mainDiv = container.firstChild;
+            const mainDiv = container.firstElementChild;
             expect(mainDiv).toHaveClass('flex', 'items-center', 'justify-center', 'min-h-screen');
         });
     });
@@ -38,7 +38,7 @@ describe('LoadingState', () => {
 
         it('正しいスタイルクラスが適用されている', () => {
             const { container } = render(<ErrorScreen error="test" />);
-            const mainDiv = container.firstChild;
+            const mainDiv = container.firstElementChild;
             expect(mainDiv).toHaveClass('flex', 'items-center', 'justify-center', 'min-h-screen');
         });
     });
