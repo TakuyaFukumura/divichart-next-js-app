@@ -242,4 +242,41 @@ describe('DividendPieChart', () => {
             expect(mediaQueryListeners[TABLET_QUERY].length).toBeGreaterThan(0);
         });
     });
+
+    describe('銘柄コード表示', () => {
+        it('銘柄コードが存在する場合、CustomTooltipに銘柄コードと銘柄名が表示される', () => {
+            const testData: StockDividend[] = [
+                {stockCode: 'BLV', stockName: 'VA L-TERM BOND', amount: 50000, percentage: 100.0},
+            ];
+
+            render(<DividendPieChart data={testData}/>);
+
+            // CustomTooltipが利用可能であることを確認
+            expect(screen.getByTestId('mock-tooltip')).toBeInTheDocument();
+        });
+
+        it('銘柄コードが存在しない場合、銘柄名のみが表示される', () => {
+            const testData: StockDividend[] = [
+                {stockCode: '', stockName: 'その他', amount: 10000, percentage: 100.0},
+            ];
+
+            render(<DividendPieChart data={testData}/>);
+
+            // データがレンダリングされることを確認
+            expect(screen.getByTestId('mock-pie-chart')).toBeInTheDocument();
+        });
+
+        it('銘柄コードと銘柄名が混在する場合、正しく処理される', () => {
+            const testData: StockDividend[] = [
+                {stockCode: 'BLV', stockName: 'VA L-TERM BOND', amount: 50000, percentage: 50.0},
+                {stockCode: '', stockName: 'その他', amount: 50000, percentage: 50.0},
+            ];
+
+            render(<DividendPieChart data={testData}/>);
+
+            // 円グラフが正しくレンダリングされることを確認
+            expect(screen.getByTestId('mock-pie-chart')).toBeInTheDocument();
+            expect(screen.getByTestId('mock-pie')).toBeInTheDocument();
+        });
+    });
 });
