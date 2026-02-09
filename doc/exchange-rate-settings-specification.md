@@ -237,13 +237,22 @@ const rate = savedRate ? parseFloat(savedRate) : null;
 
 ### 2. 環境変数の扱い
 
-Next.jsの環境変数は以下の優先順位で読み込まれます：
+Next.js の環境変数は **単一の優先順位で一括して読み込まれるのではなく**、`NODE_ENV` に応じて読み込まれるファイルが異なります。
+代表的な例は以下のとおりです（詳細は公式ドキュメントを参照してください）：
 
-1. `.env.local` (最優先、gitignore対象)
-2. `.env.production` (本番環境用)
-3. `.env.development` (開発環境用)
-4. `.env` (全環境共通のデフォルト値)
+- 開発環境 (`NODE_ENV=development`)
+  - `.env.development.local`（最優先、通常は gitignore 対象）
+  - `.env.development`
+  - `.env.local`
+  - `.env`（全環境共通のデフォルト値）
+- 本番環境 (`NODE_ENV=production`)
+  - `.env.production.local`（最優先、通常は gitignore 対象）
+  - `.env.production`
+  - `.env.local`
+  - `.env`（全環境共通のデフォルト値）
 
+なお、実際にどのファイルがどの順序で読み込まれるかは Next.js のバージョンや設定に依存するため、最新かつ正確な仕様は公式ドキュメントを参照してください：
+https://nextjs.org/docs/app/building-your-application/configuring/environment-variables
 ### 3. 型安全性
 
 ```typescript
