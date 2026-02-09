@@ -61,6 +61,12 @@ global.fetch = mockFetch as jest.Mock;
 // このimport文の位置に関わらずモックが適用されます。
 // このファイルはCJS変換前提で実行されており、純粋なESMとしては動作しません。
 import Home from '@/app/page';
+import {ExchangeRateProvider} from '@/app/contexts/ExchangeRateContext';
+
+// テスト用ラッパーコンポーネント
+const TestWrapper = ({children}: { children: React.ReactNode }) => (
+    <ExchangeRateProvider>{children}</ExchangeRateProvider>
+);
 
 // サンプルCSVデータとそのパース結果
 const createMockCSV = () => {
@@ -184,7 +190,7 @@ describe('Home Page', () => {
             mockFetch.mockImplementation(() => new Promise(() => {
             }));
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             expect(screen.getByText('読み込み中...')).toBeInTheDocument();
         });
@@ -193,7 +199,7 @@ describe('Home Page', () => {
             mockFetch.mockImplementation(() => new Promise(() => {
             }));
 
-            const {container} = render(<Home/>);
+            const {container} = render(<Home/>, { wrapper: TestWrapper });
 
             const spinner = container.querySelector('.animate-spin');
             expect(spinner).toBeInTheDocument();
@@ -205,7 +211,7 @@ describe('Home Page', () => {
             const csvData = createMockCSV();
             mockFetchSuccess(csvData);
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
@@ -217,7 +223,7 @@ describe('Home Page', () => {
         it('CSVファイル読み込みエラーを適切に処理する', async () => {
             mockFetchError();
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 expect(screen.getByText(/エラー:/)).toBeInTheDocument();
@@ -227,7 +233,7 @@ describe('Home Page', () => {
         it('ネットワークエラーが発生した場合にエラーメッセージを表示する', async () => {
             mockFetch.mockRejectedValueOnce(new Error('Network failed'));
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 expect(screen.getByText(/エラー: Network failed/)).toBeInTheDocument();
@@ -240,7 +246,7 @@ describe('Home Page', () => {
             const csvData = createMockCSV();
             mockFetchSuccess(csvData);
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 expect(screen.getByText('2023年')).toBeInTheDocument();
@@ -252,7 +258,7 @@ describe('Home Page', () => {
             const csvData = createMockCSV();
             mockFetchSuccess(csvData);
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 // 2023年: 1,000 + 2,000 = 3,000円
@@ -269,7 +275,7 @@ describe('Home Page', () => {
 2023/06/15,円,"5,500"`;
             mockFetchSuccess(csvData);
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 // 10,000 + 5,500 = 15,500
@@ -283,7 +289,7 @@ describe('Home Page', () => {
 2023/06/15,円,-`;
             mockFetchSuccess(csvData);
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 // 1,000 + 0 = 1,000
@@ -299,7 +305,7 @@ describe('Home Page', () => {
 2023/12/15,円,invalid`;
             mockFetchSuccess(csvData);
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
@@ -313,7 +319,7 @@ describe('Home Page', () => {
             const csvData = `入金日,受取通貨,受取金額[円/現地通貨]`;
             mockFetchSuccess(csvData);
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
@@ -327,12 +333,14 @@ describe('Home Page', () => {
         });
     });
 
-    describe('UIインタラクション - 為替レート変更', () => {
+    // 注: 為替レート入力は設定画面に移動したため、以下のUIインタラクションテストは削除されました
+    // 為替レート機能のテストは settings/page.test.tsx で行います
+    describe.skip('UIインタラクション - 為替レート変更', () => {
         it('為替レート入力フィールドが表示される', async () => {
             const csvData = createMockCSV();
             mockFetchSuccess(csvData);
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
@@ -348,7 +356,7 @@ describe('Home Page', () => {
 2024/01/15,USドル,10`;
             mockFetchSuccess(csvData);
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
@@ -369,7 +377,7 @@ describe('Home Page', () => {
 2024/01/15,USドル,10`;
             mockFetchSuccess(csvData);
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
@@ -390,7 +398,7 @@ describe('Home Page', () => {
 2024/01/15,USドル,10`;
             mockFetchSuccess(csvData);
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
@@ -410,7 +418,7 @@ describe('Home Page', () => {
             const csvData = createMockCSV();
             mockFetchSuccess(csvData);
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
@@ -441,7 +449,7 @@ describe('Home Page', () => {
 2024/01/15,USドル,10`;
             mockFetchSuccess(csvData);
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
@@ -465,7 +473,7 @@ describe('Home Page', () => {
             const csvData = createMockCSV();
             mockFetchSuccess(csvData);
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
@@ -485,7 +493,7 @@ describe('Home Page', () => {
             const csvData = createMockCSV();
             mockFetchSuccess(csvData);
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
@@ -504,7 +512,7 @@ describe('Home Page', () => {
             const csvData = createMockCSV();
             mockFetchSuccess(csvData);
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 expect(screen.getByText('年別配当金集計')).toBeInTheDocument();
@@ -522,7 +530,7 @@ describe('Home Page', () => {
 2023/06/15,円,"250,000"`;
             mockFetchSuccess(csvData);
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 expect(screen.getByText('年別配当金集計')).toBeInTheDocument();
@@ -537,7 +545,7 @@ describe('Home Page', () => {
 2023/01/15,円,"120,000"`;
             mockFetchSuccess(csvData);
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 expect(screen.getByText('年別配当金集計')).toBeInTheDocument();
@@ -558,7 +566,7 @@ describe('Home Page', () => {
 2023/01/15,円,"125,500"`;
             mockFetchSuccess(csvData);
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 expect(screen.getByText('年別配当金集計')).toBeInTheDocument();
@@ -579,7 +587,7 @@ describe('Home Page', () => {
 2023/01/15,円,"100,001"`;
             mockFetchSuccess(csvData);
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 expect(screen.getByText('年別配当金集計')).toBeInTheDocument();
@@ -600,7 +608,7 @@ describe('Home Page', () => {
 2023/01/15,円,100`;
             mockFetchSuccess(csvData);
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 expect(screen.getByText('年別配当金集計')).toBeInTheDocument();
@@ -621,7 +629,7 @@ describe('Home Page', () => {
 2023/01/15,円,0`;
             mockFetchSuccess(csvData);
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 expect(screen.getByText('年別配当金集計')).toBeInTheDocument();
@@ -638,12 +646,13 @@ describe('Home Page', () => {
             expect(zeroElements).toHaveLength(2);
         });
 
-        it('為替レート変更時に月平均配当も更新される', async () => {
+        // 注: 為替レート入力は設定画面に移動したため、このテストはスキップされます
+        it.skip('為替レート変更時に月平均配当も更新される', async () => {
             const csvData = `入金日,受取通貨,受取金額[円/現地通貨]
 2024/01/15,USドル,10`;
             mockFetchSuccess(csvData);
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
@@ -672,7 +681,7 @@ describe('Home Page', () => {
             const csvData = createMockCSV();
             mockFetchSuccess(csvData);
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
@@ -687,7 +696,7 @@ describe('Home Page', () => {
             const csvData = createMockCSV();
             mockFetchSuccess(csvData);
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
@@ -698,11 +707,12 @@ describe('Home Page', () => {
             ).toBeInTheDocument();
         });
 
-        it('為替レート変更後、説明文の為替レートが更新される', async () => {
+        // 注: 為替レート入力は設定画面に移動したため、このテストはスキップされます
+        it.skip('為替レート変更後、説明文の為替レートが更新される', async () => {
             const csvData = createMockCSV();
             mockFetchSuccess(csvData);
 
-            render(<Home/>);
+            render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
                 expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();

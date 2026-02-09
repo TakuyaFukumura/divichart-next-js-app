@@ -17,6 +17,13 @@ jest.mock('@/app/components/DarkModeProvider', () => ({
     ),
 }));
 
+// ExchangeRateProviderのモック
+jest.mock('@/app/contexts/ExchangeRateContext', () => ({
+    ExchangeRateProvider: ({children}: { children: React.ReactNode }) => (
+        <div data-testid="exchange-rate-provider">{children}</div>
+    ),
+}));
+
 // Headerコンポーネントのモック
 jest.mock('@/app/components/Header', () => {
     return function Header() {
@@ -134,10 +141,10 @@ describe('RootLayout', () => {
                 </RootLayout>
             );
 
-            const provider = screen.getByTestId('dark-mode-provider');
-            const children = Array.from(provider.children);
+            const exchangeRateProvider = screen.getByTestId('exchange-rate-provider');
+            const children = Array.from(exchangeRateProvider.children);
 
-            // 最初の子要素がHeader、2番目が子コンポーネント
+            // ExchangeRateProvider内で、最初の子要素がHeader、2番目が子コンポーネント
             expect(children[0]).toBe(screen.getByTestId('header'));
             expect(children[1]).toBe(screen.getByTestId('test-child'));
         });
@@ -151,13 +158,16 @@ describe('RootLayout', () => {
                 </RootLayout>
             );
 
-            const provider = screen.getByTestId('dark-mode-provider');
+            const darkModeProvider = screen.getByTestId('dark-mode-provider');
+            const exchangeRateProvider = screen.getByTestId('exchange-rate-provider');
             const header = screen.getByTestId('header');
             const content = screen.getByTestId('page-content');
 
-            // DarkModeProviderがHeaderと子コンポーネントの両方を含む
-            expect(provider).toContainElement(header);
-            expect(provider).toContainElement(content);
+            // DarkModeProviderがExchangeRateProviderを含む
+            expect(darkModeProvider).toContainElement(exchangeRateProvider);
+            // ExchangeRateProviderがHeaderと子コンポーネントの両方を含む
+            expect(exchangeRateProvider).toContainElement(header);
+            expect(exchangeRateProvider).toContainElement(content);
         });
     });
 });

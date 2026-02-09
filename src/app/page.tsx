@@ -5,7 +5,7 @@ import {Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxi
 import {useDividendData} from '@/hooks/useDividendData';
 import {CSVRow} from '@/types/dividend';
 import {formatYAxisValue} from '@/lib/formatYAxisValue';
-import {getUsdToJpyRate} from '@/lib/exchangeRate';
+import {useExchangeRate} from '@/app/contexts/ExchangeRateContext';
 import {LoadingScreen, ErrorScreen} from '@/app/components/LoadingState';
 import {aggregateDividendsByYear, formatYearlyDividendData} from '@/lib/dividendCalculator';
 
@@ -20,17 +20,13 @@ type DividendData = {
     totalDividend: number;
 };
 
-// 為替レート設定（1ドル=150円）
-// 環境変数から読み込み、未設定の場合はデフォルト値を使用
-const USD_TO_JPY_RATE = getUsdToJpyRate();
-
 /**
  * ホームページコンポーネント
  * 配当金データをCSVファイルから読み込み、年別に集計してグラフと表で表示する
  *
  * @remarks
  * - CSVファイルはShift-JISエンコーディングで保存されている
- * - USドル建ての配当金は設定した為替レートで円換算される
+ * - USドル建ての配当金は設定画面で設定した為替レートで円換算される
  * - グラフは棒グラフで表示される
  *
  * @returns 配当金グラフアプリケーションのメインページ
@@ -38,8 +34,7 @@ const USD_TO_JPY_RATE = getUsdToJpyRate();
 export default function Home() {
     const {data: rawData, loading, error} = useDividendData();
     const [data, setData] = useState<DividendData[]>([]);
-    const [usdToJpyRate, setUsdToJpyRate] = useState<number>(USD_TO_JPY_RATE);
-    const [inputValue, setInputValue] = useState<string>(String(USD_TO_JPY_RATE));
+    const {usdToJpyRate} = useExchangeRate();
 
     /**
      * CSVデータから年別配当金データを計算する関数
@@ -104,37 +99,6 @@ export default function Home() {
                     <h1 className="text-4xl font-bold mb-6 text-gray-800 dark:text-gray-200">
                         年別配当グラフ
                     </h1>
-
-                    <div className="mb-6">
-                        <label htmlFor="usd-jpy-rate"
-                               className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            為替レート（1ドル = 円）
-                        </label>
-                        <div className="flex items-center gap-4">
-                            <input
-                                id="usd-jpy-rate"
-                                type="number"
-                                min="1"
-                                step="0.01"
-                                value={inputValue}
-                                onChange={(e) => {
-                                    const value = e.target.value;
-                                    setInputValue(value);
-
-                                    const numValue = parseFloat(value);
-                                    if (!isNaN(numValue) && numValue > 0) {
-                                        setUsdToJpyRate(numValue);
-                                    }
-                                }}
-                                onBlur={() => {
-                                    // フォーカスが外れたときに、無効な入力を現在の有効な値にリセット
-                                    setInputValue(String(usdToJpyRate));
-                                }}
-                                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent w-[150px]"
-                            />
-                            <span className="text-gray-600 dark:text-gray-400">円</span>
-                        </div>
-                    </div>
 
                     <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-6">
                         <ResponsiveContainer width="100%" height={400}>
