@@ -32,11 +32,9 @@ export const CustomTooltip = ({active, payload}: CustomTooltipProps) => {
         const data = payload[0];
         const { stockCode, stockName } = data.payload;
         
-        // 銘柄コードが存在する場合は、銘柄コードと銘柄名の両方を表示
-        // 銘柄コードが存在しない場合は、銘柄名のみを表示
-        const displayTitle = stockCode 
-            ? `${stockCode} - ${stockName}`
-            : stockName;
+        // 銘柄コードが存在する場合は、銘柄コードのみを表示
+        // 銘柄コードが存在しない場合は、銘柄名を表示
+        const displayTitle = stockCode || stockName;
         
         return (
             <div

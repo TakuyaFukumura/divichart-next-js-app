@@ -8,7 +8,7 @@ import {CustomTooltip} from '@/app/components/DividendPieChart';
 
 describe('CustomTooltip', () => {
     describe('銘柄コードが存在する場合', () => {
-        it('銘柄コードと銘柄名が「-」で結合されて表示される', () => {
+        it('銘柄コードのみが表示される', () => {
             const props = {
                 active: true,
                 payload: [
@@ -26,10 +26,13 @@ describe('CustomTooltip', () => {
 
             render(<CustomTooltip {...props} />);
 
-            // 銘柄コード - 銘柄名 の形式で表示されることを確認
-            expect(screen.getByText('BLV - VA L-TERM BOND')).toBeInTheDocument();
+            // 銘柄コードのみが表示されることを確認
+            expect(screen.getByText('BLV')).toBeInTheDocument();
             expect(screen.getByText('金額: ¥50,000')).toBeInTheDocument();
             expect(screen.getByText('割合: 25.0%')).toBeInTheDocument();
+            
+            // 銘柄名が含まれていないことを確認
+            expect(screen.queryByText(/VA L-TERM BOND/)).not.toBeInTheDocument();
         });
     });
 
