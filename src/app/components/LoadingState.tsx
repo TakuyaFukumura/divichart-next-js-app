@@ -25,7 +25,11 @@ export function LoadingScreen() {
 export function ErrorScreen({ error }: { error: string }) {
     return (
         <div className="flex items-center justify-center min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-            <div className="text-red-600 dark:text-red-400 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
+            <div
+                className="text-red-600 dark:text-red-400 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg"
+                role="alert"
+                aria-live="assertive"
+            >
                 エラー: {error}
             </div>
         </div>
