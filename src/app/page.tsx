@@ -7,6 +7,7 @@ import {CSVRow} from '@/types/dividend';
 import {formatYAxisValue} from '@/lib/formatYAxisValue';
 import {getUsdToJpyRate} from '@/lib/exchangeRate';
 import {LoadingScreen, ErrorScreen} from '@/app/components/LoadingState';
+import {aggregateDividendsByYear, formatYearlyDividendData} from '@/lib/dividendCalculator';
 
 /**
  * 配当金データの型定義
@@ -53,42 +54,8 @@ export default function Home() {
      * - 年別に集計し、最終的に円単位で四捨五入される
      */
     const calculateDividendData = useCallback((csvData: CSVRow[], exchangeRate: number): DividendData[] => {
-        // 年別に配当金を集計
-        const yearlyDividends: { [year: string]: number } = {};
-
-        csvData.forEach((row) => {
-            const dateStr = row['入金日'];
-            const currency = row['受取通貨'];
-            const amountStr = row['受取金額[円/現地通貨]'];
-
-            if (!dateStr || !amountStr) return;
-
-            // 日付から年を抽出（YYYY/MM/DD形式）
-            const year = dateStr.split('/')[0];
-            if (!year) return;
-
-            // 金額を数値に変換（カンマを除去）
-            // NOTE: CSVデータでは税額が"-"で表示されることがあり、その場合は0として扱う
-            const amountValue = amountStr === '-' ? 0 : parseFloat(amountStr.replace(/,/g, ''));
-            if (isNaN(amountValue)) return;
-
-            // USドルの場合は円に換算、円の場合はそのまま
-            let amountInYen = amountValue;
-            if (currency === 'USドル') {
-                amountInYen = amountValue * exchangeRate;
-            }
-
-            // 年別に集計
-            yearlyDividends[year] = (yearlyDividends[year] || 0) + amountInYen;
-        });
-
-        // グラフ用のデータに変換（年でソート）
-        return Object.keys(yearlyDividends)
-            .sort()
-            .map((year) => ({
-                year: `${year}年`,
-                totalDividend: Math.round(yearlyDividends[year]),
-            }));
+        const yearlyDividends = aggregateDividendsByYear(csvData, exchangeRate);
+        return formatYearlyDividendData(yearlyDividends);
     }, []);
 
     // 為替レートが変更されたときにデータを再計算

@@ -1,6 +1,114 @@
 import {CSVRow, StockDividend, YearlyPortfolio} from '@/types/dividend';
 
 /**
+ * 日付文字列から年を抽出
+ * 
+ * @param dateStr - YYYY/MM/DD形式の日付文字列
+ * @returns 年（YYYY形式）、抽出失敗時はnull
+ */
+function extractYear(dateStr: string | undefined): string | null {
+    if (!dateStr) return null;
+    const year = dateStr.split('/')[0];
+    return year && year.length === 4 ? year : null;
+}
+
+/**
+ * 配当金額をパースし、必要に応じて円換算
+ * 
+ * @param row - CSVデータ行
+ * @param exchangeRate - USドル→円の為替レート
+ * @returns 円換算された金額、パース失敗時はNaN
+ */
+function parseAndConvertAmount(row: CSVRow, exchangeRate: number): number {
+    const amountStr = row['受取金額[円/現地通貨]'];
+    const currency = row['受取通貨'];
+    
+    if (!amountStr) return NaN;
+    
+    // "-"は0として扱う（税額表示用）
+    const amount = amountStr === '-' 
+        ? 0 
+        : parseFloat(amountStr.replace(/,/g, ''));
+    
+    if (isNaN(amount)) return NaN;
+    
+    // USドルの場合は円換算
+    return currency === 'USドル' ? amount * exchangeRate : amount;
+}
+
+/**
+ * CSVデータから年別配当金を集計
+ * 
+ * @param csvData - CSVファイルから読み込んだ配当データ
+ * @param exchangeRate - USドル→円の為替レート
+ * @returns 年をキー、配当金合計を値とするMap
+ * 
+ * @remarks
+ * - USドル建て配当は為替レートで円換算
+ * - 金額が"-"の場合は0として扱う
+ * - 無効なデータはスキップ
+ */
+export function aggregateDividendsByYear(
+    csvData: CSVRow[],
+    exchangeRate: number
+): Map<string, number> {
+    const yearlyDividends = new Map<string, number>();
+    
+    for (const row of csvData) {
+        const year = extractYear(row['入金日']);
+        if (!year) continue;
+        
+        const amount = parseAndConvertAmount(row, exchangeRate);
+        if (isNaN(amount)) continue;
+        
+        const current = yearlyDividends.get(year) ?? 0;
+        yearlyDividends.set(year, current + amount);
+    }
+    
+    return yearlyDividends;
+}
+
+/**
+ * 年別配当金データをグラフ用に整形
+ * 
+ * @param yearlyDividends - 年別配当金のMap
+ * @returns グラフ表示用の配当金データ配列（年でソート済み）
+ */
+export function formatYearlyDividendData(
+    yearlyDividends: Map<string, number>
+): Array<{ year: string; totalDividend: number }> {
+    return Array.from(yearlyDividends.entries())
+        .sort((a, b) => a[0].localeCompare(b[0]))
+        .map(([year, amount]) => ({
+            year: `${year}年`,
+            totalDividend: Math.round(amount),
+        }));
+}
+
+/**
+ * 累計配当金データをグラフ用に整形
+ * 
+ * @param yearlyDividends - 年別配当金のMap
+ * @returns グラフ表示用の累計配当金データ配列（年でソート済み）
+ */
+export function formatCumulativeDividendData(
+    yearlyDividends: Map<string, number>
+): Array<{ year: string; yearlyDividend: number; cumulativeDividend: number }> {
+    const sortedEntries = Array.from(yearlyDividends.entries())
+        .sort((a, b) => a[0].localeCompare(b[0]));
+    
+    let cumulative = 0;
+    return sortedEntries.map(([year, yearlyAmount]) => {
+        cumulative += yearlyAmount;
+        return {
+            year: `${year}年`,
+            yearlyDividend: Math.round(yearlyAmount),
+            cumulativeDividend: Math.round(cumulative),
+        };
+    });
+}
+
+/**
  * 銘柄を一意に識別するためのキーを生成
  *
  * @param stockCode - 銘柄コード

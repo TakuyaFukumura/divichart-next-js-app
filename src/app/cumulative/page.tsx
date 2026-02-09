@@ -7,6 +7,7 @@ import {useDividendData} from '@/hooks/useDividendData';
 import {formatYAxisValue} from '@/lib/formatYAxisValue';
 import {getUsdToJpyRate} from '@/lib/exchangeRate';
 import {LoadingScreen, ErrorScreen} from '@/app/components/LoadingState';
+import {aggregateDividendsByYear, formatCumulativeDividendData} from '@/lib/dividendCalculator';
 
 // 為替レート設定（1ドル=150円）
 // 環境変数から読み込み、未設定の場合はデフォルト値を使用
@@ -42,49 +43,8 @@ export default function CumulativeDividendPage() {
      * - 年別に集計し、累計を計算し、最終的に円単位で四捨五入される
      */
     const calculateCumulativeDividendData = useCallback((csvData: CSVRow[], exchangeRate: number): CumulativeDividendData[] => {
-        // 年別に配当金を集計
-        const yearlyDividends: { [year: string]: number } = {};
-
-        csvData.forEach((row) => {
-            const dateStr = row['入金日'];
-            const currency = row['受取通貨'];
-            const amountStr = row['受取金額[円/現地通貨]'];
-
-            if (!dateStr || !amountStr) return;
-
-            // 日付から年を抽出（YYYY/MM/DD形式）
-            const year = dateStr.split('/')[0];
-            if (!year) return;
-
-            // 金額を数値に変換（カンマを除去）
-            // NOTE: CSVデータでは税額が"-"で表示されることがあり、その場合は0として扱う
-            const amountValue = amountStr === '-' ? 0 : Number.parseFloat(amountStr.replaceAll(',', ''));
-            if (Number.isNaN(amountValue)) return;
-
-            // USドルの場合は円に換算、円の場合はそのまま
-            let amountInYen = amountValue;
-            if (currency === 'USドル') {
-                amountInYen = amountValue * exchangeRate;
-            }
-
-            // 年別に集計
-            yearlyDividends[year] = (yearlyDividends[year] || 0) + amountInYen;
-        });
-
-        // 年でソート
-        const sortedYears = Object.keys(yearlyDividends).sort((a, b) => a.localeCompare(b));
-
-        // 累計配当金を計算
-        let cumulative = 0;
-        return sortedYears.map((year) => {
-            const yearlyAmount = yearlyDividends[year];
-            cumulative += yearlyAmount;
-            return {
-                year: `${year}年`,
-                yearlyDividend: Math.round(yearlyAmount),
-                cumulativeDividend: Math.round(cumulative),
-            };
-        });
+        const yearlyDividends = aggregateDividendsByYear(csvData, exchangeRate);
+        return formatCumulativeDividendData(yearlyDividends);
     }, []);
 
     // 為替レートが変更されたときにデータを再計算
