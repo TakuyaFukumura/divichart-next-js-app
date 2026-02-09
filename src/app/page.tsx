@@ -6,6 +6,7 @@ import {useDividendData} from '@/hooks/useDividendData';
 import {CSVRow} from '@/types/dividend';
 import {formatYAxisValue} from '@/lib/formatYAxisValue';
 import {getUsdToJpyRate} from '@/lib/exchangeRate';
+import {LoadingScreen, ErrorScreen} from '@/app/components/LoadingState';
 
 /**
  * 配当金データの型定義
@@ -98,28 +99,8 @@ export default function Home() {
         }
     }, [usdToJpyRate, rawData, calculateDividendData]);
 
-    if (loading) {
-        return (
-            <div
-                className="flex items-center justify-center min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-                <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                    <span className="ml-2 text-gray-600 dark:text-gray-400">読み込み中...</span>
-                </div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div
-                className="flex items-center justify-center min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-                <div className="text-red-600 dark:text-red-400 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
-                    エラー: {error}
-                </div>
-            </div>
-        );
-    }
+    if (loading) return <LoadingScreen />;
+    if (error) return <ErrorScreen error={error} />;
 
     /**
      * チャート用のカスタムツールチップコンポーネント
