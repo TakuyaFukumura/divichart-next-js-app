@@ -444,7 +444,7 @@ import { TABLE_STYLES } from '@/styles/tableStyles';
     <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
       {data.map((row) => (
         <tr key={row.year} className={TABLE_STYLES.body.row}>
-          <td className={TABLE_STYLES.body.cell + ' text-right'}>
+          <td className={TABLE_STYLES.body.cellRight}>
             {row.year}
           </td>
           <td className={TABLE_STYLES.body.cellRight}>
