@@ -20,7 +20,7 @@ import {useDarkMode} from './DarkModeProvider';
 export default function Header() {
     const {theme, setTheme} = useDarkMode();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const previousOverflowRef = useRef<string>('');
+    const previousOverflowRef = useRef<string | null>(null);
 
     /**
      * テーマ切り替えハンドラー
@@ -93,22 +93,22 @@ export default function Header() {
      */
     useEffect(() => {
         if (isMenuOpen) {
-            // メニューを開く前の overflow 値を保存
-            if (previousOverflowRef.current === '') {
+            // メニューを開く前の overflow 値を保存（初回のみ）
+            if (previousOverflowRef.current === null) {
                 previousOverflowRef.current = document.body.style.overflow;
             }
             document.body.style.overflow = 'hidden';
-        } else if (previousOverflowRef.current !== '') {
+        } else if (previousOverflowRef.current !== null) {
             // メニューを閉じる際は、保存していた値を復元
             document.body.style.overflow = previousOverflowRef.current;
-            previousOverflowRef.current = '';
+            previousOverflowRef.current = null;
         }
 
         return () => {
             // クリーンアップ時にも保存していた値を復元
-            if (previousOverflowRef.current !== '') {
+            if (previousOverflowRef.current !== null) {
                 document.body.style.overflow = previousOverflowRef.current;
-                previousOverflowRef.current = '';
+                previousOverflowRef.current = null;
             }
         };
     }, [isMenuOpen]);
@@ -207,8 +207,9 @@ export default function Header() {
                 id="mobile-menu"
                 role="navigation"
                 aria-label="メインメニュー"
+                aria-hidden={!isMenuOpen}
                 className={`fixed inset-y-0 left-0 w-80 max-w-[80vw] bg-white dark:bg-gray-800 
-                    shadow-2xl z-50 transform transition-transform duration-300 ease-in-out
+                    shadow-2xl z-50 transform transition-transform duration-300 ease-in-out md:hidden
                     ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
             >
                 <div className="flex flex-col h-full">

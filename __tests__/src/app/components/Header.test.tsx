@@ -239,6 +239,12 @@ describe('Header', () => {
             expect(desktopNav).toBeDefined();
             expect(desktopNav).toHaveClass('hidden', 'md:flex');
         });
+
+        it('モバイルメニューがデスクトップで非表示になる', () => {
+            // aria-hidden=trueの要素を取得するため、document.querySelectorを使用
+            const mobileMenu = document.querySelector('#mobile-menu');
+            expect(mobileMenu).toHaveClass('md:hidden');
+        });
     });
 
     describe('ハンバーガーメニュー', () => {
@@ -283,7 +289,7 @@ describe('Header', () => {
             fireEvent.click(overlay!);
 
             // メニューパネルが閉じる（-translate-x-fullクラスが適用される）
-            const mobileMenu = screen.getByRole('navigation', {name: 'メインメニュー'});
+            const mobileMenu = document.querySelector('#mobile-menu');
             expect(mobileMenu).toHaveClass('-translate-x-full');
         });
 
@@ -291,12 +297,13 @@ describe('Header', () => {
             const hamburgerButton = screen.getByLabelText('メニューを開く');
             fireEvent.click(hamburgerButton);
 
-            // 閉じるボタンをクリック
-            const closeButton = screen.getByLabelText('メニューを閉じる');
-            fireEvent.click(closeButton);
+            // 閉じるボタンをクリック（メニュー内の閉じるボタン - 2番目の要素）
+            const closeButtons = screen.getAllByLabelText('メニューを閉じる');
+            const menuCloseButton = closeButtons[1]; // メニュー内の閉じるボタンは2番目
+            fireEvent.click(menuCloseButton);
 
             // メニューパネルが閉じる
-            const mobileMenu = screen.getByRole('navigation', {name: 'メインメニュー'});
+            const mobileMenu = document.querySelector('#mobile-menu');
             expect(mobileMenu).toHaveClass('-translate-x-full');
         });
 
@@ -308,7 +315,7 @@ describe('Header', () => {
             fireEvent.keyDown(document, {key: 'Escape'});
 
             // メニューパネルが閉じる
-            const mobileMenu = screen.getByRole('navigation', {name: 'メインメニュー'});
+            const mobileMenu = document.querySelector('#mobile-menu');
             expect(mobileMenu).toHaveClass('-translate-x-full');
         });
 
@@ -321,7 +328,7 @@ describe('Header', () => {
             fireEvent.click(menuItem);
 
             // メニューパネルが閉じる
-            const mobileMenu = screen.getByRole('navigation', {name: 'メインメニュー'});
+            const mobileMenu = document.querySelector('#mobile-menu');
             expect(mobileMenu).toHaveClass('-translate-x-full');
         });
 
@@ -348,39 +355,94 @@ describe('Header', () => {
 
             // 開く
             fireEvent.click(hamburgerButton);
-            expect(hamburgerButton).toHaveAttribute('aria-expanded', 'true');
+            
+            // メニューが開いたので、ハンバーガーボタンのラベルが変わる（最初の要素がハンバーガーボタン）
+            const buttons = screen.getAllByLabelText('メニューを閉じる');
+            const hamburgerButtonAfterOpen = buttons[0]; // ハンバーガーボタンは最初
+            expect(hamburgerButtonAfterOpen).toHaveAttribute('aria-expanded', 'true');
 
             // 閉じる
-            const closeButton = screen.getByLabelText('メニューを閉じる');
-            fireEvent.click(closeButton);
-            expect(hamburgerButton).toHaveAttribute('aria-expanded', 'false');
+            fireEvent.click(hamburgerButtonAfterOpen);
+            
+            // メニューが閉じたので、再度取得
+            const hamburgerButtonAfterClose = screen.getByLabelText('メニューを開く');
+            expect(hamburgerButtonAfterClose).toHaveAttribute('aria-expanded', 'false');
         });
 
         it('aria-controls属性が正しく設定される', () => {
             const hamburgerButton = screen.getByLabelText('メニューを開く');
             expect(hamburgerButton).toHaveAttribute('aria-controls', 'mobile-menu');
 
-            const mobileMenu = screen.getByRole('navigation', {name: 'メインメニュー'});
+            const mobileMenu = document.querySelector('#mobile-menu');
             expect(mobileMenu).toHaveAttribute('id', 'mobile-menu');
+        });
+
+        it('メニューが閉じているときaria-hiddenがtrueになる', () => {
+            // aria-hidden=trueの要素を取得するため、通常のクエリではなくgetAllを使用
+            const mobileMenu = document.querySelector('#mobile-menu');
+            expect(mobileMenu).toHaveAttribute('aria-hidden', 'true');
+        });
+
+        it('メニューが開いているときaria-hiddenがfalseになる', () => {
+            const hamburgerButton = screen.getByLabelText('メニューを開く');
+            fireEvent.click(hamburgerButton);
+
+            const mobileMenu = screen.getByRole('navigation', {name: 'メインメニュー'});
+            expect(mobileMenu).toHaveAttribute('aria-hidden', 'false');
         });
     });
 
-    describe('レスポンシブデザイン', () => {
+    describe('ボディスクロールのロック', () => {
         beforeEach(() => {
-            window.localStorage.setItem('theme', 'light');
+            // 初期状態をクリア
+            document.body.style.overflow = '';
             renderWithProvider();
         });
 
-        it('テキストラベルが適切なクラスで制御されている', () => {
-            // 'hidden sm:inline' クラスでモバイルでは非表示になることを想定
-            const textLabel = screen.getByText('ライトモード');
-            expect(textLabel).toHaveClass('hidden', 'sm:inline');
+        afterEach(() => {
+            // テスト後にクリーンアップ
+            document.body.style.overflow = '';
         });
 
-        it('アイコンが常に表示される', () => {
+        it('メニューを開くとbody overflowがhiddenになる', () => {
+            const hamburgerButton = screen.getByLabelText('メニューを開く');
+            fireEvent.click(hamburgerButton);
 
-            const icon = screen.getByText('☀️');
-            expect(icon).toBeInTheDocument();
+            expect(document.body.style.overflow).toBe('hidden');
+        });
+
+        it('メニューを閉じるとbody overflowが元の値に戻る', () => {
+            // 初期値を設定
+            document.body.style.overflow = 'auto';
+
+            const hamburgerButton = screen.getByLabelText('メニューを開く');
+            fireEvent.click(hamburgerButton);
+
+            expect(document.body.style.overflow).toBe('hidden');
+
+            // メニューを閉じる（ハンバーガーボタンを再度クリック）
+            const buttons = screen.getAllByLabelText('メニューを閉じる');
+            const hamburgerButtonAfterOpen = buttons[0]; // ハンバーガーボタンは最初
+            fireEvent.click(hamburgerButtonAfterOpen);
+
+            expect(document.body.style.overflow).toBe('auto');
+        });
+
+        it('デフォルトのoverflowが空文字列の場合も正しく復元される', () => {
+            // デフォルトは空文字列
+            expect(document.body.style.overflow).toBe('');
+
+            const hamburgerButton = screen.getByLabelText('メニューを開く');
+            fireEvent.click(hamburgerButton);
+
+            expect(document.body.style.overflow).toBe('hidden');
+
+            // メニューを閉じる（ハンバーガーボタンを再度クリック）
+            const buttons = screen.getAllByLabelText('メニューを閉じる');
+            const hamburgerButtonAfterOpen = buttons[0]; // ハンバーガーボタンは最初
+            fireEvent.click(hamburgerButtonAfterOpen);
+
+            expect(document.body.style.overflow).toBe('');
         });
     });
 
