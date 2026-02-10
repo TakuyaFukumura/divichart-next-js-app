@@ -4,6 +4,13 @@ import Link from 'next/link';
 import {useEffect, useRef, useState} from 'react';
 import {useDarkMode} from './DarkModeProvider';
 
+// inert 属性の型定義（React types にまだ含まれていないため）
+declare module 'react' {
+    interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
+        inert?: '' | undefined;
+    }
+}
+
 /**
  * ヘッダーコンポーネント
  * アプリケーション共通のヘッダー部分を表示する
@@ -196,7 +203,7 @@ export default function Header() {
             {/* オーバーレイ（メニューが開いている時のみ表示） */}
             {isMenuOpen && (
                 <div
-                    className="fixed inset-0 bg-black/50 z-40 transition-opacity duration-300"
+                    className="fixed inset-0 bg-black/50 z-50 transition-opacity duration-300"
                     onClick={closeMenu}
                     aria-hidden="true"
                 />
@@ -208,8 +215,9 @@ export default function Header() {
                 role="navigation"
                 aria-label="メインメニュー"
                 aria-hidden={!isMenuOpen}
+                inert={!isMenuOpen ? '' : undefined}
                 className={`fixed inset-y-0 left-0 w-80 max-w-[80vw] bg-white dark:bg-gray-800 
-                    shadow-2xl z-50 transform transition-transform duration-300 ease-in-out md:hidden
+                    shadow-2xl z-[60] transform transition-transform duration-300 ease-in-out md:hidden
                     ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
             >
                 <div className="flex flex-col h-full">
