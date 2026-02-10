@@ -94,16 +94,22 @@ export default function Header() {
     useEffect(() => {
         if (isMenuOpen) {
             // メニューを開く前の overflow 値を保存
-            previousOverflowRef.current = document.body.style.overflow;
+            if (previousOverflowRef.current === '') {
+                previousOverflowRef.current = document.body.style.overflow;
+            }
             document.body.style.overflow = 'hidden';
-        } else {
+        } else if (previousOverflowRef.current !== '') {
             // メニューを閉じる際は、保存していた値を復元
             document.body.style.overflow = previousOverflowRef.current;
+            previousOverflowRef.current = '';
         }
 
         return () => {
             // クリーンアップ時にも保存していた値を復元
-            document.body.style.overflow = previousOverflowRef.current;
+            if (previousOverflowRef.current !== '') {
+                document.body.style.overflow = previousOverflowRef.current;
+                previousOverflowRef.current = '';
+            }
         };
     }, [isMenuOpen]);
 

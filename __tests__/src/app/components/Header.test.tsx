@@ -233,7 +233,10 @@ describe('Header', () => {
         });
 
         it('デスクトップナビゲーションに適切なレスポンシブクラスが適用される', () => {
-            const desktopNav = screen.getAllByRole('navigation')[0];
+            // デスクトップ用の水平ナビゲーションを取得（hidden md:flexクラスを持つ要素）
+            const navElements = screen.getAllByRole('navigation');
+            const desktopNav = navElements.find(nav => nav.classList.contains('hidden') && nav.classList.contains('md:flex'));
+            expect(desktopNav).toBeDefined();
             expect(desktopNav).toHaveClass('hidden', 'md:flex');
         });
     });
