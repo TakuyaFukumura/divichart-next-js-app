@@ -432,14 +432,18 @@ z-0:  通常コンテンツ
 **背後のコンテンツのスクロール防止**:
 ```typescript
 useEffect(() => {
+  const previousOverflow = document.body.style.overflow;
+
   if (isMenuOpen) {
     document.body.style.overflow = 'hidden';
   } else {
-    document.body.style.overflow = 'unset';
+    // メニューを閉じる際は、変更前の値を復元する
+    document.body.style.overflow = previousOverflow || '';
   }
-  
+
   return () => {
-    document.body.style.overflow = 'unset';
+    // クリーンアップ時にも変更前の値を復元する
+    document.body.style.overflow = previousOverflow || '';
   };
 }, [isMenuOpen]);
 ```
