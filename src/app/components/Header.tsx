@@ -125,7 +125,7 @@ export default function Header() {
                             <button
                                 onClick={toggleMenu}
                                 className="md:hidden p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                                aria-label="メニューを開く"
+                                aria-label={isMenuOpen ? 'メニューを閉じる' : 'メニューを開く'}
                                 aria-expanded={isMenuOpen}
                                 aria-controls="mobile-menu"
                             >
