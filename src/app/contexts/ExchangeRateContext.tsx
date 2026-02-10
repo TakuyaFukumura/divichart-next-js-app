@@ -75,10 +75,10 @@ export function ExchangeRateProvider({children}: { readonly children: ReactNode 
 
     /**
      * 為替レートをデフォルト値にリセットする
+     * デフォルト値（150円）に戻し、localStorageをクリアする
      */
     const resetToDefault = () => {
-        const defaultRate = getUsdToJpyRate();
-        setUsdToJpyRateState(defaultRate);
+        setUsdToJpyRateState(DEFAULT_USD_TO_JPY_RATE);
         if (typeof window !== 'undefined') {
             localStorage.removeItem('usdToJpyRate');
         }

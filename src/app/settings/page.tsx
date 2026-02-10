@@ -1,8 +1,7 @@
 'use client';
 
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useExchangeRate} from '@/app/contexts/ExchangeRateContext';
-import {getUsdToJpyRate} from '@/lib/exchangeRate';
 
 /**
  * 設定画面コンポーネント
@@ -20,6 +19,14 @@ export default function SettingsPage() {
     const {usdToJpyRate, setUsdToJpyRate, defaultRate, resetToDefault} = useExchangeRate();
     const [inputValue, setInputValue] = useState<string>(String(usdToJpyRate));
     const [error, setError] = useState<string>('');
+    const [isEditing, setIsEditing] = useState<boolean>(false);
+
+    // usdToJpyRate が変更されたときに inputValue を同期（編集中でない場合のみ）
+    useEffect(() => {
+        if (!isEditing) {
+            setInputValue(String(usdToJpyRate));
+        }
+    }, [usdToJpyRate, isEditing]);
 
     /**
      * 入力値変更ハンドラー
@@ -29,6 +36,7 @@ export default function SettingsPage() {
         const value = e.target.value;
         setInputValue(value);
         setError('');
+        setIsEditing(true);
 
         const numValue = parseFloat(value);
         if (value === '' || isNaN(numValue)) {
@@ -50,6 +58,7 @@ export default function SettingsPage() {
      * 無効な入力値を現在の有効な値にリセットする
      */
     const handleBlur = () => {
+        setIsEditing(false);
         if (error) {
             setInputValue(String(usdToJpyRate));
             setError('');
@@ -58,13 +67,13 @@ export default function SettingsPage() {
 
     /**
      * リセットボタンのハンドラー
-     * 為替レートをデフォルト値に戻す
+     * 為替レートをデフォルト値（150円）に戻す
      */
     const handleReset = () => {
         resetToDefault();
-        const newRate = getUsdToJpyRate();
-        setInputValue(String(newRate));
+        setInputValue(String(defaultRate));
         setError('');
+        setIsEditing(false);
     };
 
     return (
