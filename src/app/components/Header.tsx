@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {useDarkMode} from './DarkModeProvider';
 
 /**
@@ -20,6 +20,7 @@ import {useDarkMode} from './DarkModeProvider';
 export default function Header() {
     const {theme, setTheme} = useDarkMode();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const previousOverflowRef = useRef<string>('');
 
     /**
      * テーマ切り替えハンドラー
@@ -91,16 +92,18 @@ export default function Header() {
      * メニューが開いている間、背後のコンテンツのスクロールを防止
      */
     useEffect(() => {
-        const previousOverflow = document.body.style.overflow;
-
         if (isMenuOpen) {
+            // メニューを開く前の overflow 値を保存
+            previousOverflowRef.current = document.body.style.overflow;
             document.body.style.overflow = 'hidden';
         } else {
-            document.body.style.overflow = previousOverflow || '';
+            // メニューを閉じる際は、保存していた値を復元
+            document.body.style.overflow = previousOverflowRef.current;
         }
 
         return () => {
-            document.body.style.overflow = previousOverflow || '';
+            // クリーンアップ時にも保存していた値を復元
+            document.body.style.overflow = previousOverflowRef.current;
         };
     }, [isMenuOpen]);
 
