@@ -316,7 +316,7 @@ divichart [☰]          [🌙 ダークモード]
 {isMenuOpen && (
   <div 
     className="fixed inset-0 bg-black/50 z-40"
-    onClick={toggleMenu}
+    onClick={closeMenu}
     aria-hidden="true"
   />
 )}
