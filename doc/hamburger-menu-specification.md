@@ -163,7 +163,7 @@ const [isMenuOpen, setIsMenuOpen] = useState(false);
 
 // メニューの開閉を切り替える関数
 const toggleMenu = () => {
-  setIsMenuOpen(!isMenuOpen);
+  setIsMenuOpen((prev) => !prev);
 };
 
 // メニューリンククリック時に自動的に閉じる
