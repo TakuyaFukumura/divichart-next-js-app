@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, type ChangeEvent} from 'react';
 import {useExchangeRate} from '@/app/contexts/ExchangeRateContext';
 
 /**
@@ -32,7 +32,7 @@ export default function SettingsPage() {
      * 入力値変更ハンドラー
      * 入力値をバリデーションして為替レートを更新する
      */
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setInputValue(value);
         setError('');

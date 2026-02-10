@@ -35,7 +35,9 @@ describe('Header', () => {
             renderWithProvider();
 
             expect(screen.getByText('年別配当')).toBeInTheDocument();
+            expect(screen.getByText('累計配当')).toBeInTheDocument();
             expect(screen.getByText('ポートフォリオ')).toBeInTheDocument();
+            expect(screen.getByText('⚙️ 設定')).toBeInTheDocument();
         });
 
         it('年別配当リンクが正しいhrefを持つ', () => {
@@ -50,6 +52,20 @@ describe('Header', () => {
 
             const link = screen.getByText('ポートフォリオ').closest('a');
             expect(link).toHaveAttribute('href', '/portfolio');
+        });
+
+        it('累計配当リンクが正しいhrefを持つ', () => {
+            renderWithProvider();
+
+            const link = screen.getByText('累計配当').closest('a');
+            expect(link).toHaveAttribute('href', '/cumulative');
+        });
+
+        it('設定リンクが正しいhrefを持つ', () => {
+            renderWithProvider();
+
+            const link = screen.getByText('⚙️ 設定').closest('a');
+            expect(link).toHaveAttribute('href', '/settings');
         });
 
         it('ヘッダーのHTML構造が正しい', () => {
