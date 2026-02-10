@@ -64,7 +64,7 @@ export default function Header() {
      * メニューを開閉する関数
      */
     const toggleMenu = () => {
-        setIsMenuOpen(!isMenuOpen);
+        setIsMenuOpen((prev) => !prev);
     };
 
     /**
