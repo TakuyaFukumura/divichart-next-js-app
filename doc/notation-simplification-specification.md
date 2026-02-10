@@ -284,5 +284,3 @@ expect(screen.getByText('年別配当')).toBeInTheDocument();
 
 実装担当者: GitHub Copilot
 レビュアー: プロジェクトオーナー
-
-<!-- 日本語でレビューして下さい -->
