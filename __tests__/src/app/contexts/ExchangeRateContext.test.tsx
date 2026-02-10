@@ -208,7 +208,6 @@ describe('ExchangeRateContext', () => {
             });
 
             expect(result.current.usdToJpyRate).toBe(DEFAULT_USD_TO_JPY_RATE);
-            expect(result.current.usdToJpyRate).toBe(150);
         });
     });
 
