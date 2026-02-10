@@ -714,8 +714,8 @@ className="transition-opacity duration-300"
 
 ### XSS対策
 
-- Next.jsのLink コンポーネントを使用（自動的にサニタイズされる）
-- 外部リンクは含まない予定（将来的に追加する場合は`rel="noopener noreferrer"`を追加）
+- Next.js の Link コンポーネントと固定の内部パスのみを使用（ユーザー入力を介さないため XSS リスクは低い）
+- 現状は外部リンクやユーザー入力由来の URL は含まない想定（将来的に外部リンクを追加する場合は `rel="noopener noreferrer"` を付与し、ユーザー入力を含む URL は別途バリデーション・正規化を行う）
 
 ### アクセス制御
 
