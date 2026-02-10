@@ -10,6 +10,12 @@ import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import '@testing-library/jest-dom';
 // next/jest 環境では jest.mock が巻き上げられるため、見た目上は先に import がありますが、実行時にはモック定義の後にコンポーネントが読み込まれます
 import CumulativeDividendPage from '@/app/cumulative/page';
+import {ExchangeRateProvider} from '@/app/contexts/ExchangeRateContext';
+
+// テスト用ラッパーコンポーネント
+const TestWrapper = ({children}: { children: React.ReactNode }) => (
+    <ExchangeRateProvider>{children}</ExchangeRateProvider>
+);
 
 // PapaParse オプションの型定義
 type PapaParseOptions = {
@@ -87,12 +93,12 @@ describe('CumulativeDividendPage', () => {
     });
 
     test('ローディング中はスピナーが表示される', () => {
-        render(<CumulativeDividendPage/>);
+        render(<CumulativeDividendPage/>, { wrapper: TestWrapper });
         expect(screen.getByText('読み込み中...')).toBeInTheDocument();
     });
 
     test('データ読み込み後にタイトルが表示される', async () => {
-        render(<CumulativeDividendPage/>);
+        render(<CumulativeDividendPage/>, { wrapper: TestWrapper });
 
         await waitFor(() => {
             expect(screen.getByText('累計配当グラフ')).toBeInTheDocument();
@@ -100,7 +106,7 @@ describe('CumulativeDividendPage', () => {
     });
 
     test('データ読み込み後にグラフが表示される', async () => {
-        render(<CumulativeDividendPage/>);
+        render(<CumulativeDividendPage/>, { wrapper: TestWrapper });
 
         await waitFor(() => {
             expect(screen.getByTestId('line-chart')).toBeInTheDocument();
@@ -108,7 +114,7 @@ describe('CumulativeDividendPage', () => {
     });
 
     test('データ読み込み後にテーブルが表示される', async () => {
-        render(<CumulativeDividendPage/>);
+        render(<CumulativeDividendPage/>, { wrapper: TestWrapper });
 
         await waitFor(() => {
             expect(screen.getByText('年別累計配当金集計')).toBeInTheDocument();
@@ -116,7 +122,7 @@ describe('CumulativeDividendPage', () => {
     });
 
     test('累計配当金が正しく計算される', async () => {
-        render(<CumulativeDividendPage/>);
+        render(<CumulativeDividendPage/>, { wrapper: TestWrapper });
 
         await waitFor(() => {
             // 2020年: 10000 + 15000 = 25000
@@ -129,8 +135,10 @@ describe('CumulativeDividendPage', () => {
         });
     });
 
-    test('為替レート入力フィールドが表示される', async () => {
-        render(<CumulativeDividendPage/>);
+    // 注: 為替レート入力は設定画面に移動したため、以下のUIインタラクションテストはスキップされます
+    // 為替レート機能のテストは settings/page.test.tsx で行います
+    test.skip('為替レート入力フィールドが表示される', async () => {
+        render(<CumulativeDividendPage/>, { wrapper: TestWrapper });
 
         await waitFor(() => {
             const input = screen.getByLabelText('為替レート（1ドル = 円）');
@@ -139,8 +147,8 @@ describe('CumulativeDividendPage', () => {
         });
     });
 
-    test('為替レート変更時にデータが再計算される', async () => {
-        render(<CumulativeDividendPage/>);
+    test.skip('為替レート変更時にデータが再計算される', async () => {
+        render(<CumulativeDividendPage/>, { wrapper: TestWrapper });
 
         await waitFor(() => {
             expect(screen.getByText('¥60,000')).toBeInTheDocument();
@@ -162,7 +170,7 @@ describe('CumulativeDividendPage', () => {
     test('エラー時にエラーメッセージが表示される', async () => {
         mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
-        render(<CumulativeDividendPage/>);
+        render(<CumulativeDividendPage/>, { wrapper: TestWrapper });
 
         await waitFor(() => {
             expect(screen.getByText(/エラー:/)).toBeInTheDocument();
@@ -170,7 +178,7 @@ describe('CumulativeDividendPage', () => {
     });
 
     test('説明文が表示される', async () => {
-        render(<CumulativeDividendPage/>);
+        render(<CumulativeDividendPage/>, { wrapper: TestWrapper });
 
         await waitFor(() => {
             expect(screen.getByText(/このグラフは、配当金データから年別に税引き後の配当金を累計して表示しています。/)).toBeInTheDocument();
@@ -184,7 +192,7 @@ describe('CumulativeDividendPage', () => {
             arrayBuffer: async () => new ArrayBuffer(0),
         });
 
-        render(<CumulativeDividendPage/>);
+        render(<CumulativeDividendPage/>, { wrapper: TestWrapper });
 
         await waitFor(() => {
             expect(screen.getByText(/エラー:/)).toBeInTheDocument();
@@ -201,7 +209,7 @@ describe('CumulativeDividendPage', () => {
             }, 0);
         });
 
-        render(<CumulativeDividendPage/>);
+        render(<CumulativeDividendPage/>, { wrapper: TestWrapper });
 
         await waitFor(() => {
             expect(screen.getByText(/エラー:/)).toBeInTheDocument();
@@ -220,7 +228,7 @@ describe('CumulativeDividendPage', () => {
             }, 0);
         });
 
-        render(<CumulativeDividendPage/>);
+        render(<CumulativeDividendPage/>, { wrapper: TestWrapper });
 
         await waitFor(() => {
             // "-" は0として扱われるので、累計は10000のみ
@@ -241,7 +249,7 @@ describe('CumulativeDividendPage', () => {
             }, 0);
         });
 
-        render(<CumulativeDividendPage/>);
+        render(<CumulativeDividendPage/>, { wrapper: TestWrapper });
 
         await waitFor(() => {
             // 正常な行のみが処理される
@@ -261,7 +269,7 @@ describe('CumulativeDividendPage', () => {
             }, 0);
         });
 
-        render(<CumulativeDividendPage/>);
+        render(<CumulativeDividendPage/>, { wrapper: TestWrapper });
 
         await waitFor(() => {
             // 無効な金額はスキップされ、有効な金額のみ処理される

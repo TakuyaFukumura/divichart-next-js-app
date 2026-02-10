@@ -1,6 +1,7 @@
 import type {Metadata} from "next";
 import "./globals.css";
 import {DarkModeProvider} from "./components/DarkModeProvider";
+import {ExchangeRateProvider} from "./contexts/ExchangeRateContext";
 import Header from "./components/Header";
 import React from "react";
 
@@ -23,6 +24,7 @@ export const metadata: Metadata = {
  *
  * @remarks
  * - DarkModeProviderでダークモード機能を提供
+ * - ExchangeRateProviderで為替レート設定機能を提供
  * - Headerコンポーネントで共通のヘッダーを表示
  * - 言語設定は日本語（ja）
  */
@@ -35,8 +37,10 @@ export default function RootLayout({
         <html lang="ja">
         <body className="antialiased">
         <DarkModeProvider>
-            <Header/>
-            {children}
+            <ExchangeRateProvider>
+                <Header/>
+                {children}
+            </ExchangeRateProvider>
         </DarkModeProvider>
         </body>
         </html>

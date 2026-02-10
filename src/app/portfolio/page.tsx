@@ -8,11 +8,8 @@ import {CSVRow, YearlyPortfolio} from '@/types/dividend';
 import YearSelector from '@/app/components/YearSelector';
 import DividendPieChart from '@/app/components/DividendPieChart';
 import DividendTable from '@/app/components/DividendTable';
-import {getUsdToJpyRate} from '@/lib/exchangeRate';
+import {useExchangeRate} from '@/app/contexts/ExchangeRateContext';
 import {LoadingScreen, ErrorScreen} from '@/app/components/LoadingState';
-
-// 為替レート設定（1ドル=150円）
-const USD_TO_JPY_RATE = getUsdToJpyRate();
 
 /**
  * 配当ポートフォリオコンポーネント（内部実装）
@@ -28,7 +25,7 @@ function PortfolioContent() {
     const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear());
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const [usdToJpyRate] = useState<number>(USD_TO_JPY_RATE);
+    const {usdToJpyRate} = useExchangeRate();
 
     // CSVデータの読み込み（初回マウント時のみ）
     useEffect(() => {
