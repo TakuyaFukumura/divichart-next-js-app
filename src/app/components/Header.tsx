@@ -4,13 +4,6 @@ import Link from 'next/link';
 import {useEffect, useRef, useState} from 'react';
 import {useDarkMode} from './DarkModeProvider';
 
-// inert 属性の型定義（React types にまだ含まれていないため）
-declare module 'react' {
-    interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
-        inert?: '' | undefined;
-    }
-}
-
 /**
  * ヘッダーコンポーネント
  * アプリケーション共通のヘッダー部分を表示する
@@ -28,6 +21,8 @@ export default function Header() {
     const {theme, setTheme} = useDarkMode();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const previousOverflowRef = useRef<string | null>(null);
+    const menuRef = useRef<HTMLElement>(null);
+    const firstFocusableRef = useRef<HTMLAnchorElement>(null);
 
     /**
      * テーマ切り替えハンドラー
@@ -120,6 +115,16 @@ export default function Header() {
         };
     }, [isMenuOpen]);
 
+    /**
+     * メニューを開いたときに最初のフォーカス可能な要素にフォーカスを移動
+     */
+    useEffect(() => {
+        if (isMenuOpen && firstFocusableRef.current) {
+            // メニューが開いたら最初のリンクにフォーカスを移動
+            firstFocusableRef.current.focus();
+        }
+    }, [isMenuOpen]);
+
     return (
         <>
             <header
@@ -132,7 +137,7 @@ export default function Header() {
                             <button
                                 onClick={toggleMenu}
                                 className="md:hidden p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                                aria-label={isMenuOpen ? 'メニューを閉じる' : 'メニューを開く'}
+                                aria-label={isMenuOpen ? 'メインメニューを閉じる' : 'メインメニューを開く'}
                                 aria-expanded={isMenuOpen}
                                 aria-controls="mobile-menu"
                             >
@@ -203,7 +208,8 @@ export default function Header() {
             {/* オーバーレイ（メニューが開いている時のみ表示） */}
             {isMenuOpen && (
                 <div
-                    className="fixed inset-0 bg-black/50 z-50 transition-opacity duration-300"
+                    data-testid="menu-overlay"
+                    className="fixed inset-0 bg-black/50 z-50"
                     onClick={closeMenu}
                     aria-hidden="true"
                 />
@@ -211,6 +217,7 @@ export default function Header() {
 
             {/* モバイルメニューパネル */}
             <nav
+                ref={menuRef}
                 id="mobile-menu"
                 role="navigation"
                 aria-label="メインメニュー"
@@ -229,7 +236,7 @@ export default function Header() {
                         <button
                             onClick={closeMenu}
                             className="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                            aria-label="メニューを閉じる"
+                            aria-label="メニューパネルを閉じる"
                         >
                             <svg
                                 className="w-6 h-6"
@@ -251,6 +258,7 @@ export default function Header() {
                     <div className="flex-1 overflow-y-auto">
                         <div className="flex flex-col py-4">
                             <Link
+                                ref={firstFocusableRef}
                                 href="/"
                                 onClick={closeMenu}
                                 className="py-4 px-6 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"

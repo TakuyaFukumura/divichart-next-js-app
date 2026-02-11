@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import {fireEvent, render, screen} from '@testing-library/react';
+import {fireEvent, render, screen, within} from '@testing-library/react';
 import {DarkModeProvider} from '@/app/components/DarkModeProvider';
 import Header from '../../../../src/app/components/Header';
 import '@testing-library/jest-dom';
@@ -253,17 +253,17 @@ describe('Header', () => {
         });
 
         it('ハンバーガーメニューボタンが表示される', () => {
-            const hamburgerButton = screen.getByLabelText('メニューを開く');
+            const hamburgerButton = screen.getByLabelText('メインメニューを開く');
             expect(hamburgerButton).toBeInTheDocument();
         });
 
         it('ハンバーガーメニューボタンにモバイル専用クラスが適用される', () => {
-            const hamburgerButton = screen.getByLabelText('メニューを開く');
+            const hamburgerButton = screen.getByLabelText('メインメニューを開く');
             expect(hamburgerButton).toHaveClass('md:hidden');
         });
 
         it('ハンバーガーメニューボタンをクリックするとメニューが開く', () => {
-            const hamburgerButton = screen.getByLabelText('メニューを開く');
+            const hamburgerButton = screen.getByLabelText('メインメニューを開く');
             fireEvent.click(hamburgerButton);
 
             // メニューパネルが表示される（translate-x-0クラスが適用される）
@@ -272,21 +272,21 @@ describe('Header', () => {
         });
 
         it('メニューが開いているときオーバーレイが表示される', () => {
-            const hamburgerButton = screen.getByLabelText('メニューを開く');
+            const hamburgerButton = screen.getByLabelText('メインメニューを開く');
             fireEvent.click(hamburgerButton);
 
             // オーバーレイが表示される
-            const overlay = document.querySelector('.fixed.inset-0.bg-black\\/50');
+            const overlay = screen.getByTestId('menu-overlay');
             expect(overlay).toBeInTheDocument();
         });
 
         it('オーバーレイをクリックするとメニューが閉じる', () => {
-            const hamburgerButton = screen.getByLabelText('メニューを開く');
+            const hamburgerButton = screen.getByLabelText('メインメニューを開く');
             fireEvent.click(hamburgerButton);
 
             // オーバーレイをクリック
-            const overlay = document.querySelector('.fixed.inset-0.bg-black\\/50');
-            fireEvent.click(overlay!);
+            const overlay = screen.getByTestId('menu-overlay');
+            fireEvent.click(overlay);
 
             // メニューパネルが閉じる（-translate-x-fullクラスが適用される）
             const mobileMenu = document.querySelector('#mobile-menu');
@@ -294,21 +294,21 @@ describe('Header', () => {
         });
 
         it('閉じるボタンをクリックするとメニューが閉じる', () => {
-            const hamburgerButton = screen.getByLabelText('メニューを開く');
+            const hamburgerButton = screen.getByLabelText('メインメニューを開く');
             fireEvent.click(hamburgerButton);
 
-            // 閉じるボタンをクリック（メニュー内の閉じるボタン - 2番目の要素）
-            const closeButtons = screen.getAllByLabelText('メニューを閉じる');
-            const menuCloseButton = closeButtons[1]; // メニュー内の閉じるボタンは2番目
-            fireEvent.click(menuCloseButton);
+            // メニューパネル内の閉じるボタンをスコープ付きで取得
+            const mobileMenu = screen.getByRole('navigation', {name: 'メインメニュー'});
+            const closeButton = within(mobileMenu).getByRole('button', {name: 'メニューパネルを閉じる'});
+            fireEvent.click(closeButton);
 
             // メニューパネルが閉じる
-            const mobileMenu = document.querySelector('#mobile-menu');
-            expect(mobileMenu).toHaveClass('-translate-x-full');
+            const mobileMenuAfterClose = document.querySelector('#mobile-menu');
+            expect(mobileMenuAfterClose).toHaveClass('-translate-x-full');
         });
 
         it('ESCキーを押すとメニューが閉じる', () => {
-            const hamburgerButton = screen.getByLabelText('メニューを開く');
+            const hamburgerButton = screen.getByLabelText('メインメニューを開く');
             fireEvent.click(hamburgerButton);
 
             // ESCキーを押す
@@ -320,7 +320,7 @@ describe('Header', () => {
         });
 
         it('メニュー項目をクリックするとメニューが閉じる', () => {
-            const hamburgerButton = screen.getByLabelText('メニューを開く');
+            const hamburgerButton = screen.getByLabelText('メインメニューを開く');
             fireEvent.click(hamburgerButton);
 
             // メニュー項目をクリック
@@ -333,7 +333,7 @@ describe('Header', () => {
         });
 
         it('モバイルメニュー内にすべてのナビゲーションリンクが表示される', () => {
-            const hamburgerButton = screen.getByLabelText('メニューを開く');
+            const hamburgerButton = screen.getByLabelText('メインメニューを開く');
             fireEvent.click(hamburgerButton);
 
             // モバイルメニュー内のリンクを確認
@@ -348,7 +348,7 @@ describe('Header', () => {
         });
 
         it('aria-expanded属性が正しく設定される', () => {
-            const hamburgerButton = screen.getByLabelText('メニューを開く');
+            const hamburgerButton = screen.getByLabelText('メインメニューを開く');
 
             // 閉じている状態
             expect(hamburgerButton).toHaveAttribute('aria-expanded', 'false');
@@ -356,21 +356,20 @@ describe('Header', () => {
             // 開く
             fireEvent.click(hamburgerButton);
             
-            // メニューが開いたので、ハンバーガーボタンのラベルが変わる（最初の要素がハンバーガーボタン）
-            const buttons = screen.getAllByLabelText('メニューを閉じる');
-            const hamburgerButtonAfterOpen = buttons[0]; // ハンバーガーボタンは最初
+            // メニューが開いたので、ハンバーガーボタンのラベルが変わる
+            const hamburgerButtonAfterOpen = screen.getByLabelText('メインメニューを閉じる');
             expect(hamburgerButtonAfterOpen).toHaveAttribute('aria-expanded', 'true');
 
             // 閉じる
             fireEvent.click(hamburgerButtonAfterOpen);
             
             // メニューが閉じたので、再度取得
-            const hamburgerButtonAfterClose = screen.getByLabelText('メニューを開く');
+            const hamburgerButtonAfterClose = screen.getByLabelText('メインメニューを開く');
             expect(hamburgerButtonAfterClose).toHaveAttribute('aria-expanded', 'false');
         });
 
         it('aria-controls属性が正しく設定される', () => {
-            const hamburgerButton = screen.getByLabelText('メニューを開く');
+            const hamburgerButton = screen.getByLabelText('メインメニューを開く');
             expect(hamburgerButton).toHaveAttribute('aria-controls', 'mobile-menu');
 
             const mobileMenu = document.querySelector('#mobile-menu');
@@ -384,7 +383,7 @@ describe('Header', () => {
         });
 
         it('メニューが開いているときaria-hiddenがfalseになる', () => {
-            const hamburgerButton = screen.getByLabelText('メニューを開く');
+            const hamburgerButton = screen.getByLabelText('メインメニューを開く');
             fireEvent.click(hamburgerButton);
 
             const mobileMenu = screen.getByRole('navigation', {name: 'メインメニュー'});
@@ -405,7 +404,7 @@ describe('Header', () => {
         });
 
         it('メニューを開くとbody overflowがhiddenになる', () => {
-            const hamburgerButton = screen.getByLabelText('メニューを開く');
+            const hamburgerButton = screen.getByLabelText('メインメニューを開く');
             fireEvent.click(hamburgerButton);
 
             expect(document.body.style.overflow).toBe('hidden');
@@ -415,14 +414,13 @@ describe('Header', () => {
             // 初期値を設定
             document.body.style.overflow = 'auto';
 
-            const hamburgerButton = screen.getByLabelText('メニューを開く');
+            const hamburgerButton = screen.getByLabelText('メインメニューを開く');
             fireEvent.click(hamburgerButton);
 
             expect(document.body.style.overflow).toBe('hidden');
 
             // メニューを閉じる（ハンバーガーボタンを再度クリック）
-            const buttons = screen.getAllByLabelText('メニューを閉じる');
-            const hamburgerButtonAfterOpen = buttons[0]; // ハンバーガーボタンは最初
+            const hamburgerButtonAfterOpen = screen.getByLabelText('メインメニューを閉じる');
             fireEvent.click(hamburgerButtonAfterOpen);
 
             expect(document.body.style.overflow).toBe('auto');
@@ -432,14 +430,13 @@ describe('Header', () => {
             // デフォルトは空文字列
             expect(document.body.style.overflow).toBe('');
 
-            const hamburgerButton = screen.getByLabelText('メニューを開く');
+            const hamburgerButton = screen.getByLabelText('メインメニューを開く');
             fireEvent.click(hamburgerButton);
 
             expect(document.body.style.overflow).toBe('hidden');
 
             // メニューを閉じる（ハンバーガーボタンを再度クリック）
-            const buttons = screen.getAllByLabelText('メニューを閉じる');
-            const hamburgerButtonAfterOpen = buttons[0]; // ハンバーガーボタンは最初
+            const hamburgerButtonAfterOpen = screen.getByLabelText('メインメニューを閉じる');
             fireEvent.click(hamburgerButtonAfterOpen);
 
             expect(document.body.style.overflow).toBe('');
