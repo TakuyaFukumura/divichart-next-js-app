@@ -21,7 +21,6 @@ export default function Header() {
     const {theme, setTheme} = useDarkMode();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const previousOverflowRef = useRef<string | null>(null);
-    const menuRef = useRef<HTMLElement>(null);
     const firstFocusableRef = useRef<HTMLAnchorElement>(null);
 
     /**
@@ -217,7 +216,6 @@ export default function Header() {
 
             {/* モバイルメニューパネル */}
             <nav
-                ref={menuRef}
                 id="mobile-menu"
                 role="navigation"
                 aria-label="メインメニュー"
