@@ -220,7 +220,7 @@ export default function Header() {
                 role="navigation"
                 aria-label="メインメニュー"
                 aria-hidden={!isMenuOpen}
-                inert={!isMenuOpen ? '' : undefined}
+                inert={!isMenuOpen || undefined}
                 className={`fixed inset-y-0 left-0 w-80 max-w-[80vw] bg-white dark:bg-gray-800 
                     shadow-2xl z-[60] transform transition-transform duration-300 ease-in-out md:hidden
                     ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
