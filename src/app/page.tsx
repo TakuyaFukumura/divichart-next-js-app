@@ -118,7 +118,7 @@ export default function Home() {
                             年別配当金集計
                         </h2>
                         <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700">
                                 <thead className="bg-gray-100 dark:bg-gray-700">
                                 <tr>
                                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
@@ -137,13 +137,13 @@ export default function Home() {
                                 {data.map((row) => (
                                     <tr key={row.year}
                                         className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right font-mono">
                                             {row.year}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right font-mono">
                                             ¥{row.totalDividend.toLocaleString()}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right font-mono">
                                             ¥{Math.floor(row.totalDividend / 12).toLocaleString()}
                                         </td>
                                     </tr>

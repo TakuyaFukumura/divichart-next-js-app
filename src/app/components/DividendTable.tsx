@@ -41,7 +41,7 @@ export default function DividendTable({
                 配当内訳一覧
             </h2>
             <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-xl shadow">
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700">
                     <thead className="bg-gray-100 dark:bg-gray-700">
                     <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
@@ -62,7 +62,7 @@ export default function DividendTable({
                     {data.map((row, index) => (
                         <tr
                             key={`${row.stockCode || 'NO_CODE'}-${row.stockName}`}
-                            className={`${getRowBgClass(row, index)} hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors`}
+                            className={`${getRowBgClass(row, index)} hover:brightness-95 dark:hover:brightness-110 transition-colors`}
                         >
                             <td
                                 className={`px-6 py-4 whitespace-nowrap text-sm text-left ${
