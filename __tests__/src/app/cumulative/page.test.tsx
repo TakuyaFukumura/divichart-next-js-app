@@ -101,7 +101,7 @@ describe('CumulativeDividendPage', () => {
         render(<CumulativeDividendPage/>, { wrapper: TestWrapper });
 
         await waitFor(() => {
-            expect(screen.getByText('累計配当グラフ')).toBeInTheDocument();
+            expect(screen.getByText('累計配当')).toBeInTheDocument();
         });
     });
 
