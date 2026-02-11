@@ -62,7 +62,7 @@ export default function DividendTable({
                     {data.map((row, index) => (
                         <tr
                             key={`${row.stockCode || 'NO_CODE'}-${row.stockName}`}
-                            className={`${getRowBgClass(row, index)} hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors`}
+                            className={`${getRowBgClass(row, index)} hover:brightness-95 dark:hover:brightness-110 transition-colors`}
                         >
                             <td
                                 className={`px-6 py-4 whitespace-nowrap text-sm text-left ${
