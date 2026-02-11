@@ -214,7 +214,7 @@ describe('Home Page', () => {
             render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
-                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当')).toBeInTheDocument();
             });
 
             expect(mockFetch).toHaveBeenCalledWith('/data/dividendlist_20260205.csv');
@@ -308,7 +308,7 @@ describe('Home Page', () => {
             render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
-                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当')).toBeInTheDocument();
             }, {timeout: 3000});
 
             // 年別配当金集計のヘッダーが表示されることを確認
@@ -322,7 +322,7 @@ describe('Home Page', () => {
             render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
-                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当')).toBeInTheDocument();
             });
 
             // テーブルにデータ行がないことを確認（theadではなくtbodyをチェック）
@@ -343,7 +343,7 @@ describe('Home Page', () => {
             render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
-                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当')).toBeInTheDocument();
             });
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）');
@@ -359,7 +359,7 @@ describe('Home Page', () => {
             render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
-                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当')).toBeInTheDocument();
             }, {timeout: 3000});
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）');
@@ -380,7 +380,7 @@ describe('Home Page', () => {
             render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
-                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当')).toBeInTheDocument();
             }, {timeout: 3000});
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）') as HTMLInputElement;
@@ -401,7 +401,7 @@ describe('Home Page', () => {
             render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
-                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当')).toBeInTheDocument();
             }, {timeout: 3000});
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）') as HTMLInputElement;
@@ -421,7 +421,7 @@ describe('Home Page', () => {
             render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
-                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当')).toBeInTheDocument();
             }, {timeout: 3000});
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）') as HTMLInputElement;
@@ -452,7 +452,7 @@ describe('Home Page', () => {
             render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
-                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当')).toBeInTheDocument();
             });
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）');
@@ -476,7 +476,7 @@ describe('Home Page', () => {
             render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
-                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当')).toBeInTheDocument();
             });
 
             expect(screen.getByTestId('responsive-container')).toBeInTheDocument();
@@ -496,7 +496,7 @@ describe('Home Page', () => {
             render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
-                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当')).toBeInTheDocument();
             }, {timeout: 3000});
 
             const barChart = screen.getByTestId('bar-chart');
@@ -655,7 +655,7 @@ describe('Home Page', () => {
             render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
-                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当')).toBeInTheDocument();
             }, {timeout: 3000});
 
             // 初期値: 10ドル * 150円 = 1,500円、月平均: floor(1,500 / 12) = 125円
@@ -684,7 +684,7 @@ describe('Home Page', () => {
             render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
-                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当')).toBeInTheDocument();
             });
 
             expect(
@@ -699,7 +699,7 @@ describe('Home Page', () => {
             render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
-                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当')).toBeInTheDocument();
             });
 
             expect(
@@ -715,7 +715,7 @@ describe('Home Page', () => {
             render(<Home/>, { wrapper: TestWrapper });
 
             await waitFor(() => {
-                expect(screen.getByText('年別配当グラフ')).toBeInTheDocument();
+                expect(screen.getByText('年別配当')).toBeInTheDocument();
             });
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）');
