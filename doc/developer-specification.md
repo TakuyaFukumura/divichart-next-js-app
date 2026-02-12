@@ -636,10 +636,12 @@ GoalsPage
 
 **主要な状態**
 
-| 状態変数       | 型      | 初期値  | 説明           |
-|------------|--------|------|--------------|
-| exchangeRate | number | 150  | 為替レート（1ドル=円） |
-| inputValue | string | "150" | 為替レート入力値     |
+| 状態変数      | スコープ   | 型             | 初期値                                      | 説明                             |
+|-----------|--------|----------------|-------------------------------------------|--------------------------------|
+| usdToJpyRate | Context | number         | `NEXT_PUBLIC_USD_TO_JPY_RATE` または `150` | グローバル為替レート（1ドル=円）        |
+| inputValue  | Local  | string         | `usdToJpyRate` を文字列化した値               | 為替レート入力フィールドの表示用文字列       |
+| error       | Local  | string \| null | `null`                                    | バリデーションエラーメッセージ（なければ null） |
+| isEditing   | Local  | boolean        | `false`                                   | 入力中かどうかのフラグ                  |
 
 **Context APIの使用**
 
