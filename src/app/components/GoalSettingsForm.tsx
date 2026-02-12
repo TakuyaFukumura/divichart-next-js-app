@@ -20,7 +20,7 @@ export default function GoalSettingsForm({initialValue, onSave}: GoalSettingsFor
      */
     const handleSave = () => {
         // バリデーション
-        if (monthlyTarget < 1000 || monthlyTarget > 10000000) {
+        if (isNaN(monthlyTarget) || monthlyTarget < 1000 || monthlyTarget > 10000000) {
             setError('目標金額は1,000円〜10,000,000円の範囲で設定してください');
             return;
         }
@@ -35,7 +35,9 @@ export default function GoalSettingsForm({initialValue, onSave}: GoalSettingsFor
         }, 3000);
     };
 
-    const yearlyTarget = monthlyTarget * 12;
+    // 無効な値の場合は初期値を使用
+    const displayTarget = isNaN(monthlyTarget) || monthlyTarget === 0 ? initialValue : monthlyTarget;
+    const yearlyTarget = displayTarget * 12;
 
     return (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
