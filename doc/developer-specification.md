@@ -3,8 +3,8 @@
 ## 1. ドキュメント情報
 
 - **作成日**: 2026年2月5日
-- **最終更新日**: 2026年2月7日
-- **対象バージョン**: v0.10.0
+- **最終更新日**: 2026年2月12日
+- **対象バージョン**: v0.19.0
 - **対象読者**: 開発者、システムアーキテクト、保守担当者
 
 ---
@@ -44,9 +44,16 @@ divichart-next-js-appは、証券会社から提供される配当金データ�
     - 配当金の内訳をテーブル表示
     - 上位10銘柄の個別表示と「その他」の集約
 
-6. **設定機能**
+6. **配当目標管理**（/goalsページ）
+    - 月平均配当目標の設定（年次目標は月平均×12で自動計算）
+    - 目標達成率の計算と表示
+    - 年別目標進捗バーの可視化
+    - 目標達成状況のサマリー統計（未実装・将来拡張予定）
+
+7. **設定機能**（/settingsページ）
     - ダークモード/ライトモードの切り替え
     - 為替レートのリアルタイム変更
+    - デフォルト為替レートへのリセット機能
     - ナビゲーションによる複数ページの切り替え
 
 ### 2.3 対象ユーザー
@@ -67,7 +74,8 @@ divichart-next-js-appは、証券会社から提供される配当金データ�
 │  ┌──────────────────────────────────────────┐  │
 │  │         Next.js App Router               │  │
 │  │  ┌────────────────────────────────────┐  │  │
-│  │  │  Layout (Header + DarkMode)        │  │  │
+│  │  │  Layout (Header + DarkMode +     │   │  │
+│  │  │          ExchangeRateProvider)    │  │  │
 │  │  │  ┌──────────────────────────────┐  │  │  │
 │  │  │  │  Page (メインページ)         │  │  │  │
 │  │  │  │  - useDividendData Hook     │  │  │  │
@@ -88,6 +96,21 @@ divichart-next-js-appは、証券会社から提供される配当金データ�
 │  │  │  │  - 円グラフ表示             │  │  │  │
 │  │  │  │  - YearSelector             │  │  │  │
 │  │  │  │  - DividendTable            │  │  │  │
+│  │  │  └──────────────────────────────┘  │  │  │
+│  │  │  ┌──────────────────────────────┐  │  │  │
+│  │  │  │  /goals (配当目標管理)       │  │  │  │
+│  │  │  │  - useDividendData Hook     │  │  │  │
+│  │  │  │  - goalStorage利用          │  │  │  │
+│  │  │  │  - goalCalculator利用       │  │  │  │
+│  │  │  │  - GoalSettingsForm         │  │  │  │
+│  │  │  │  - YearlyGoalProgressBar    │  │  │  │
+│  │  │  │  - GoalAchievementTable     │  │  │  │
+│  │  │  └──────────────────────────────┘  │  │  │
+│  │  │  ┌──────────────────────────────┐  │  │  │
+│  │  │  │  /settings (設定ページ)      │  │  │  │
+│  │  │  │  - ExchangeRateContext利用  │  │  │  │
+│  │  │  │  - 為替レート設定UI          │  │  │  │
+│  │  │  │  - デフォルト値リセット      │  │  │  │
 │  │  │  └──────────────────────────────┘  │  │  │
 │  │  └────────────────────────────────────┘  │  │
 │  └──────────────────────────────────────────┘  │
@@ -133,40 +156,72 @@ divichart-next-js-appは、証券会社から提供される配当金データ�
 ```
 divichart-next-js-app/
 ├── .github/
+│   ├── copilot-instructions.md # GitHub Copilot用指示
 │   ├── dependabot.yml          # Dependabot設定
+│   ├── PULL_REQUEST_TEMPLATE.md # PR テンプレート
+│   ├── ISSUE_TEMPLATE/
+│   │   ├── config.yml          # Issueテンプレート設定
+│   │   ├── ai-doc.md           # AI用ドキュメント作成Issue
+│   │   └── ai-dev.md           # AI用開発Issue
 │   └── workflows/
 │       └── ci.yml              # CI/CDワークフロー
 ├── __tests__/                  # テストファイル（src構造をミラー）
 │   └── src/
 │       ├── app/
 │       │   ├── components/
+│       │   │   ├── CustomTooltip.test.tsx
 │       │   │   ├── DarkModeProvider.test.tsx
+│       │   │   ├── DividendPieChart.test.tsx
 │       │   │   ├── Header.test.tsx
+│       │   │   ├── LoadingState.test.tsx
 │       │   │   └── YearSelector.test.tsx
+│       │   ├── contexts/
+│       │   │   └── ExchangeRateContext.test.tsx
 │       │   ├── cumulative/
+│       │   │   └── page.test.tsx
+│       │   ├── goals/
+│       │   │   └── page.test.tsx
+│       │   ├── settings/
 │       │   │   └── page.test.tsx
 │       │   ├── layout.test.tsx
 │       │   └── page.test.tsx
 │       └── lib/
-│           └── dividendCalculator.test.ts
+│           ├── dividendCalculator.test.ts
+│           ├── exchangeRate.test.ts
+│           ├── formatYAxisValue.test.ts
+│           ├── goalCalculator.test.ts
+│           └── goalStorage.test.ts
 ├── doc/                        # ドキュメント
-│   ├── developer-specification.md  # 本ドキュメント
-│   ├── improvements.md         # 改善提案リスト
-│   └── test-code-organization.md
+│   ├── developer-specification.md      # 本ドキュメント
+│   ├── feature-addition-consideration.md # 機能追加検討
+│   ├── improvements.md                 # 改善提案リスト
+│   ├── refactoring-decision-guide.md   # リファクタリング判断基準
+│   ├── refactoring-plan.md             # リファクタリング計画
+│   └── refactoring-summary.md          # リファクタリング概要
 ├── public/                     # 静的ファイル
 │   └── data/                   # CSVデータファイル
 │       └── dividendlist_20260205.csv
 ├── src/
 │   ├── app/
 │   │   ├── components/         # Reactコンポーネント
-│   │   │   ├── DarkModeProvider.tsx  # ダークモードProvider
-│   │   │   ├── DividendPieChart.tsx  # 円グラフコンポーネント
-│   │   │   ├── DividendTable.tsx     # 配当テーブルコンポーネント
-│   │   │   ├── Header.tsx            # ヘッダーコンポーネント
-│   │   │   └── YearSelector.tsx      # 年度選択コンポーネント
+│   │   │   ├── DarkModeProvider.tsx        # ダークモードProvider
+│   │   │   ├── DividendPieChart.tsx        # 円グラフコンポーネント
+│   │   │   ├── DividendTable.tsx           # 配当テーブルコンポーネント
+│   │   │   ├── GoalAchievementTable.tsx    # 目標達成テーブル
+│   │   │   ├── GoalSettingsForm.tsx        # 目標設定フォーム
+│   │   │   ├── Header.tsx                  # ヘッダーコンポーネント
+│   │   │   ├── LoadingState.tsx            # ローディング状態コンポーネント
+│   │   │   ├── YearSelector.tsx            # 年度選択コンポーネント
+│   │   │   └── YearlyGoalProgressBar.tsx   # 年別目標進捗バー
+│   │   ├── contexts/           # React Context
+│   │   │   └── ExchangeRateContext.tsx     # 為替レートContext
 │   │   ├── cumulative/         # 累計配当グラフページ
 │   │   │   └── page.tsx
+│   │   ├── goals/              # 配当目標管理ページ
+│   │   │   └── page.tsx
 │   │   ├── portfolio/          # ポートフォリオページ
+│   │   │   └── page.tsx
+│   │   ├── settings/           # 設定ページ
 │   │   │   └── page.tsx
 │   │   ├── globals.css         # グローバルスタイル
 │   │   ├── layout.tsx          # アプリケーションレイアウト
@@ -175,9 +230,14 @@ divichart-next-js-app/
 │   │   └── useDividendData.ts  # 配当データ読み込みフック
 │   ├── lib/                    # ユーティリティ関数
 │   │   ├── csvLoader.ts        # CSV読み込み処理
-│   │   └── dividendCalculator.ts  # 配当金計算ロジック
+│   │   ├── dividendCalculator.ts  # 配当金計算ロジック
+│   │   ├── exchangeRate.ts     # 為替レート関連ユーティリティ
+│   │   ├── formatYAxisValue.ts # Y軸値フォーマット
+│   │   ├── goalCalculator.ts   # 目標達成計算ロジック
+│   │   └── goalStorage.ts      # 目標設定LocalStorage管理
 │   └── types/                  # TypeScript型定義
-│       └── dividend.ts         # 配当金関連の型定義
+│       ├── dividend.ts         # 配当金関連の型定義
+│       └── react-inert.d.ts    # React inert属性の型定義
 ├── .gitignore
 ├── eslint.config.mjs           # ESLint設定
 ├── jest.config.mjs             # Jest設定
@@ -307,6 +367,42 @@ export type YearlyPortfolio = {
     /** 年間配当金合計 [円] */
     totalAmount: number;
 };
+
+/**
+ * 年別目標達成データ
+ */
+export type YearlyGoalAchievement = {
+    /** 対象年 */
+    year: number;
+    /** 実際の年間配当金 [円] */
+    actualAmount: number;
+    /** 目標金額（年間） [円] */
+    targetAmount: number;
+    /** 達成率 [%] */
+    achievementRate: number;
+    /** 差額 [円] (正の値: 超過達成, 負の値: 未達成) */
+    difference: number;
+};
+
+/**
+ * 目標達成サマリーの型定義
+ */
+export type GoalAchievementSummary = {
+    /** 達成した年数 */
+    achievedYearsCount: number;
+    /** 総年数 */
+    totalYearsCount: number;
+    /** 平均達成率 [%] */
+    averageAchievementRate: number;
+    /** 最高達成率 [%] */
+    maxAchievementRate: number;
+    /** 最高達成率の年 */
+    maxAchievementYear: number;
+    /** 最低達成率 [%] */
+    minAchievementRate: number;
+    /** 最低達成率の年 */
+    minAchievementYear: number;
+};
 ```
 
 #### データ変換フロー
@@ -343,6 +439,15 @@ CSVRow[]
 YearlyPortfolio
     ↓
 円グラフ・テーブルに表示
+
+CSVRow[]
+    ↓ [目標ページ] aggregateDividendsByYear() → calculateGoalAchievements()
+    ├─ 年別配当金を集計
+    ├─ 目標額と比較
+    └─ 達成率を計算
+YearlyGoalAchievement[]
+    ↓
+目標達成テーブル・進捗バーに表示
 ```
 
 ---
@@ -487,6 +592,86 @@ PortfolioContent (Suspenseでラップ)
 └── DividendTable（配当内訳テーブル）
 ```
 
+#### `src/app/goals/page.tsx` - 配当目標管理ページ
+
+**責務**
+
+- CSVデータの読み込み（useDividendDataフックを使用）
+- 月平均配当目標の設定と年次目標（金額）の自動計算（月平均×12）
+- 目標達成率の計算と表示
+- 年別目標進捗の可視化
+- 目標達成状況のサマリー統計表示
+
+**主要な状態**
+
+| 状態変数          | 型                    | 初期値 | 説明                                             |
+|-------------------|-----------------------|--------|--------------------------------------------------|
+| rawData           | CSVRow[]              | []     | パース済みCSVデータ                              |
+| goalSettings      | GoalSettings          | loadGoalSettings()から読み込み   | 目標設定情報（monthlyTargetAmountなど）         |
+| achievements      | YearlyGoalAchievement[]     | []     | 目標達成状況一覧（年別の実績サマリを含む） |
+
+**ライブラリ関数の使用**
+
+```typescript
+// src/lib/goalStorage.ts から
+import {loadGoalSettings, saveGoalSettings} from '@/lib/goalStorage';
+
+// src/lib/dividendCalculator.ts から
+import {aggregateDividendsByYear} from '@/lib/dividendCalculator';
+
+// src/lib/goalCalculator.ts から
+import {calculateGoalAchievements} from '@/lib/goalCalculator';
+```
+
+**UIコンポーネント構成**
+
+```
+GoalsPage
+├── GoalSettingsForm（目標設定フォーム）
+├── GoalAchievementTable（目標達成テーブル）
+└── YearlyGoalProgressBar（年別目標進捗バー）× N年分
+```
+
+#### `src/app/settings/page.tsx` - 設定ページ
+
+**責務**
+
+- 為替レートの設定と変更
+- デフォルト為替レートへのリセット機能
+- ExchangeRateContextを使用したグローバル為替レート管理
+
+**主要な状態**
+
+| 状態変数      | スコープ   | 型             | 初期値                                      | 説明                             |
+|-----------|--------|----------------|-------------------------------------------|--------------------------------|
+| usdToJpyRate | Context | number         | `NEXT_PUBLIC_USD_TO_JPY_RATE` または `150` | グローバル為替レート（1ドル=円）        |
+| inputValue  | Local  | string         | `usdToJpyRate` を文字列化した値               | 為替レート入力フィールドの表示用文字列       |
+| error       | Local  | string \| null | `null`                                    | バリデーションエラーメッセージ（なければ null） |
+| isEditing   | Local  | boolean        | `false`                                   | 入力中かどうかのフラグ                  |
+
+**Context APIの使用**
+
+```typescript
+// src/app/contexts/ExchangeRateContext.tsx から
+import {useExchangeRate} from '@/app/contexts/ExchangeRateContext';
+```
+
+**主要機能**
+
+- 為替レート入力フィールド
+- リアルタイム為替レート更新
+- デフォルト値（150円）へのリセットボタン
+- 設定値のLocalStorage保存
+
+**UIコンポーネント構成**
+
+```
+SettingsPage
+├── 為替レート入力フィールド
+├── リセットボタン
+└── 説明文
+```
+
 ### 5.2 レイアウトコンポーネント
 
 #### `src/app/layout.tsx` - ルートレイアウト
@@ -496,6 +681,7 @@ PortfolioContent (Suspenseでラップ)
 - アプリケーション全体のレイアウト構造
 - メタデータの設定
 - グローバルスタイルの適用
+- ExchangeRateProviderの配置
 - DarkModeProviderの配置
 - ナビゲーション機能の提供（Header内）
 
@@ -505,8 +691,10 @@ PortfolioContent (Suspenseでラップ)
 <html lang="ja">
 <body>
 <DarkModeProvider>
-    <Header/>
-    {children}
+    <ExchangeRateProvider>
+        <Header/>
+        {children}
+    </ExchangeRateProvider>
 </DarkModeProvider>
 </body>
 </html>
@@ -534,6 +722,8 @@ PortfolioContent (Suspenseでラップ)
 - ホーム（/）: 年別配当グラフ
 - 累計（/cumulative）: 累計配当グラフ
 - ポートフォリオ（/portfolio）: 銘柄別配当表示
+- 目標（/goals）: 配当目標管理
+- 設定（/settings）: アプリケーション設定
 
 **Props**: なし
 
@@ -616,6 +806,108 @@ PortfolioContent (Suspenseでラップ)
 | 配当金額[円] | 配当金額（税引き後）   | 3桁区切り（カンマ付き） |
 | 割合[%]   | 全体に占める配当金の割合 | 小数点1桁        |
 
+#### `src/app/components/GoalSettingsForm.tsx` - 目標設定フォーム
+
+**責務**
+
+- 月平均配当目標の入力フォームの提供
+- 入力値のバリデーション（1,000円〜10,000,000円の範囲チェック）
+- LocalStorageへの目標値保存
+
+**Props**
+
+```typescript
+{
+    initialValue: number;                     // 初期の月平均目標額
+    onSave: (value: number) => void;          // 目標保存時のコールバック
+}
+```
+
+**主要機能**
+
+- 月平均目標入力フィールド
+- 年間目標の自動計算表示（月平均 × 12）
+- 保存ボタン
+- 入力値の数値バリデーション（1,000円〜10,000,000円）
+- 保存成功メッセージの表示
+
+#### `src/app/components/YearlyGoalProgressBar.tsx` - 年別目標進捗バー
+
+**責務**
+
+- 年別目標達成率の視覚的表示
+- プログレスバーによる達成度の可視化
+- 達成率に応じた色分け表示
+- 実績・目標・差額の詳細情報表示
+
+**Props**
+
+```typescript
+{
+    achievement: YearlyGoalAchievement;  // 年別目標達成データ
+}
+```
+
+**主要機能**
+
+- 年の表示
+- プログレスバー（0-100%、100%以上は100%で表示）
+- 達成率の数値表示
+- 色分け
+  - 120%以上: 黄色（bg-yellow-500）
+  - 100%以上120%未満: 緑色（bg-green-500）
+  - 100%未満: 青色（bg-blue-500）
+- 詳細情報（実績金額、目標金額、差額）の表示
+
+#### `src/app/components/GoalAchievementTable.tsx` - 目標達成テーブル
+
+**責務**
+
+- 年別目標達成状況をテーブル形式で表示
+- 配当金額、目標額、達成率、差額の詳細表示
+- ダークモード対応
+- 達成率・差額の色分け表示
+
+**Props**
+
+```typescript
+{
+    achievements: YearlyGoalAchievement[];  // 年別目標達成データ
+}
+```
+
+**表示カラム**
+
+| カラム名     | 説明           | フォーマット       |
+|----------|--------------|--------------|
+| 年        | 対象年          | YYYY        |
+| 実績[円]  | 実際の配当金額（税引き後） | 3桁区切り（カンマ付き） |
+| 目標[円]   | 年次目標額        | 3桁区切り（カンマ付き） |
+| 達成率[%]   | 目標に対する達成率    | 小数点1桁、色分け（120%以上: 黄色、100%以上: 緑色、未達成: 赤色）        |
+| 差額[円]   | 実績と目標の差額（超過達成: 正の値、未達成: 負の値）    | 3桁区切り（カンマ付き）、色分け（正: 緑色、負: 赤色）        |
+
+#### `src/app/components/LoadingState.tsx` - ローディング状態コンポーネント
+
+**責務**
+
+- ローディング中の全画面表示（`LoadingScreen`）
+- エラー発生時の全画面表示（`ErrorScreen`）
+- ページコンポーネント等からの再利用可能な状態画面コンポーネント
+
+**提供コンポーネント**
+
+- `LoadingScreen`
+    - 配当データなどの取得中に表示するローディング画面
+    - スピナーやローディングメッセージを表示
+- `ErrorScreen`
+    - データ取得や処理でエラーが発生した際に表示するエラー画面
+    - エラー内容に応じたメッセージを表示
+
+**利用方針**
+
+- データフェッチ中のページで `LoadingScreen` を直接レンダリングして使用
+- 致命的なエラーが発生した場合に `ErrorScreen` をレンダリングしてユーザーに通知
+- より細かい制御が必要な場合は、これらをラップするコンポーネントを別途実装
 #### `src/app/components/DarkModeProvider.tsx` - ダークモードプロバイダー
 
 **責務**
@@ -650,6 +942,44 @@ function useDarkMode(): DarkModeContextType
 
 - `localStorage.getItem('theme')`で初期テーマを読み込み
 - `localStorage.setItem('theme', newTheme)`でテーマを保存
+
+#### `src/app/contexts/ExchangeRateContext.tsx` - 為替レートContext
+
+**責務**
+
+- 為替レート状態のグローバル管理
+- LocalStorageへの為替レート保存
+- 為替レート変更APIの提供
+- デフォルト値へのリセット機能
+- 全ページでの為替レート共有
+
+**Context API**
+
+```typescript
+interface ExchangeRateContextType {
+    usdToJpyRate: number;                       // 現在の為替レート（1ドル=円）
+    setUsdToJpyRate: (rate: number) => void;    // 為替レート変更関数
+    defaultRate: number;                        // デフォルトの為替レート（定数）
+    resetToDefault: () => void;                 // デフォルト値にリセットする関数
+}
+```
+
+**カスタムフック**
+
+```typescript
+/**
+ * ExchangeRateContextを利用するフック
+ * @returns 為替レート情報と為替レート変更関数
+ * @throws ExchangeRateProvider外で使用した場合にエラー
+ */
+function useExchangeRate(): ExchangeRateContextType
+```
+
+**永続化**
+
+- `localStorage.getItem('usdToJpyRate')`で初期為替レートを読み込み
+- `localStorage.setItem('usdToJpyRate', rate)`で為替レートを保存
+- 優先順位: 1. localStorage の値 → 2. 環境変数（NEXT_PUBLIC_USD_TO_JPY_RATE） → 3. デフォルト値（150円）
 
 ---
 
@@ -770,6 +1100,114 @@ export function getAvailableYears(csvData: CSVRow[]): number[]
 - 通貨の自動為替換算
 - パーセンテージの自動計算
 
+#### `src/lib/goalCalculator.ts` - 目標達成計算ロジック
+
+**主要関数**
+
+```typescript
+/**
+ * 年別の目標達成データを計算
+ * @param yearlyDividends 年別配当金のMap（キー: 年、値: 年間配当金[円]）
+ * @param monthlyTarget 月平均配当目標金額[円]
+ * @returns 年別目標達成データの配列（降順ソート済み）
+ */
+export function calculateGoalAchievements(
+    yearlyDividends: Map<string, number>,
+    monthlyTarget: number
+): YearlyGoalAchievement[]
+
+/**
+ * 目標達成サマリーを計算
+ * @param achievements 年別目標達成データの配列
+ * @returns 目標達成サマリー（データがない場合はnull）
+ */
+export function calculateGoalSummary(
+    achievements: YearlyGoalAchievement[]
+): GoalAchievementSummary | null
+```
+
+**特徴**
+
+- 年次目標は月平均目標 × 12で自動計算
+- 年別配当金の集計（Mapから取得）
+- 目標達成率の自動計算（小数点第1位まで）
+- 差額（実績 - 目標）の計算
+- 達成年数・総年数の集計
+- 平均達成率・最高/最低達成率の算出
+
+#### `src/lib/goalStorage.ts` - 目標設定LocalStorage管理
+
+**主要関数**
+
+```typescript
+/**
+ * 目標設定を保存
+ * @param monthlyTarget 月平均配当目標金額[円]
+ */
+export function saveGoalSettings(monthlyTarget: number): void
+
+/**
+ * 目標設定を読み込み
+ * @returns 目標設定（未設定の場合はデフォルト値）
+ */
+export function loadGoalSettings(): GoalSettings
+```
+
+**特徴**
+
+- LocalStorageキー: 'goalSettings'
+- JSON形式での保存
+- デフォルト値: { monthlyTargetAmount: 30000 }（月平均30,000円）
+- 数値バリデーション（1,000円〜10,000,000円の範囲チェック）
+- 読み込み失敗時のフォールバック処理
+- SSR対応（window未定義時の処理）
+
+#### `src/lib/exchangeRate.ts` - 為替レート関連ユーティリティ
+
+**主要関数**
+
+```typescript
+/**
+ * USドルから日本円への為替レートを取得
+ * @returns 為替レート（1ドル = n円）
+ */
+export function getUsdToJpyRate(): number
+
+/**
+ * デフォルトの為替レート（定数）
+ */
+export const DEFAULT_USD_TO_JPY_RATE = 150;
+```
+
+**特徴**
+
+- 環境変数 `NEXT_PUBLIC_USD_TO_JPY_RATE` から為替レートを取得
+- 環境変数が未設定または無効な場合はデフォルト値（150円）を使用
+- 負の値やNaNの場合もデフォルト値を使用
+- LocalStorage操作はExchangeRateContext側で実装
+
+#### `src/lib/formatYAxisValue.ts` - Y軸値フォーマット
+
+**主要関数**
+
+```typescript
+/**
+ * グラフのy軸用に金額を短縮表示する
+ * @param value 表示する金額（円単位）
+ * @returns 短縮表示された文字列（例: "5千円", "32万円"）
+ */
+export function formatYAxisValue(value: number): string
+```
+
+**特徴**
+
+- 10,000円以上: "万円"単位で表示（整数、例: "5万円"、"32万円"）
+- 1,000円以上10,000円未満: "千円"単位で表示（整数、例: "5千円"）
+- 1,000円未満: "円"単位で表示（例: "500円"）
+- 0の場合: "0"を表示
+- グラフの可読性向上
+- 日本語表記対応
+
 ---
 
 ## 6. 状態管理
@@ -785,10 +1223,12 @@ export function getAvailableYears(csvData: CSVRow[]): number[]
 **使用例**
 
 - CSVデータ（各ページコンポーネント）
-- 為替レート（各ページコンポーネント）
+- 為替レート（各ページコンポーネント、v0.19.0以降はExchangeRateContextも使用）
 - ローディング状態（各ページコンポーネント）
 - 表示年（portfolioページ）
 - ポートフォリオデータ（portfolioページ）
+- 月次・年次目標（goalsページ）
+- 目標達成データ（goalsページ）
 
 ### 6.3 グローバル状態（Context API）
 
@@ -797,6 +1237,7 @@ export function getAvailableYears(csvData: CSVRow[]): number[]
 **現在の使用例**
 
 - ダークモードのテーマ状態（`DarkModeProvider`）
+- 為替レート状態（`ExchangeRateProvider`、v0.19.0で追加）
 
 ### 6.4 カスタムフック
 
@@ -805,8 +1246,20 @@ export function getAvailableYears(csvData: CSVRow[]): number[]
 **現在の使用例**
 
 - `useDividendData`: CSVデータ読み込みと状態管理
+- `useDarkMode`: ダークモードのテーマ管理
+- `useExchangeRate`: 為替レート管理（v0.19.0で追加）
 
-### 6.5 サーバー状態
+### 6.5 LocalStorage永続化
+
+ユーザー設定は`localStorage`を使用して永続化しています。
+
+**永続化している設定**
+
+- ダークモードのテーマ（key: 'theme'）
+- 為替レート（key: 'usdToJpyRate'）
+- 配当目標設定（key: 'goalSettings'）
+
+### 6.6 サーバー状態
 
 現在、サーバー状態の管理は行っていません。CSVファイルは静的ファイルとして配信され、クライアントで読み込まれます。カスタムフック（useDividendData）は初回マウント時および
 `csvFilePath`変更時にデータを取得し、その結果としてページリロード時にも再取得されます。
@@ -817,7 +1270,7 @@ export function getAvailableYears(csvData: CSVRow[]): number[]
 
 ### 7.1 CSVデータ読み込みフロー
 
-#### メインページ・累計ページ（useDividendDataフック使用）
+#### メインページ・累計ページ・目標ページ（useDividendDataフック使用）
 
 ```
 [ユーザーがページアクセス]
@@ -1510,7 +1963,10 @@ console.log('Exchange Rate:', usdToJpyRate);
 
 - `README.md`: プロジェクト概要とセットアップ手順
 - `doc/improvements.md`: 改善提案リスト
-- `doc/test-code-organization.md`: テストコード構成
+- `doc/refactoring-summary.md`: リファクタリング概要
+- `doc/refactoring-plan.md`: リファクタリング計画
+- `doc/refactoring-decision-guide.md`: リファクタリング判断基準
+- `doc/feature-addition-consideration.md`: 機能追加検討
 
 ### 18.3 外部リソース
 
@@ -1522,10 +1978,11 @@ console.log('Exchange Rate:', usdToJpyRate);
 
 ## 19. 変更履歴
 
-| 日付         | バージョン | 変更内容                                                                                                                         | 作成者            |
-|------------|-------|------------------------------------------------------------------------------------------------------------------------------|----------------|
-| 2026-02-05 | 1.0.0 | 初版作成                                                                                                                         | GitHub Copilot |
-| 2026-02-07 | 2.0.0 | v0.10.0対応: 累計配当グラフページ追加、ポートフォリオページ追加、新コンポーネント追加（YearSelector, DividendPieChart, DividendTable）、カスタムフック・ライブラリ関数の追加、テストカバレッジ拡充 | GitHub Copilot |
+| 日付         | バージョン | 変更内容                                                                                                                                                                                                                                                                        | 作成者            |
+|------------|-------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|
+| 2026-02-05 | 1.0.0 | 初版作成                                                                                                                                                                                                                                                                        | GitHub Copilot |
+| 2026-02-07 | 2.0.0 | v0.10.0対応: 累計配当グラフページ追加、ポートフォリオページ追加、新コンポーネント追加（YearSelector, DividendPieChart, DividendTable）、カスタムフック・ライブラリ関数の追加、テストカバレッジ拡充                                                                                                                                                | GitHub Copilot |
+| 2026-02-12 | 3.0.0 | v0.19.0対応: 配当目標管理ページ（/goals）追加、設定ページ（/settings）追加、新コンポーネント追加（GoalSettingsForm, YearlyGoalProgressBar, GoalAchievementTable, LoadingState）、ExchangeRateContext追加、新ライブラリ追加（goalCalculator, goalStorage, formatYAxisValue, exchangeRate）、テストカバレッジ拡充、ドキュメント全面更新 | GitHub Copilot |
 
 ---
 
