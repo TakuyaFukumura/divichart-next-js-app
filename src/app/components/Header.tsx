@@ -180,6 +180,12 @@ export default function Header() {
                                     ポートフォリオ
                                 </Link>
                                 <Link
+                                    href="/goals"
+                                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                                >
+                                    目標達成度
+                                </Link>
+                                <Link
                                     href="/settings"
                                     className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                                 >
@@ -276,6 +282,13 @@ export default function Header() {
                                 className="py-4 px-6 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                             >
                                 💼 ポートフォリオ
+                            </Link>
+                            <Link
+                                href="/goals"
+                                onClick={closeMenu}
+                                className="py-4 px-6 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                            >
+                                🎯 目標達成度
                             </Link>
                             <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
                             <Link

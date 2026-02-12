@@ -85,3 +85,48 @@ export type CumulativeDividendData = {
     /** 累計配当金（税引き後）[円] */
     cumulativeDividend: number;
 };
+
+/**
+ * 目標設定の型定義
+ */
+export type GoalSettings = {
+    /** 月平均配当目標金額 [円] */
+    monthlyTargetAmount: number;
+};
+
+/**
+ * 年別目標達成データの型定義
+ */
+export type YearlyGoalAchievement = {
+    /** 対象年 */
+    year: number;
+    /** 実際の年間配当金 [円] */
+    actualAmount: number;
+    /** 目標金額（年間） [円] */
+    targetAmount: number;
+    /** 達成率 [%] */
+    achievementRate: number;
+    /** 差額 [円] (正の値: 超過達成, 負の値: 未達成) */
+    difference: number;
+};
+
+/**
+ * 目標達成サマリーの型定義
+ */
+export type GoalAchievementSummary = {
+    /** 達成した年数 */
+    achievedYearsCount: number;
+    /** 総年数 */
+    totalYearsCount: number;
+    /** 平均達成率 [%] */
+    averageAchievementRate: number;
+    /** 最高達成率 [%] */
+    maxAchievementRate: number;
+    /** 最高達成率の年 */
+    maxAchievementYear: number;
+    /** 最低達成率 [%] */
+    minAchievementRate: number;
+    /** 最低達成率の年 */
+    minAchievementYear: number;
+};
+
