@@ -242,11 +242,11 @@ export type GoalAchievementSummary = {
 ### 3.2 LocalStorageキー
 
 ```typescript
-// 目標設定の保存キー
-const GOAL_SETTINGS_STORAGE_KEY = 'divichart_goal_settings';
+// 目標設定の保存キー（既存の localStorage キーと同様に短いキー名を使用）
+export const GOAL_SETTINGS_STORAGE_KEY = 'goalSettings';
 
 // デフォルト値
-const DEFAULT_MONTHLY_TARGET = 30000; // 円
+export const DEFAULT_MONTHLY_TARGET = 30000; // 円
 ```
 
 ### 3.3 データフロー
@@ -461,6 +461,11 @@ function YearlyGoalProgressBar({ achievement }: { achievement: YearlyGoalAchieve
         <div
           className={`h-full ${progressColor} transition-all duration-500 ease-out flex items-center justify-end pr-3`}
           style={{ width: `${progressWidth}%` }}
+          role="progressbar"
+          aria-valuenow={progressWidth}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={`${achievement.year}年の目標達成率`}
         >
           {progressWidth > 15 && (
             <span className="text-white text-sm font-semibold">
