@@ -608,13 +608,13 @@ PortfolioContent (Suspenseでラップ)
 
 ```typescript
 // src/lib/goalStorage.ts から
-import {loadGoals, saveGoals} from '@/lib/goalStorage';
-
-// src/lib/goalCalculator.ts から
-import {calculateYearlyGoalAchievements, calculateGoalSummaryStats} from '@/lib/goalCalculator';
+import {loadGoalSettings, saveGoalSettings} from '@/lib/goalStorage';
 
 // src/lib/dividendCalculator.ts から
-import {getAvailableYears} from '@/lib/dividendCalculator';
+import {aggregateDividendsByYear} from '@/lib/dividendCalculator';
+
+// src/lib/goalCalculator.ts から
+import {calculateGoalAchievements} from '@/lib/goalCalculator';
 ```
 
 **UIコンポーネント構成**
