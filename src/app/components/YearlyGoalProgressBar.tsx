@@ -66,10 +66,11 @@ export default function YearlyGoalProgressBar({achievement}: { achievement: Year
                     <span>目標: ¥{achievement.targetAmount.toLocaleString()}</span>
                 </div>
                 <div className="mt-1">
-          <span
-              className={achievement.difference >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
-            差額: {achievement.difference >= 0 ? '+' : ''}¥{achievement.difference.toLocaleString()}
-          </span>
+                    <span
+                        className={achievement.difference >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}
+                    >
+                        差額: {achievement.difference >= 0 ? '+' : ''}¥{achievement.difference.toLocaleString()}
+                    </span>
                 </div>
             </div>
         </div>
