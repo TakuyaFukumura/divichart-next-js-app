@@ -1192,17 +1192,19 @@ export const DEFAULT_USD_TO_JPY_RATE = 150;
 
 ```typescript
 /**
- * Y軸の値を読みやすい形式にフォーマットする
- * @param value フォーマット対象の値
- * @returns フォーマット済みの文字列（例: "1.5万", "10万"）
+ * グラフのy軸用に金額を短縮表示する
+ * @param value 表示する金額（円単位）
+ * @returns 短縮表示された文字列（例: "5千円", "32万円"）
  */
 export function formatYAxisValue(value: number): string
 ```
 
 **特徴**
 
-- 10,000以上: "万"単位で表示（例: "1.5万"、"10万"）
-- 10,000未満: そのまま数値表示（例: "5000"）
+- 10,000円以上: "万円"単位で表示（整数、例: "5万円"、"32万円"）
+- 1,000円以上10,000円未満: "千円"単位で表示（整数、例: "5千円"）
+- 1,000円未満: "円"単位で表示（例: "500円"）
+- 0の場合: "0"を表示
 - グラフの可読性向上
 - 日本語表記対応
 
@@ -1961,7 +1963,10 @@ console.log('Exchange Rate:', usdToJpyRate);
 
 - `README.md`: プロジェクト概要とセットアップ手順
 - `doc/improvements.md`: 改善提案リスト
-- `doc/test-code-organization.md`: テストコード構成
+- `doc/refactoring-summary.md`: リファクタリング概要
+- `doc/refactoring-plan.md`: リファクタリング計画
+- `doc/refactoring-decision-guide.md`: リファクタリング判断基準
+- `doc/feature-addition-consideration.md`: 機能追加検討
 
 ### 18.3 外部リソース
 
