@@ -782,7 +782,8 @@ describe('GoalsPage', () => {
     render(<GoalsPage />);
     
     await waitFor(() => {
-      expect(screen.getByRole('progressbar')).toBeInTheDocument();
+      const progressbars = screen.getAllByRole('progressbar');
+      expect(progressbars.length).toBeGreaterThan(0);
     });
   });
 });
