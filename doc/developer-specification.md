@@ -160,6 +160,7 @@ divichart-next-js-app/
 │   ├── dependabot.yml          # Dependabot設定
 │   ├── PULL_REQUEST_TEMPLATE.md # PR テンプレート
 │   ├── ISSUE_TEMPLATE/
+│   │   ├── config.yml          # Issueテンプレート設定
 │   │   ├── ai-doc.md           # AI用ドキュメント作成Issue
 │   │   └── ai-dev.md           # AI用開発Issue
 │   └── workflows/
