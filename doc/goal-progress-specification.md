@@ -302,6 +302,8 @@ export const DEFAULT_MONTHLY_TARGET = 30000; // 円
  * @param monthlyTarget - 月平均配当目標金額 [円]
  */
 function saveGoalSettings(monthlyTarget: number): void {
+  if (typeof window === 'undefined') return; // SSR対応
+  
   const settings: GoalSettings = {
     monthlyTargetAmount: monthlyTarget,
   };
@@ -320,17 +322,33 @@ function saveGoalSettings(monthlyTarget: number): void {
  * @returns 目標設定（未設定の場合はデフォルト値）
  */
 function loadGoalSettings(): GoalSettings {
+  if (typeof window === 'undefined') {
+    // SSR環境ではデフォルト値を返す
+    return {
+      monthlyTargetAmount: DEFAULT_MONTHLY_TARGET,
+    };
+  }
+  
   try {
     const stored = localStorage.getItem(GOAL_SETTINGS_STORAGE_KEY);
     if (stored) {
       const settings = JSON.parse(stored) as GoalSettings;
-      return settings;
+      
+      // バリデーション: monthlyTargetAmount が数値かつ範囲内かチェック
+      if (
+        typeof settings.monthlyTargetAmount === 'number' &&
+        !isNaN(settings.monthlyTargetAmount) &&
+        settings.monthlyTargetAmount >= 1000 &&
+        settings.monthlyTargetAmount <= 10000000
+      ) {
+        return settings;
+      }
     }
   } catch (error) {
     console.error('目標設定の読み込みに失敗しました:', error);
   }
   
-  // デフォルト値を返す
+  // デフォルト値を返す（不正な値の場合もここに到達）
   return {
     monthlyTargetAmount: DEFAULT_MONTHLY_TARGET,
   };
@@ -466,6 +484,7 @@ function YearlyGoalProgressBar({ achievement }: { achievement: YearlyGoalAchieve
           aria-valuemin={0}
           aria-valuemax={100}
           aria-label={`${achievement.year}年の目標達成率`}
+          aria-valuetext={`${achievement.achievementRate.toFixed(1)}%`}
         >
           {progressWidth > 15 && (
             <span className="text-white text-sm font-semibold">
