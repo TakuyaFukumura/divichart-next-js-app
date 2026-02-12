@@ -339,11 +339,12 @@ describe('Header', () => {
             // モバイルメニュー内のリンクを確認
             const mobileMenu = screen.getByRole('navigation', {name: 'メインメニュー'});
             const links = mobileMenu.querySelectorAll('a');
-            expect(links.length).toBe(4);
+            expect(links.length).toBe(5);
 
             expect(screen.getAllByText('📊 年別配当').length).toBeGreaterThan(0);
             expect(screen.getAllByText('📈 累計配当').length).toBeGreaterThan(0);
             expect(screen.getAllByText('💼 ポートフォリオ').length).toBeGreaterThan(0);
+            expect(screen.getAllByText('🎯 目標達成度').length).toBeGreaterThan(0);
             expect(screen.getAllByText('⚙️ 設定').length).toBeGreaterThan(0);
         });
 
