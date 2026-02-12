@@ -544,4 +544,3 @@ export function useDividendData(csvFilePath: string = '/data/dividendlist_202602
 ### 2026年2月5日
 - 初版作成
 - 25項目の改善提案をリストアップ
-
