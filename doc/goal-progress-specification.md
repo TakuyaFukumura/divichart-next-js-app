@@ -327,7 +327,7 @@ function loadGoalSettings(): GoalSettings {
       return settings;
     }
   } catch (error) {
-    console.error('Failed to load goal settings:', error);
+    console.error('目標設定の読み込みに失敗しました:', error);
   }
   
   // デフォルト値を返す
