@@ -441,7 +441,7 @@ YearlyPortfolio
 円グラフ・テーブルに表示
 
 CSVRow[]
-    ↓ [目標ページ] calculateYearlyGoalAchievements()
+    ↓ [目標ページ] aggregateDividendsByYear() → calculateGoalAchievements()
     ├─ 年別配当金を集計
     ├─ 目標額と比較
     └─ 達成率を計算
