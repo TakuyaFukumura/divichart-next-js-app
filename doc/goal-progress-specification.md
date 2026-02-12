@@ -307,10 +307,16 @@ function saveGoalSettings(monthlyTarget: number): void {
   const settings: GoalSettings = {
     monthlyTargetAmount: monthlyTarget,
   };
-  localStorage.setItem(
-    GOAL_SETTINGS_STORAGE_KEY,
-    JSON.stringify(settings)
-  );
+  try {
+    localStorage.setItem(
+      GOAL_SETTINGS_STORAGE_KEY,
+      JSON.stringify(settings)
+    );
+  } catch (error) {
+    // LocalStorage が使用できない場合は、アプリを落とさずにログのみ出力
+    // 必要に応じてユーザー通知などのフォールバックを検討する
+    console.error('目標設定の保存に失敗しました:', error);
+  }
 }
 ```
 
