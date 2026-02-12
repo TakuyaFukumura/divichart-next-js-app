@@ -1247,8 +1247,8 @@ export function formatYAxisValue(value: number): string
 **永続化している設定**
 
 - ダークモードのテーマ（key: 'theme'）
-- 為替レート（key: 'exchangeRate'）
-- 配当目標設定（key: 'dividendGoals'）
+- 為替レート（key: 'usdToJpyRate'）
+- 配当目標設定（key: 'goalSettings'）
 
 ### 6.6 サーバー状態
 
