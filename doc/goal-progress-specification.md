@@ -100,23 +100,6 @@
 └─────────────────────────────────────────────────────┘
 ```
 
-#### 2.2.4 サマリー表示エリア
-
-```
-┌─────────────────────────────────────────────────────┐
-│ 達成状況サマリー                                      │
-│ ┌─────────────────┐ ┌─────────────────┐           │
-│ │ 目標達成年数     │ │ 平均達成率       │           │
-│ │ 1年 / 3年       │ │ 80.0%            │           │
-│ └─────────────────┘ └─────────────────┘           │
-│                                                     │
-│ ┌─────────────────┐ ┌─────────────────┐           │
-│ │ 最高達成率       │ │ 最低達成率       │           │
-│ │ 120% (2025年)   │ │ 45% (2024年)     │           │
-│ └─────────────────┘ └─────────────────┘           │
-└─────────────────────────────────────────────────────┘
-```
-
 #### 2.2.5 年別詳細テーブル
 
 ```
@@ -166,17 +149,14 @@
 
 - **デスクトップ（1024px以上）**
   - プログレスバーの幅: 最大600px
-  - サマリーカード: 2列配置
   - テーブル: 全カラム表示
 
 - **タブレット（768px〜1023px）**
   - プログレスバーの幅: コンテナ幅の90%
-  - サマリーカード: 2列配置
   - テーブル: 全カラム表示（スクロール可）
 
 - **モバイル（767px以下）**
   - プログレスバーの幅: コンテナ幅の100%
-  - サマリーカード: 1列配置
   - テーブル: 横スクロール
 
 #### 2.3.4 ダークモード対応
@@ -216,26 +196,6 @@ export type YearlyGoalAchievement = {
   achievementRate: number;
   /** 差額 [円] (正の値: 超過達成, 負の値: 未達成) */
   difference: number;
-};
-
-/**
- * 目標達成サマリーの型定義
- */
-export type GoalAchievementSummary = {
-  /** 目標達成年数 */
-  achievedYearsCount: number;
-  /** 総年数 */
-  totalYearsCount: number;
-  /** 平均達成率 [%] */
-  averageAchievementRate: number;
-  /** 最高達成率 [%] */
-  maxAchievementRate: number;
-  /** 最高達成率の年 */
-  maxAchievementYear: number;
-  /** 最低達成率 [%] */
-  minAchievementRate: number;
-  /** 最低達成率の年 */
-  minAchievementYear: number;
 };
 ```
 
@@ -593,7 +553,7 @@ const achievements = useMemo(() => {
 
 1. **型定義の追加**
    - `src/types/dividend.ts`に新しい型を追加
-   - GoalSettings、YearlyGoalAchievement、GoalAchievementSummary
+   - GoalSettings、YearlyGoalAchievement
 
 2. **計算ロジックの実装**
    - `src/lib/goalCalculator.ts`を新規作成
@@ -612,7 +572,6 @@ const achievements = useMemo(() => {
 5. **コンポーネント分割**
    - `src/app/components/GoalSettingsForm.tsx`
    - `src/app/components/YearlyGoalProgressBar.tsx`
-   - `src/app/components/GoalAchievementSummary.tsx`
    - `src/app/components/GoalAchievementTable.tsx`
 
 6. **スタイリングの強化**
@@ -655,7 +614,6 @@ const achievements = useMemo(() => {
   src/app/components/
     ├── GoalSettingsForm.tsx              # 目標設定フォーム
     ├── YearlyGoalProgressBar.tsx         # プログレスバー
-    ├── GoalAchievementSummary.tsx        # サマリー表示
     └── GoalAchievementTable.tsx          # 詳細テーブル
   src/lib/
     ├── goalCalculator.ts                 # 目標達成度計算
@@ -705,24 +663,6 @@ describe('goalCalculator', () => {
       const yearlyDividends = new Map([['2024', 100000]]);
       const result = calculateGoalAchievements(yearlyDividends, 0);
       expect(result[0].achievementRate).toBe(0);
-    });
-  });
-  
-  describe('calculateGoalSummary', () => {
-    it('サマリーを正しく計算できる', () => {
-      const achievements: YearlyGoalAchievement[] = [
-        { year: 2024, actualAmount: 180000, targetAmount: 360000, achievementRate: 50.0, difference: -180000 },
-        { year: 2025, actualAmount: 360000, targetAmount: 360000, achievementRate: 100.0, difference: 0 },
-        { year: 2026, actualAmount: 540000, targetAmount: 360000, achievementRate: 150.0, difference: 180000 },
-      ];
-      
-      const summary = calculateGoalSummary(achievements);
-      
-      expect(summary?.achievedYearsCount).toBe(2);
-      expect(summary?.totalYearsCount).toBe(3);
-      expect(summary?.averageAchievementRate).toBe(100.0);
-      expect(summary?.maxAchievementRate).toBe(150.0);
-      expect(summary?.minAchievementRate).toBe(50.0);
     });
   });
 });
