@@ -5,8 +5,8 @@ import {useDividendData} from '@/hooks/useDividendData';
 import {useExchangeRate} from '@/app/contexts/ExchangeRateContext';
 import {aggregateDividendsByYear} from '@/lib/dividendCalculator';
 import {calculateGoalAchievements} from '@/lib/goalCalculator';
-import {loadGoalSettings, saveGoalSettings, DEFAULT_MONTHLY_TARGET} from '@/lib/goalStorage';
-import LoadingState from '@/app/components/LoadingState';
+import {loadGoalSettings, saveGoalSettings} from '@/lib/goalStorage';
+import {LoadingScreen, ErrorScreen} from '@/app/components/LoadingState';
 import GoalSettingsForm from '@/app/components/GoalSettingsForm';
 import YearlyGoalProgressBar from '@/app/components/YearlyGoalProgressBar';
 import GoalAchievementTable from '@/app/components/GoalAchievementTable';
@@ -37,17 +37,11 @@ export default function GoalsPage() {
     }, [rawData, usdToJpyRate, goalSettings.monthlyTargetAmount]);
 
     if (loading) {
-        return <LoadingState/>;
+        return <LoadingScreen/>;
     }
 
     if (error) {
-        return (
-            <div className="container mx-auto px-4 py-8">
-                <div className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 p-4 rounded-md">
-                    エラー: {error}
-                </div>
-            </div>
-        );
+        return <ErrorScreen error={error}/>;
     }
 
     return (
