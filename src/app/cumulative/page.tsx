@@ -53,6 +53,27 @@ export default function CumulativeDividendPage() {
     if (loading) return <LoadingScreen />;
     if (error) return <ErrorScreen error={error} />;
 
+    // データが空の場合の表示
+    if (rawData.length === 0) {
+        return (
+            <div
+                className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-8">
+                <div className="max-w-6xl mx-auto">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
+                        <h1 className="text-4xl font-bold mb-6 text-gray-800 dark:text-gray-200">
+                            累計配当
+                        </h1>
+                        <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-6">
+                            <p className="text-gray-500 dark:text-gray-400 text-center">
+                                表示する配当データがありません
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div
             className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-8">

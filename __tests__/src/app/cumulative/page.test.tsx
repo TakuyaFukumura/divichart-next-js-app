@@ -277,4 +277,26 @@ describe('CumulativeDividendPage', () => {
             expect(values.length).toBeGreaterThan(0);
         });
     });
+
+    test('空のCSVデータを処理する', async () => {
+        mockPapaParse.mockImplementation((text: string, options: PapaParseOptions) => {
+            setTimeout(() => {
+                const data: Array<Record<string, string>> = [];
+                options.complete({data});
+            }, 0);
+        });
+
+        render(<CumulativeDividendPage/>, { wrapper: TestWrapper });
+
+        await waitFor(() => {
+            expect(screen.getByText('累計配当')).toBeInTheDocument();
+        });
+
+        // 空データメッセージが表示されることを確認
+        expect(screen.getByText('表示する配当データがありません')).toBeInTheDocument();
+
+        // グラフとテーブルが表示されないことを確認
+        expect(screen.queryByTestId('line-chart')).not.toBeInTheDocument();
+        expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    });
 });

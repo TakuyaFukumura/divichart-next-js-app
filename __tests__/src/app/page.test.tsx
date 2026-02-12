@@ -325,11 +325,12 @@ describe('Home Page', () => {
                 expect(screen.getByText('年別配当')).toBeInTheDocument();
             });
 
-            // テーブルにデータ行がないことを確認（theadではなくtbodyをチェック）
-            const tables = screen.getAllByRole('table');
-            expect(tables).toHaveLength(1);
-            const tbody = tables[0].querySelector('tbody');
-            expect(tbody?.querySelectorAll('tr')).toHaveLength(0);
+            // 空データメッセージが表示されることを確認
+            expect(screen.getByText('表示する配当データがありません')).toBeInTheDocument();
+
+            // グラフとテーブルが表示されないことを確認
+            expect(screen.queryByTestId('bar-chart')).not.toBeInTheDocument();
+            expect(screen.queryByRole('table')).not.toBeInTheDocument();
         });
     });
 
