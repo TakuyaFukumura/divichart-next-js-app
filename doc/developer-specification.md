@@ -374,26 +374,34 @@ export type YearlyPortfolio = {
 export type YearlyGoalAchievement = {
     /** 対象年 */
     year: number;
-    /** 年間配当金額（税引き後）[円] */
+    /** 実際の年間配当金 [円] */
     actualAmount: number;
-    /** 年次目標額 [円] */
-    goalAmount: number;
-    /** 目標達成率 [%] */
+    /** 目標金額（年間） [円] */
+    targetAmount: number;
+    /** 達成率 [%] */
     achievementRate: number;
+    /** 差額 [円] (正の値: 超過達成, 負の値: 未達成) */
+    difference: number;
 };
 
 /**
- * 目標達成サマリー統計
+ * 目標達成サマリーの型定義
  */
-export type GoalSummaryStats = {
-    /** 目標を達成した年数 */
-    achievedYears: number;
-    /** 目標未達成の年数 */
-    notAchievedYears: number;
+export type GoalAchievementSummary = {
+    /** 達成した年数 */
+    achievedYearsCount: number;
+    /** 総年数 */
+    totalYearsCount: number;
     /** 平均達成率 [%] */
     averageAchievementRate: number;
-    /** 総配当金額 [円] */
-    totalDividends: number;
+    /** 最高達成率 [%] */
+    maxAchievementRate: number;
+    /** 最高達成率の年 */
+    maxAchievementYear: number;
+    /** 最低達成率 [%] */
+    minAchievementRate: number;
+    /** 最低達成率の年 */
+    minAchievementYear: number;
 };
 ```
 
@@ -596,13 +604,11 @@ PortfolioContent (Suspenseでラップ)
 
 **主要な状態**
 
-| 状態変数                | 型       | 初期値  | 説明                 |
-|---------------------|---------|------|--------------------|
-| rawData             | CSVRow[] | []   | パース済みCSVデータ        |
-| monthlyGoal         | number  | 0    | 月次目標額（LocalStorageから読み込み） |
-| yearlyGoal          | number  | 0    | 年次目標額（LocalStorageから読み込み） |
-| yearlyAchievements  | YearlyGoalAchievement[] | []   | 年別目標達成状況         |
-| summaryStats        | GoalSummaryStats \| null | null | 目標達成サマリー統計       |
+| 状態変数          | 型                    | 初期値 | 説明                                             |
+|-------------------|-----------------------|--------|--------------------------------------------------|
+| rawData           | CSVRow[]              | []     | パース済みCSVデータ                              |
+| goalSettings      | GoalSettings          | loadGoalSettings()から読み込み   | 目標設定情報（monthlyTargetAmountなど）         |
+| achievements      | YearlyGoalAchievement[]     | []     | 目標達成状況一覧（年別の実績サマリを含む） |
 
 **ライブラリ関数の使用**
 
@@ -684,12 +690,12 @@ SettingsPage
 ```tsx
 <html lang="ja">
 <body>
-<ExchangeRateProvider>
-    <DarkModeProvider>
+<DarkModeProvider>
+    <ExchangeRateProvider>
         <Header/>
         {children}
-    </DarkModeProvider>
-</ExchangeRateProvider>
+    </ExchangeRateProvider>
+</DarkModeProvider>
 </body>
 </html>
 ```
@@ -804,26 +810,26 @@ SettingsPage
 
 **責務**
 
-- 月次・年次配当目標の入力フォームの提供
-- 入力値のバリデーション
+- 月平均配当目標の入力フォームの提供
+- 入力値のバリデーション（1,000円〜10,000,000円の範囲チェック）
 - LocalStorageへの目標値保存
 
 **Props**
 
 ```typescript
 {
-    monthlyGoal: number;                      // 現在の月次目標額
-    yearlyGoal: number;                       // 現在の年次目標額
-    onGoalsChange: (monthly: number, yearly: number) => void;  // 目標変更時のコールバック
+    initialValue: number;                     // 初期の月平均目標額
+    onSave: (value: number) => void;          // 目標保存時のコールバック
 }
 ```
 
 **主要機能**
 
-- 月次目標入力フィールド
-- 年次目標入力フィールド
+- 月平均目標入力フィールド
+- 年間目標の自動計算表示（月平均 × 12）
 - 保存ボタン
-- 入力値の数値バリデーション
+- 入力値の数値バリデーション（1,000円〜10,000,000円）
+- 保存成功メッセージの表示
 
 #### `src/app/components/YearlyGoalProgressBar.tsx` - 年別目標進捗バー
 
@@ -832,36 +838,41 @@ SettingsPage
 - 年別目標達成率の視覚的表示
 - プログレスバーによる達成度の可視化
 - 達成率に応じた色分け表示
+- 実績・目標・差額の詳細情報表示
 
 **Props**
 
 ```typescript
 {
-    year: number;             // 対象年
-    achievementRate: number;  // 達成率（パーセンテージ）
+    achievement: YearlyGoalAchievement;  // 年別目標達成データ
 }
 ```
 
 **主要機能**
 
 - 年の表示
-- プログレスバー（0-100%）
+- プログレスバー（0-100%、100%以上は100%で表示）
 - 達成率の数値表示
-- 色分け（未達成: グレー、達成: グリーン、超過達成: ブルー）
+- 色分け
+  - 120%以上: 黄色（bg-yellow-500）
+  - 100%以上120%未満: 緑色（bg-green-500）
+  - 100%未満: 青色（bg-blue-500）
+- 詳細情報（実績金額、目標金額、差額）の表示
 
 #### `src/app/components/GoalAchievementTable.tsx` - 目標達成テーブル
 
 **責務**
 
 - 年別目標達成状況をテーブル形式で表示
-- 配当金額、目標額、達成率の詳細表示
+- 配当金額、目標額、達成率、差額の詳細表示
 - ダークモード対応
+- 達成率・差額の色分け表示
 
 **Props**
 
 ```typescript
 {
-    data: YearlyGoalAchievement[];  // 年別目標達成データ
+    achievements: YearlyGoalAchievement[];  // 年別目標達成データ
 }
 ```
 
@@ -869,10 +880,11 @@ SettingsPage
 
 | カラム名     | 説明           | フォーマット       |
 |----------|--------------|--------------|
-| 年        | 対象年          | YYYY年        |
-| 配当金額[円]  | 実際の配当金額（税引き後） | 3桁区切り（カンマ付き） |
-| 目標額[円]   | 年次目標額        | 3桁区切り（カンマ付き） |
-| 達成率[%]   | 目標に対する達成率    | 小数点1桁        |
+| 年        | 対象年          | YYYY        |
+| 実績[円]  | 実際の配当金額（税引き後） | 3桁区切り（カンマ付き） |
+| 目標[円]   | 年次目標額        | 3桁区切り（カンマ付き） |
+| 達成率[%]   | 目標に対する達成率    | 小数点1桁、色分け（120%以上: 黄色、100%以上: 緑色、未達成: 赤色）        |
+| 差額[円]   | 実績と目標の差額（超過達成: 正の値、未達成: 負の値）    | 3桁区切り（カンマ付き）、色分け（正: 緑色、負: 赤色）        |
 
 #### `src/app/components/LoadingState.tsx` - ローディング状態コンポーネント
 
@@ -938,14 +950,17 @@ function useDarkMode(): DarkModeContextType
 - 為替レート状態のグローバル管理
 - LocalStorageへの為替レート保存
 - 為替レート変更APIの提供
+- デフォルト値へのリセット機能
 - 全ページでの為替レート共有
 
 **Context API**
 
 ```typescript
 interface ExchangeRateContextType {
-    exchangeRate: number;                     // 現在の為替レート（1ドル=円）
-    setExchangeRate: (rate: number) => void;  // 為替レート変更関数
+    usdToJpyRate: number;                       // 現在の為替レート（1ドル=円）
+    setUsdToJpyRate: (rate: number) => void;    // 為替レート変更関数
+    defaultRate: number;                        // デフォルトの為替レート（定数）
+    resetToDefault: () => void;                 // デフォルト値にリセットする関数
 }
 ```
 
@@ -962,9 +977,9 @@ function useExchangeRate(): ExchangeRateContextType
 
 **永続化**
 
-- `localStorage.getItem('exchangeRate')`で初期為替レートを読み込み
-- `localStorage.setItem('exchangeRate', rate)`で為替レートを保存
-- デフォルト値: 150円
+- `localStorage.getItem('usdToJpyRate')`で初期為替レートを読み込み
+- `localStorage.setItem('usdToJpyRate', rate)`で為替レートを保存
+- 優先順位: 1. localStorage の値 → 2. 環境変数（NEXT_PUBLIC_USD_TO_JPY_RATE） → 3. デフォルト値（150円）
 
 ---
 
@@ -1091,36 +1106,34 @@ export function getAvailableYears(csvData: CSVRow[]): number[]
 
 ```typescript
 /**
- * 年別目標達成状況を計算する
- * @param csvData CSVから読み込んだ配当データ
- * @param availableYears 利用可能な年のリスト
- * @param exchangeRate USドル→円の為替レート
- * @param yearlyGoal 年次目標額
- * @returns 年別目標達成データの配列
+ * 年別の目標達成データを計算
+ * @param yearlyDividends 年別配当金のMap（キー: 年、値: 年間配当金[円]）
+ * @param monthlyTarget 月平均配当目標金額[円]
+ * @returns 年別目標達成データの配列（降順ソート済み）
  */
-export function calculateYearlyGoalAchievements(
-    csvData: CSVRow[],
-    availableYears: number[],
-    exchangeRate: number,
-    yearlyGoal: number
+export function calculateGoalAchievements(
+    yearlyDividends: Map<string, number>,
+    monthlyTarget: number
 ): YearlyGoalAchievement[]
 
 /**
- * 目標達成サマリー統計を計算する
- * @param achievements 年別目標達成データ
- * @returns サマリー統計データ
+ * 目標達成サマリーを計算
+ * @param achievements 年別目標達成データの配列
+ * @returns 目標達成サマリー（データがない場合はnull）
  */
-export function calculateGoalSummaryStats(
+export function calculateGoalSummary(
     achievements: YearlyGoalAchievement[]
-): GoalSummaryStats
+): GoalAchievementSummary | null
 ```
 
 **特徴**
 
-- 年別配当金の集計
-- 目標達成率の自動計算
-- 達成年数・未達成年数の集計
-- 平均達成率の算出
+- 年次目標は月平均目標 × 12で自動計算
+- 年別配当金の集計（Mapから取得）
+- 目標達成率の自動計算（小数点第1位まで）
+- 差額（実績 - 目標）の計算
+- 達成年数・総年数の集計
+- 平均達成率・最高/最低達成率の算出
 
 #### `src/lib/goalStorage.ts` - 目標設定LocalStorage管理
 
@@ -1128,25 +1141,26 @@ export function calculateGoalSummaryStats(
 
 ```typescript
 /**
- * LocalStorageから目標設定を読み込む
- * @returns 月次目標と年次目標を含むオブジェクト
+ * 目標設定を保存
+ * @param monthlyTarget 月平均配当目標金額[円]
  */
-export function loadGoals(): { monthlyGoal: number; yearlyGoal: number }
+export function saveGoalSettings(monthlyTarget: number): void
 
 /**
- * LocalStorageに目標設定を保存する
- * @param monthlyGoal 月次目標額
- * @param yearlyGoal 年次目標額
+ * 目標設定を読み込み
+ * @returns 目標設定（未設定の場合はデフォルト値）
  */
-export function saveGoals(monthlyGoal: number, yearlyGoal: number): void
+export function loadGoalSettings(): GoalSettings
 ```
 
 **特徴**
 
-- LocalStorageキー: 'dividendGoals'
+- LocalStorageキー: 'goalSettings'
 - JSON形式での保存
-- デフォルト値: { monthlyGoal: 0, yearlyGoal: 0 }
+- デフォルト値: { monthlyTargetAmount: 30000 }（月平均30,000円）
+- 数値バリデーション（1,000円〜10,000,000円の範囲チェック）
 - 読み込み失敗時のフォールバック処理
+- SSR対応（window未定義時の処理）
 
 #### `src/lib/exchangeRate.ts` - 為替レート関連ユーティリティ
 
@@ -1154,30 +1168,23 @@ export function saveGoals(monthlyGoal: number, yearlyGoal: number): void
 
 ```typescript
 /**
- * LocalStorageから為替レートを読み込む
- * @returns 保存された為替レート、またはデフォルト値（150円）
+ * USドルから日本円への為替レートを取得
+ * @returns 為替レート（1ドル = n円）
  */
-export function loadExchangeRate(): number
+export function getUsdToJpyRate(): number
 
 /**
- * LocalStorageに為替レートを保存する
- * @param rate 為替レート（1ドル=円）
+ * デフォルトの為替レート（定数）
  */
-export function saveExchangeRate(rate: number): void
-
-/**
- * デフォルトの為替レートを取得する
- * @returns デフォルト為替レート（150円）
- */
-export function getDefaultExchangeRate(): number
+export const DEFAULT_USD_TO_JPY_RATE = 150;
 ```
 
 **特徴**
 
-- LocalStorageキー: 'exchangeRate'
-- デフォルト値: 150円
-- 数値バリデーション
-- 読み込み失敗時のフォールバック処理
+- 環境変数 `NEXT_PUBLIC_USD_TO_JPY_RATE` から為替レートを取得
+- 環境変数が未設定または無効な場合はデフォルト値（150円）を使用
+- 負の値やNaNの場合もデフォルト値を使用
+- LocalStorage操作はExchangeRateContext側で実装
 
 #### `src/lib/formatYAxisValue.ts` - Y軸値フォーマット
 
