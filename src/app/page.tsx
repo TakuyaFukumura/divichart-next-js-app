@@ -68,13 +68,13 @@ export default function Home() {
     if (rawData.length === 0) {
         return (
             <div
-                className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-8">
+                className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-3 sm:p-6 lg:p-8">
                 <div className="max-w-6xl mx-auto">
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
-                        <h1 className="text-4xl font-bold mb-6 text-gray-800 dark:text-gray-200">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8">
+                        <h1 className="text-3xl sm:text-4xl font-bold mb-4 sm:mb-6 text-gray-800 dark:text-gray-200">
                             年別配当
                         </h1>
-                        <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-6">
+                        <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-2 sm:p-4 lg:p-6">
                             <p className="text-gray-500 dark:text-gray-400 text-center">
                                 表示する配当データがありません
                             </p>
@@ -114,41 +114,43 @@ export default function Home() {
 
     return (
         <div
-            className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-8">
+            className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-3 sm:p-6 lg:p-8">
             <div className="max-w-6xl mx-auto">
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
-                    <h1 className="text-4xl font-bold mb-6 text-gray-800 dark:text-gray-200">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8">
+                    <h1 className="text-3xl sm:text-4xl font-bold mb-4 sm:mb-6 text-gray-800 dark:text-gray-200">
                         年別配当
                     </h1>
 
-                    <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-6">
-                        <ResponsiveContainer width="100%" height={400}>
-                            <BarChart data={data}>
-                                <CartesianGrid strokeDasharray="3 3"/>
-                                <XAxis dataKey="year"/>
-                                <YAxis tickFormatter={formatYAxisValue}/>
-                                <Tooltip content={<CustomTooltip/>}/>
-                                <Legend/>
-                                <Bar dataKey="totalDividend" fill="#3b82f6" name="配当金（税引き後）[円]"/>
-                            </BarChart>
-                        </ResponsiveContainer>
+                    <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-2 sm:p-4 lg:p-6">
+                        <div className="h-[300px] sm:h-[400px]">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={data}>
+                                    <CartesianGrid strokeDasharray="3 3"/>
+                                    <XAxis dataKey="year"/>
+                                    <YAxis tickFormatter={formatYAxisValue}/>
+                                    <Tooltip content={<CustomTooltip/>}/>
+                                    <Legend/>
+                                    <Bar dataKey="totalDividend" fill="#3b82f6" name="配当金（税引き後）[円]"/>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
                     </div>
 
-                    <div className="mt-8">
-                        <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
+                    <div className="mt-6 sm:mt-8">
+                        <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-800 dark:text-gray-200">
                             年別配当金集計
                         </h2>
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700">
                                 <thead className="bg-gray-100 dark:bg-gray-700">
                                 <tr>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                    <th className="px-3 sm:px-6 py-2 sm:py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                         年
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                    <th className="px-3 sm:px-6 py-2 sm:py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                         税引後配当合計[円]
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                    <th className="px-3 sm:px-6 py-2 sm:py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                         月平均配当[円]
                                     </th>
                                 </tr>
@@ -158,13 +160,13 @@ export default function Home() {
                                 {data.map((row) => (
                                     <tr key={row.year}
                                         className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right font-mono">
+                                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right font-mono">
                                             {row.year}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right font-mono">
+                                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right font-mono">
                                             ¥{row.totalDividend.toLocaleString()}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right font-mono">
+                                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right font-mono">
                                             ¥{Math.floor(row.totalDividend / 12).toLocaleString()}
                                         </td>
                                     </tr>

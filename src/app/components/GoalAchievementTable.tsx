@@ -19,8 +19,8 @@ export default function GoalAchievementTable({achievements}: GoalAchievementTabl
     }
 
     return (
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-200 mb-3 sm:mb-4">
                 年別詳細
             </h2>
 
@@ -28,19 +28,19 @@ export default function GoalAchievementTable({achievements}: GoalAchievementTabl
                 <table className="w-full text-sm">
                     <thead>
                     <tr className="border-b border-gray-200 dark:border-gray-700">
-                        <th className="py-3 px-4 text-left font-semibold text-gray-700 dark:text-gray-300">
+                        <th className="py-2 sm:py-3 px-2 sm:px-4 text-left font-semibold text-gray-700 dark:text-gray-300">
                             年
                         </th>
-                        <th className="py-3 px-4 text-right font-semibold text-gray-700 dark:text-gray-300">
+                        <th className="py-2 sm:py-3 px-2 sm:px-4 text-right font-semibold text-gray-700 dark:text-gray-300">
                             実績 [円]
                         </th>
-                        <th className="py-3 px-4 text-right font-semibold text-gray-700 dark:text-gray-300">
+                        <th className="py-2 sm:py-3 px-2 sm:px-4 text-right font-semibold text-gray-700 dark:text-gray-300">
                             目標 [円]
                         </th>
-                        <th className="py-3 px-4 text-right font-semibold text-gray-700 dark:text-gray-300">
+                        <th className="py-2 sm:py-3 px-2 sm:px-4 text-right font-semibold text-gray-700 dark:text-gray-300">
                             達成率
                         </th>
-                        <th className="py-3 px-4 text-right font-semibold text-gray-700 dark:text-gray-300">
+                        <th className="py-2 sm:py-3 px-2 sm:px-4 text-right font-semibold text-gray-700 dark:text-gray-300">
                             差額 [円]
                         </th>
                     </tr>
@@ -64,19 +64,19 @@ export default function GoalAchievementTable({achievements}: GoalAchievementTabl
                                 key={achievement.year}
                                 className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50"
                             >
-                                <td className="py-3 px-4 text-gray-800 dark:text-gray-200">
+                                <td className="py-2 sm:py-3 px-2 sm:px-4 text-gray-800 dark:text-gray-200">
                                     {achievement.year}
                                 </td>
-                                <td className="py-3 px-4 text-right text-gray-800 dark:text-gray-200">
+                                <td className="py-2 sm:py-3 px-2 sm:px-4 text-right text-gray-800 dark:text-gray-200">
                                     {achievement.actualAmount.toLocaleString()}
                                 </td>
-                                <td className="py-3 px-4 text-right text-gray-800 dark:text-gray-200">
+                                <td className="py-2 sm:py-3 px-2 sm:px-4 text-right text-gray-800 dark:text-gray-200">
                                     {achievement.targetAmount.toLocaleString()}
                                 </td>
-                                <td className={`py-3 px-4 text-right font-semibold ${rateColor}`}>
+                                <td className={`py-2 sm:py-3 px-2 sm:px-4 text-right font-semibold ${rateColor}`}>
                                     {achievement.achievementRate.toFixed(1)}%
                                 </td>
-                                <td className={`py-3 px-4 text-right font-semibold ${diffColor}`}>
+                                <td className={`py-2 sm:py-3 px-2 sm:px-4 text-right font-semibold ${diffColor}`}>
                                     {achievement.difference >= 0 ? '+' : ''}
                                     {achievement.difference.toLocaleString()}
                                 </td>
