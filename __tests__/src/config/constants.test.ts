@@ -85,23 +85,23 @@ describe('constants', () => {
   });
 
   describe('定数の整合性', () => {
-    it('NUMBER_FORMAT_CONSTANTSとchartConfigのyAxisが一致すること', () => {
+    it('NUMBER_FORMAT_CONSTANTSの値が期待どおりであること', () => {
       // 値が同じであることを確認
       expect(NUMBER_FORMAT_CONSTANTS.THOUSAND).toBe(1000);
       expect(NUMBER_FORMAT_CONSTANTS.TEN_THOUSAND).toBe(10000);
     });
 
-    it('VALIDATION_CONSTANTSとgoalConfigが一致すること', () => {
+    it('VALIDATION_CONSTANTSの値が期待どおりであること', () => {
       expect(VALIDATION_CONSTANTS.MIN_GOAL_AMOUNT).toBe(1000);
       expect(VALIDATION_CONSTANTS.MAX_GOAL_AMOUNT).toBe(10000000);
     });
 
-    it('DISPLAY_CONSTANTSとportfolioConfigが一致すること', () => {
+    it('DISPLAY_CONSTANTSの値が期待どおりであること', () => {
       expect(DISPLAY_CONSTANTS.TOP_STOCKS_COUNT).toBe(10);
       expect(DISPLAY_CONSTANTS.MIN_PERCENTAGE_FOR_LABEL).toBe(3);
     });
 
-    it('DEFAULT_VALUESと各設定のデフォルト値が一致すること', () => {
+    it('DEFAULT_VALUESの値が期待どおりであること', () => {
       expect(DEFAULT_VALUES.USD_TO_JPY_RATE).toBe(150);
       expect(DEFAULT_VALUES.MONTHLY_TARGET).toBe(30000);
     });
