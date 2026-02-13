@@ -39,6 +39,13 @@ export const exchangeRateConfig: ExchangeRateConfig = {
 };
 
 /**
+ * 目標金額の定数
+ */
+const GOAL_MIN_TARGET = 1000;
+const GOAL_MAX_TARGET = 10000000;
+const GOAL_DEFAULT_MONTHLY_TARGET = 30000;
+
+/**
  * 目標設定のデフォルト値を取得
  * 
  * @returns デフォルトの月次目標金額（円）
@@ -47,14 +54,14 @@ export function getDefaultMonthlyTarget(): number {
   const envTarget = process.env.NEXT_PUBLIC_DEFAULT_MONTHLY_TARGET;
   
   if (!envTarget) {
-    return 30000;
+    return GOAL_DEFAULT_MONTHLY_TARGET;
   }
   
   const target = Number(envTarget);
   
   // バリデーション: 最小値と最大値の範囲内かチェック
-  if (isNaN(target) || target < 1000 || target > 10000000) {
-    return 30000;
+  if (isNaN(target) || target < GOAL_MIN_TARGET || target > GOAL_MAX_TARGET) {
+    return GOAL_DEFAULT_MONTHLY_TARGET;
   }
   
   return target;
@@ -65,8 +72,8 @@ export function getDefaultMonthlyTarget(): number {
  */
 export const goalConfig: GoalConfig = {
   defaultMonthlyTarget: getDefaultMonthlyTarget(),
-  minTarget: 1000,
-  maxTarget: 10000000,
+  minTarget: GOAL_MIN_TARGET,
+  maxTarget: GOAL_MAX_TARGET,
 };
 
 /**
