@@ -1,7 +1,7 @@
 'use client';
 
 import {createContext, ReactNode, useContext, useEffect, useMemo, useState} from 'react';
-import {DEFAULT_USD_TO_JPY_RATE, getUsdToJpyRate} from '@/lib/exchangeRate';
+import {DEFAULT_USD_TO_JPY_RATE, getUsdToJpyRate, MIN_USD_TO_JPY_RATE, MAX_USD_TO_JPY_RATE} from '@/lib/exchangeRate';
 import { storageKeys, getStorageItem, setStorageItem, removeStorageItem } from '@/config';
 
 /**
@@ -50,12 +50,12 @@ export function ExchangeRateProvider({children}: { readonly children: ReactNode 
             const savedRate = getStorageItem(storageKeys.exchangeRate);
             if (savedRate) {
                 const rate = parseFloat(savedRate);
-                if (!isNaN(rate) && rate > 0) {
+                if (!isNaN(rate) && rate >= MIN_USD_TO_JPY_RATE && rate <= MAX_USD_TO_JPY_RATE) {
                     setUsdToJpyRateState(rate);
                     return;
                 }
             }
-            // localStorage に値がない場合は環境変数またはデフォルト値を使用
+            // localStorage に値がない場合、または範囲外の場合は環境変数またはデフォルト値を使用
             setUsdToJpyRateState(getUsdToJpyRate());
         }
     }, []);
@@ -63,10 +63,10 @@ export function ExchangeRateProvider({children}: { readonly children: ReactNode 
     /**
      * 為替レートを設定し、localStorageに保存する
      *
-     * @param rate - 新しい為替レート（正の数値のみ有効）
+     * @param rate - 新しい為替レート（50〜300円の範囲のみ有効）
      */
     const setUsdToJpyRate = (rate: number) => {
-        if (!isNaN(rate) && rate > 0) {
+        if (!isNaN(rate) && rate >= MIN_USD_TO_JPY_RATE && rate <= MAX_USD_TO_JPY_RATE) {
             setUsdToJpyRateState(rate);
             if (typeof window !== 'undefined') {
                 setStorageItem(storageKeys.exchangeRate, String(rate));

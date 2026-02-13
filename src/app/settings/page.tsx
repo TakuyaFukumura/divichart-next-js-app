@@ -54,6 +54,12 @@ export default function SettingsPage() {
         setError('');
         setIsEditing(true);
 
+        // 既存のデバウンスタイマーを必ずクリア
+        if (debounceTimeoutRef.current) {
+            clearTimeout(debounceTimeoutRef.current);
+            debounceTimeoutRef.current = null;
+        }
+
         const numValue = parseFloat(value);
         if (value === '' || isNaN(numValue)) {
             setError('数値を入力してください');
@@ -66,20 +72,32 @@ export default function SettingsPage() {
         }
 
         // デバウンス処理でステート更新を遅延
-        if (debounceTimeoutRef.current) {
-            clearTimeout(debounceTimeoutRef.current);
-        }
-
         debounceTimeoutRef.current = setTimeout(() => {
             setUsdToJpyRate(numValue);
+            debounceTimeoutRef.current = null;
         }, EXCHANGE_RATE_DEBOUNCE_DELAY);
     };
 
     /**
      * フォーカスが外れた際のハンドラー
      * 無効な入力値を現在の有効な値にリセットする
+     * 保留中のデバウンスを即座に反映する
      */
     const handleBlur = () => {
+        // 保留中のデバウンスタイマーがあれば即座に実行
+        if (debounceTimeoutRef.current) {
+            clearTimeout(debounceTimeoutRef.current);
+            debounceTimeoutRef.current = null;
+            
+            // エラーがない場合は、現在の入力値で即座に更新
+            if (!error) {
+                const numValue = parseFloat(inputValue);
+                if (!isNaN(numValue) && numValue >= MIN_USD_TO_JPY_RATE && numValue <= MAX_USD_TO_JPY_RATE) {
+                    setUsdToJpyRate(numValue);
+                }
+            }
+        }
+        
         setIsEditing(false);
         if (error) {
             setInputValue(String(usdToJpyRate));
@@ -92,6 +110,12 @@ export default function SettingsPage() {
      * 為替レートをデフォルト値（150円）に戻す
      */
     const handleReset = () => {
+        // 保留中のデバウンスタイマーをクリア
+        if (debounceTimeoutRef.current) {
+            clearTimeout(debounceTimeoutRef.current);
+            debounceTimeoutRef.current = null;
+        }
+        
         resetToDefault();
         setInputValue(String(defaultRate));
         setError('');

@@ -9,7 +9,7 @@ import React from 'react';
 import {act, render, renderHook, screen, waitFor} from '@testing-library/react';
 import '@testing-library/jest-dom';
 import {ExchangeRateProvider, useExchangeRate} from '@/app/contexts/ExchangeRateContext';
-import {DEFAULT_USD_TO_JPY_RATE} from '@/lib/exchangeRate';
+import {DEFAULT_USD_TO_JPY_RATE, MIN_USD_TO_JPY_RATE, MAX_USD_TO_JPY_RATE} from '@/lib/exchangeRate';
 
 // localStorage のモック
 const localStorageMock = (() => {
@@ -83,6 +83,28 @@ describe('ExchangeRateContext', () => {
                 expect(result.current.usdToJpyRate).toBe(140);
             });
         });
+
+        it('localStorage の範囲外の値は無視されデフォルト値で初期化される', async () => {
+            localStorageMock.setItem('usdToJpyRate', '400');
+
+            const {result} = renderHook(() => useExchangeRate(), {
+                wrapper: ExchangeRateProvider,
+            });
+
+            await waitFor(() => {
+                expect(result.current.usdToJpyRate).toBe(DEFAULT_USD_TO_JPY_RATE);
+            });
+        });
+
+        it('環境変数の範囲外の値は無視されデフォルト値で初期化される', () => {
+            process.env.NEXT_PUBLIC_USD_TO_JPY_RATE = '10';
+
+            const {result} = renderHook(() => useExchangeRate(), {
+                wrapper: ExchangeRateProvider,
+            });
+
+            expect(result.current.usdToJpyRate).toBe(DEFAULT_USD_TO_JPY_RATE);
+        });
     });
 
     describe('setUsdToJpyRate', () => {
@@ -133,6 +155,34 @@ describe('ExchangeRateContext', () => {
 
             act(() => {
                 result.current.setUsdToJpyRate(0);
+            });
+
+            expect(result.current.usdToJpyRate).toBe(initialRate);
+        });
+
+        it('範囲未満の値は設定されない', () => {
+            const {result} = renderHook(() => useExchangeRate(), {
+                wrapper: ExchangeRateProvider,
+            });
+
+            const initialRate = result.current.usdToJpyRate;
+
+            act(() => {
+                result.current.setUsdToJpyRate(MIN_USD_TO_JPY_RATE - 1);
+            });
+
+            expect(result.current.usdToJpyRate).toBe(initialRate);
+        });
+
+        it('範囲超過の値は設定されない', () => {
+            const {result} = renderHook(() => useExchangeRate(), {
+                wrapper: ExchangeRateProvider,
+            });
+
+            const initialRate = result.current.usdToJpyRate;
+
+            act(() => {
+                result.current.setUsdToJpyRate(MAX_USD_TO_JPY_RATE + 1);
             });
 
             expect(result.current.usdToJpyRate).toBe(initialRate);

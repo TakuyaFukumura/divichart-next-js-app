@@ -26,7 +26,7 @@ export const EXCHANGE_RATE_DEBOUNCE_DELAY = 500;
  * @remarks
  * - 環境変数 NEXT_PUBLIC_USD_TO_JPY_RATE から取得
  * - 環境変数が未設定または無効な場合はデフォルト値(150円)を使用
- * - 負の値やNaNの場合もデフォルト値を使用
+ * - 範囲外（50円未満または300円超）の値もデフォルト値を使用
  */
 export function getUsdToJpyRate(): number {
     const envRate = process.env.NEXT_PUBLIC_USD_TO_JPY_RATE;
@@ -37,7 +37,7 @@ export function getUsdToJpyRate(): number {
     
     const rate = Number(envRate);
     
-    if (isNaN(rate) || rate <= 0) {
+    if (isNaN(rate) || rate < MIN_USD_TO_JPY_RATE || rate > MAX_USD_TO_JPY_RATE) {
         return DEFAULT_USD_TO_JPY_RATE;
     }
     
