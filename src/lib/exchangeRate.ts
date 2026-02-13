@@ -9,6 +9,15 @@ import { appConfig } from '@/config';
 /** デフォルトの為替レート（1ドル=150円） */
 export const DEFAULT_USD_TO_JPY_RATE = appConfig.exchangeRate.defaultRate;
 
+/** 為替レートの最小値（円） */
+export const MIN_USD_TO_JPY_RATE = 50;
+
+/** 為替レートの最大値（円） */
+export const MAX_USD_TO_JPY_RATE = 300;
+
+/** 為替レート入力のデバウンス遅延（ミリ秒） */
+export const EXCHANGE_RATE_DEBOUNCE_DELAY = 500;
+
 /**
  * USドルから日本円への為替レートを取得
  * 
