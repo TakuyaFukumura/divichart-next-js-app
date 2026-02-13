@@ -22,7 +22,7 @@ export default function GoalSettingsForm({initialValue, onSave}: GoalSettingsFor
     const handleSave = () => {
         // バリデーション
         if (isNaN(monthlyTarget) || monthlyTarget < appConfig.goals.minTarget || monthlyTarget > appConfig.goals.maxTarget) {
-            setError('目標金額は1,000円〜10,000,000円の範囲で設定してください');
+            setError(`目標金額は${appConfig.goals.minTarget.toLocaleString()}円〜${appConfig.goals.maxTarget.toLocaleString()}円の範囲で設定してください`);
             return;
         }
 

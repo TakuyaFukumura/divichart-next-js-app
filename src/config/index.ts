@@ -10,6 +10,7 @@ export {
   exchangeRateConfig,
   goalConfig,
   getCsvFilePath,
+  getDefaultMonthlyTarget,
   type AppConfig,
   type ExchangeRateConfig,
   type GoalConfig,

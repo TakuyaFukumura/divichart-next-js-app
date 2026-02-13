@@ -30,7 +30,7 @@ export const storageKeys: StorageConfig = {
 /**
  * localStorageから値を取得
  * 
- * @param key - storageKeysで定義されたキー
+ * @param key - localStorageのキー（任意の文字列）
  * @returns 保存された値、または null
  */
 export function getStorageItem(key: string): string | null {
@@ -43,7 +43,7 @@ export function getStorageItem(key: string): string | null {
 /**
  * localStorageに値を保存
  * 
- * @param key - storageKeysで定義されたキー
+ * @param key - localStorageのキー（任意の文字列）
  * @param value - 保存する値
  */
 export function setStorageItem(key: string, value: string): void {
@@ -56,7 +56,7 @@ export function setStorageItem(key: string, value: string): void {
 /**
  * localStorageから値を削除
  * 
- * @param key - storageKeysで定義されたキー
+ * @param key - localStorageのキー（任意の文字列）
  */
 export function removeStorageItem(key: string): void {
   if (typeof window === 'undefined') {
