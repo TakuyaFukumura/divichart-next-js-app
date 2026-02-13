@@ -95,7 +95,7 @@
   - 最大: 約160円（1990年）
 - 想定される将来的な範囲:
   - **推奨範囲: 50円〜300円**
-  - この範囲外は極端なケースとして警告を表示
+  - この範囲外はエラーとして入力を受け付けない
 
 ### 2. 視覚的なフィードバックが限定的
 
@@ -139,20 +139,20 @@
 ### 提案1: 入力値の範囲制限（必須）
 
 #### 概要
-為替レートの入力範囲を **50円〜300円** に制限し、範囲外の値に対して警告を表示します。
+為替レートの入力範囲を **50円〜300円** に制限し、範囲外の値はエラーとして受け付けないようにします。
 
 #### 実装内容
 
 1. **範囲定数の定義**
    ```typescript
-   const MIN_EXCHANGE_RATE = 50;
-   const MAX_EXCHANGE_RATE = 300;
+   const MIN_USD_TO_JPY_RATE = 50;
+   const MAX_USD_TO_JPY_RATE = 300;
    ```
 
 2. **バリデーションロジックの追加**
    ```typescript
-   if (numValue < MIN_EXCHANGE_RATE || numValue > MAX_EXCHANGE_RATE) {
-       setError(`為替レートは${MIN_EXCHANGE_RATE}円〜${MAX_EXCHANGE_RATE}円の範囲で入力してください`);
+   if (numValue < MIN_USD_TO_JPY_RATE || numValue > MAX_USD_TO_JPY_RATE) {
+       setError(`為替レートは${MIN_USD_TO_JPY_RATE}円〜${MAX_USD_TO_JPY_RATE}円の範囲で入力してください`);
        return;
    }
    ```
@@ -161,8 +161,8 @@
    ```tsx
    <input
        type="number"
-       min={MIN_EXCHANGE_RATE}
-       max={MAX_EXCHANGE_RATE}
+       min={MIN_USD_TO_JPY_RATE}
+       max={MAX_USD_TO_JPY_RATE}
        step="0.01"
        // ...
    />
@@ -183,14 +183,15 @@
 1. **範囲ガイドの追加**
    ```tsx
    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-       推奨範囲: {MIN_EXCHANGE_RATE}円 〜 {MAX_EXCHANGE_RATE}円
+       推奨範囲: {MIN_USD_TO_JPY_RATE}円 〜 {MAX_USD_TO_JPY_RATE}円
    </div>
    ```
 
-2. **警告レベルの分類**
+2. **エラー表示の分類**
    - **エラー（赤）**: 無効な値（数値でない、範囲外）
-   - **警告（黄）**: 極端だが有効な値（将来的に実装）
-   - **成功（緑）**: 有効な値（オプション）
+   - **将来的な拡張（オプション）**:
+     - 警告（黄）: 極端だが有効な値
+     - 成功（緑）: 通常の有効な値
 
 3. **入力中の状態表示**
    ```tsx
@@ -237,8 +238,8 @@
            return;
        }
        
-       if (numValue < MIN_EXCHANGE_RATE || numValue > MAX_EXCHANGE_RATE) {
-           setError(`為替レートは${MIN_EXCHANGE_RATE}円〜${MAX_EXCHANGE_RATE}円の範囲で入力してください`);
+       if (numValue < MIN_USD_TO_JPY_RATE || numValue > MAX_USD_TO_JPY_RATE) {
+           setError(`為替レートは${MIN_USD_TO_JPY_RATE}円〜${MAX_USD_TO_JPY_RATE}円の範囲で入力してください`);
            return;
        }
        
@@ -316,7 +317,7 @@
 ### 定数定義
 
 | 定数名 | 値 | 説明 |
-|--------|-----|------|
+| ------ | --- | ---- |
 | `MIN_USD_TO_JPY_RATE` | 50 | 為替レートの最小値（円） |
 | `MAX_USD_TO_JPY_RATE` | 300 | 為替レートの最大値（円） |
 | `DEFAULT_USD_TO_JPY_RATE` | 150 | デフォルトの為替レート（円） |
