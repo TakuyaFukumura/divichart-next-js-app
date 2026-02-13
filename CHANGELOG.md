@@ -21,5 +21,5 @@
 - 過去のバージョンからの変更内容
 
 [Unreleased]: https://github.com/TakuyaFukumura/divichart-next-js-app/compare/v0.22.0...HEAD
-[0.22.0]: https://github.com/TakuyaFukumura/divichart-next-js-app/releases/tag/v0.22.0
-[0.21.0]: https://github.com/TakuyaFukumura/divichart-next-js-app/releases/tag/v0.21.0
+[0.22.0]: https://github.com/TakuyaFukumura/divichart-next-js-app/compare/v0.21.0...v0.22.0
+[0.21.0]: https://github.com/TakuyaFukumura/divichart-next-js-app/compare/v0.20.0...v0.21.0
