@@ -168,9 +168,9 @@ if (loading) return <LoadingScreen />;
 if (error) return <ErrorScreen error={error} />;
 
 // ここに追加
-if (data.length === 0) {
+if (rawData.length === 0) {
   return (
-    <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-8">
       <div className="max-w-6xl mx-auto">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
           <h1 className="text-4xl font-bold mb-6 text-gray-800 dark:text-gray-200">
@@ -202,9 +202,9 @@ if (loading) return <LoadingScreen />;
 if (error) return <ErrorScreen error={error} />;
 
 // ここに追加
-if (data.length === 0) {
+if (rawData.length === 0) {
   return (
-    <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-8">
       <div className="max-w-6xl mx-auto">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
           <h1 className="text-4xl font-bold mb-6 text-gray-800 dark:text-gray-200">
@@ -325,8 +325,8 @@ data (DividendData[] or CumulativeDividendData[])
 ```
 
 **チェックポイント:**
-- `rawData.length === 0` ではなく、加工後の `data.length === 0` でチェック
-- 理由: 加工・フィルタリング後に空になる可能性があるため
+- CSVから読み込んだ `rawData.length === 0` でチェック（加工後の `data.length === 0` ではない）
+- 理由: useEffectによるデータ加工は非同期的に実行されるため、`data` の初期値は空配列となり、レースコンディションが発生する可能性がある。`rawData` は useDividendData フックで管理されており、ローディングが完了した時点で確定しているため、より信頼性が高い判定基準となる
 
 ### 6.2 エラー処理との違い
 
@@ -334,12 +334,12 @@ data (DividendData[] or CumulativeDividendData[])
 |------|---------|------|
 | ローディング中 | `loading === true` | LoadingScreen |
 | エラー | `error !== null` | ErrorScreen |
-| **空データ** | **`data.length === 0`** | **空データメッセージ** |
-| 正常（データあり） | `data.length > 0` | 通常表示 |
+| **空データ** | **`rawData.length === 0`** | **空データメッセージ** |
+| 正常（データあり） | `rawData.length > 0` | 通常表示 |
 
 ### 6.3 パフォーマンス
 
-- `data.length === 0` のチェックは O(1) で非常に高速
+- `rawData.length === 0` のチェックは O(1) で非常に高速
 - 空データ時は重いグラフ描画処理がスキップされるため、むしろパフォーマンスが向上
 
 ### 6.4 アクセシビリティ
