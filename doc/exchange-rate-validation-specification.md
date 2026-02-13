@@ -94,7 +94,7 @@
   - 最小: 約75円（2011年）
   - 最大: 約160円（1990年）
 - 想定される将来的な範囲:
-  - **推奨範囲: 50円〜300円**
+  - **許容範囲: 50円〜300円**
   - この範囲外はエラーとして入力を受け付けない
 
 ### 2. 視覚的なフィードバックが限定的
@@ -183,15 +183,15 @@
 1. **範囲ガイドの追加**
    ```tsx
    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-       推奨範囲: {MIN_USD_TO_JPY_RATE}円 〜 {MAX_USD_TO_JPY_RATE}円
+       入力可能範囲: {MIN_USD_TO_JPY_RATE}円 〜 {MAX_USD_TO_JPY_RATE}円
    </div>
    ```
 
 2. **エラー表示の分類**
    - **エラー（赤）**: 無効な値（数値でない、範囲外）
    - **将来的な拡張（オプション）**:
-     - 警告（黄）: 極端だが有効な値
-     - 成功（緑）: 通常の有効な値
+     - 範囲を拡張した際の段階的な警告（例: 50円未満または300円超の場合に警告を表示しつつ入力を許可）
+     - 成功（緑）: 通常の有効な値の明示的な表示
 
 3. **入力中の状態表示**
    ```tsx
@@ -375,7 +375,7 @@
 
 ```tsx
 <p id="rate-guide" className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-    推奨範囲: {MIN_USD_TO_JPY_RATE}円 〜 {MAX_USD_TO_JPY_RATE}円
+    入力可能範囲: {MIN_USD_TO_JPY_RATE}円 〜 {MAX_USD_TO_JPY_RATE}円
 </p>
 ```
 
