@@ -10,7 +10,12 @@ import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import '@testing-library/jest-dom';
 import SettingsPage from '@/app/settings/page';
 import {ExchangeRateProvider, useExchangeRate} from '@/app/contexts/ExchangeRateContext';
-import {DEFAULT_USD_TO_JPY_RATE} from '@/lib/exchangeRate';
+import {
+    DEFAULT_USD_TO_JPY_RATE,
+    MIN_USD_TO_JPY_RATE,
+    MAX_USD_TO_JPY_RATE,
+    EXCHANGE_RATE_DEBOUNCE_DELAY,
+} from '@/lib/exchangeRate';
 
 // localStorage のモック
 const localStorageMock = (() => {
@@ -85,19 +90,34 @@ describe('SettingsPage', () => {
             expect(input.value).toBe('160');
         });
 
-        it('入力値がlocalStorageに保存される', async () => {
+        it('入力値がlocalStorageに保存される（デバウンス後）', async () => {
+            jest.useFakeTimers();
             render(<SettingsPage/>, {wrapper: TestWrapper});
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）');
+            const initialStorageValue = localStorageMock.getItem('usdToJpyRate');
 
             await act(async () => {
                 fireEvent.change(input, {target: {value: '160'}});
             });
 
-            expect(localStorageMock.getItem('usdToJpyRate')).toBe('160');
+            // デバウンス前は保存されない
+            expect(localStorageMock.getItem('usdToJpyRate')).toBe(initialStorageValue);
+
+            // デバウンス後に保存される
+            await act(async () => {
+                jest.advanceTimersByTime(EXCHANGE_RATE_DEBOUNCE_DELAY);
+            });
+
+            await waitFor(() => {
+                expect(localStorageMock.getItem('usdToJpyRate')).toBe('160');
+            });
+
+            jest.useRealTimers();
         });
 
         it('小数点を含む値を設定できる', async () => {
+            jest.useFakeTimers();
             render(<SettingsPage/>, {wrapper: TestWrapper});
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）') as HTMLInputElement;
@@ -107,7 +127,114 @@ describe('SettingsPage', () => {
             });
 
             expect(input.value).toBe('155.5');
-            expect(localStorageMock.getItem('usdToJpyRate')).toBe('155.5');
+
+            await act(async () => {
+                jest.advanceTimersByTime(EXCHANGE_RATE_DEBOUNCE_DELAY);
+            });
+
+            await waitFor(() => {
+                expect(localStorageMock.getItem('usdToJpyRate')).toBe('155.5');
+            });
+
+            jest.useRealTimers();
+        });
+
+        it('デバウンス処理が正しく動作する', async () => {
+            jest.useFakeTimers();
+            render(<SettingsPage/>, {wrapper: TestWrapper});
+
+            const input = screen.getByLabelText('為替レート（1ドル = 円）');
+            const initialStorageValue = localStorageMock.getItem('usdToJpyRate');
+
+            // 連続して入力
+            await act(async () => {
+                fireEvent.change(input, {target: {value: '140'}});
+            });
+
+            await act(async () => {
+                fireEvent.change(input, {target: {value: '145'}});
+            });
+
+            await act(async () => {
+                fireEvent.change(input, {target: {value: '150'}});
+            });
+
+            // デバウンス期間内なので保存されない
+            expect(localStorageMock.getItem('usdToJpyRate')).toBe(initialStorageValue);
+
+            // デバウンス後に最後の値で保存される
+            await act(async () => {
+                jest.advanceTimersByTime(EXCHANGE_RATE_DEBOUNCE_DELAY);
+            });
+
+            await waitFor(() => {
+                expect(localStorageMock.getItem('usdToJpyRate')).toBe('150');
+            });
+
+            jest.useRealTimers();
+        });
+
+        it('有効値から無効値への変更でタイマーがキャンセルされる', async () => {
+            jest.useFakeTimers();
+            render(<SettingsPage/>, {wrapper: TestWrapper});
+
+            const input = screen.getByLabelText('為替レート（1ドル = 円）');
+            const initialStorageValue = localStorageMock.getItem('usdToJpyRate');
+
+            // 有効値を入力
+            await act(async () => {
+                fireEvent.change(input, {target: {value: '160'}});
+            });
+
+            // タイマーがセットされているが発火前
+            expect(localStorageMock.getItem('usdToJpyRate')).toBe(initialStorageValue);
+
+            // 無効値（範囲外）を入力
+            await act(async () => {
+                fireEvent.change(input, {target: {value: '350'}});
+            });
+
+            // エラーが表示される
+            expect(screen.getByText(/為替レートは/)).toBeInTheDocument();
+
+            // デバウンス時間経過後も保存されない（タイマーがキャンセルされている）
+            await act(async () => {
+                jest.advanceTimersByTime(EXCHANGE_RATE_DEBOUNCE_DELAY);
+            });
+
+            expect(localStorageMock.getItem('usdToJpyRate')).toBe(initialStorageValue);
+
+            jest.useRealTimers();
+        });
+
+        it('有効値から空文字への変更でタイマーがキャンセルされる', async () => {
+            jest.useFakeTimers();
+            render(<SettingsPage/>, {wrapper: TestWrapper});
+
+            const input = screen.getByLabelText('為替レート（1ドル = 円）');
+            const initialStorageValue = localStorageMock.getItem('usdToJpyRate');
+
+            // 有効値を入力
+            await act(async () => {
+                fireEvent.change(input, {target: {value: '160'}});
+            });
+
+            // 空文字を入力
+            await act(async () => {
+                fireEvent.change(input, {target: {value: ''}});
+            });
+
+            // エラーが表示される
+            expect(screen.getByText('数値を入力してください')).toBeInTheDocument();
+
+            // デバウンス時間経過後も保存されない
+            await act(async () => {
+                jest.advanceTimersByTime(EXCHANGE_RATE_DEBOUNCE_DELAY);
+            });
+
+            expect(localStorageMock.getItem('usdToJpyRate')).toBe(initialStorageValue);
+
+            jest.useRealTimers();
         });
     });
 
@@ -124,28 +251,28 @@ describe('SettingsPage', () => {
             expect(screen.getByText('数値を入力してください')).toBeInTheDocument();
         });
 
-        it('負の値を入力するとエラーが表示される', async () => {
+        it('最小値未満の値を入力するとエラーが表示される', async () => {
             render(<SettingsPage/>, {wrapper: TestWrapper});
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）');
 
             await act(async () => {
-                fireEvent.change(input, {target: {value: '-100'}});
+                fireEvent.change(input, {target: {value: '40'}});
             });
 
-            expect(screen.getByText('正の数値を入力してください')).toBeInTheDocument();
+            expect(screen.getByText(`為替レートは${MIN_USD_TO_JPY_RATE}円〜${MAX_USD_TO_JPY_RATE}円の範囲で入力してください`)).toBeInTheDocument();
         });
 
-        it('0を入力するとエラーが表示される', async () => {
+        it('最大値超過の値を入力するとエラーが表示される', async () => {
             render(<SettingsPage/>, {wrapper: TestWrapper});
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）');
 
             await act(async () => {
-                fireEvent.change(input, {target: {value: '0'}});
+                fireEvent.change(input, {target: {value: '350'}});
             });
 
-            expect(screen.getByText('正の数値を入力してください')).toBeInTheDocument();
+            expect(screen.getByText(`為替レートは${MIN_USD_TO_JPY_RATE}円〜${MAX_USD_TO_JPY_RATE}円の範囲で入力してください`)).toBeInTheDocument();
         });
 
         it('文字列を入力するとエラーが表示される', async () => {
@@ -181,6 +308,78 @@ describe('SettingsPage', () => {
                 expect(screen.queryByText('数値を入力してください')).not.toBeInTheDocument();
             });
         });
+
+        it('境界値（最小値）が正しく処理される', async () => {
+            render(<SettingsPage/>, {wrapper: TestWrapper});
+
+            const input = screen.getByLabelText('為替レート（1ドル = 円）');
+
+            await act(async () => {
+                fireEvent.change(input, {target: {value: String(MIN_USD_TO_JPY_RATE)}});
+            });
+
+            expect(screen.queryByText(/為替レートは/)).not.toBeInTheDocument();
+        });
+
+        it('境界値（最大値）が正しく処理される', async () => {
+            render(<SettingsPage/>, {wrapper: TestWrapper});
+
+            const input = screen.getByLabelText('為替レート（1ドル = 円）');
+
+            await act(async () => {
+                fireEvent.change(input, {target: {value: String(MAX_USD_TO_JPY_RATE)}});
+            });
+
+            expect(screen.queryByText(/為替レートは/)).not.toBeInTheDocument();
+        });
+
+        it('境界値-0.01（最小値未満）でエラーが表示される', async () => {
+            render(<SettingsPage/>, {wrapper: TestWrapper});
+
+            const input = screen.getByLabelText('為替レート（1ドル = 円）');
+
+            await act(async () => {
+                fireEvent.change(input, {target: {value: '49.99'}});
+            });
+
+            expect(screen.getByText(/為替レートは/)).toBeInTheDocument();
+        });
+
+        it('境界値+0.01（最大値超過）でエラーが表示される', async () => {
+            render(<SettingsPage/>, {wrapper: TestWrapper});
+
+            const input = screen.getByLabelText('為替レート（1ドル = 円）');
+
+            await act(async () => {
+                fireEvent.change(input, {target: {value: '300.01'}});
+            });
+
+            expect(screen.getByText(/為替レートは/)).toBeInTheDocument();
+        });
+
+        it('blur時に保留中のデバウンスが即座に反映される', async () => {
+            jest.useFakeTimers();
+            render(<SettingsPage/>, {wrapper: TestWrapper});
+
+            const input = screen.getByLabelText('為替レート（1ドル = 円）');
+
+            // 有効値を入力
+            await act(async () => {
+                fireEvent.change(input, {target: {value: '160'}});
+            });
+
+            // デバウンス期間内にblur
+            await act(async () => {
+                fireEvent.blur(input);
+            });
+
+            // blur時に即座に保存される
+            await waitFor(() => {
+                expect(localStorageMock.getItem('usdToJpyRate')).toBe('160');
+            });
+
+            jest.useRealTimers();
+        });
     });
 
     describe('リセット機能', () => {
@@ -208,6 +407,7 @@ describe('SettingsPage', () => {
         });
 
         it('リセット時にlocalStorageがクリアされる', async () => {
+            jest.useFakeTimers();
             render(<SettingsPage/>, {wrapper: TestWrapper});
 
             const input = screen.getByLabelText('為替レート（1ドル = 円）');
@@ -217,7 +417,13 @@ describe('SettingsPage', () => {
                 fireEvent.change(input, {target: {value: '160'}});
             });
 
-            expect(localStorageMock.getItem('usdToJpyRate')).toBe('160');
+            await act(async () => {
+                jest.advanceTimersByTime(EXCHANGE_RATE_DEBOUNCE_DELAY);
+            });
+
+            await waitFor(() => {
+                expect(localStorageMock.getItem('usdToJpyRate')).toBe('160');
+            });
 
             await act(async () => {
                 fireEvent.click(resetButton);
@@ -226,6 +432,8 @@ describe('SettingsPage', () => {
             await waitFor(() => {
                 expect(localStorageMock.getItem('usdToJpyRate')).toBeNull();
             });
+
+            jest.useRealTimers();
         });
 
         it('環境変数が設定されていてもデフォルト値（150円）にリセットされる', async () => {
@@ -244,6 +452,36 @@ describe('SettingsPage', () => {
             await waitFor(() => {
                 expect(input.value).toBe('150');
             });
+        });
+
+        it('リセット時に保留中のデバウンスタイマーがキャンセルされる', async () => {
+            jest.useFakeTimers();
+            render(<SettingsPage/>, {wrapper: TestWrapper});
+
+            const input = screen.getByLabelText('為替レート（1ドル = 円）');
+            const resetButton = screen.getByText('デフォルトに戻す');
+
+            // 有効値を入力（デバウンス待ち）
+            await act(async () => {
+                fireEvent.change(input, {target: {value: '160'}});
+            });
+
+            // デバウンス前にリセット
+            await act(async () => {
+                fireEvent.click(resetButton);
+            });
+
+            // リセット後はデフォルト値
+            expect(localStorageMock.getItem('usdToJpyRate')).toBeNull();
+
+            // デバウンス時間経過後も160は保存されない（タイマーがキャンセルされている）
+            await act(async () => {
+                jest.advanceTimersByTime(EXCHANGE_RATE_DEBOUNCE_DELAY);
+            });
+
+            expect(localStorageMock.getItem('usdToJpyRate')).toBeNull();
+
+            jest.useRealTimers();
         });
     });
 
@@ -276,6 +514,8 @@ describe('SettingsPage', () => {
         });
 
         it('編集中は外部からの更新で上書きされない', async () => {
+            jest.useFakeTimers();
+            
             const TestComponent = () => {
                 const {setUsdToJpyRate} = useExchangeRate();
                 return (
@@ -306,15 +546,18 @@ describe('SettingsPage', () => {
             // 編集中なので入力欄は上書きされず180のまま
             expect(input.value).toBe('180');
 
-            // フォーカスを外すと編集中フラグがクリアされ、Contextの値に同期される
+            // フォーカスを外すと、保留中の180が即座に反映される
             await act(async () => {
                 fireEvent.blur(input);
             });
 
-            // 編集終了後、Contextの値（170）に同期される
+            // blur時に180が保存される（デバウンスがフラッシュされる）
             await waitFor(() => {
-                expect(input.value).toBe('170');
+                expect(input.value).toBe('180');
+                expect(localStorageMock.getItem('usdToJpyRate')).toBe('180');
             });
+
+            jest.useRealTimers();
         });
     });
 });

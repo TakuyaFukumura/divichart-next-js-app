@@ -7,6 +7,36 @@
 
 ## [Unreleased]
 
+## [0.24.0] - 2026-02-13
+
+### Added
+- 為替レート入力の範囲制限（50円〜300円）
+  - 非現実的な値の入力を防止
+  - 過去の為替レート実績（1990年〜2026年）を考慮した安全な範囲設定
+- 為替レート入力のデバウンス処理（500ms）
+  - 連続入力時の不要な再計算を防止
+  - パフォーマンスの向上
+- 入力可能範囲のガイドテキスト表示
+  - ユーザーが適切な値を入力しやすくなる
+- 為替レート関連の定数を `/src/lib/exchangeRate.ts` に追加
+  - `MIN_USD_TO_JPY_RATE = 50`
+  - `MAX_USD_TO_JPY_RATE = 300`
+  - `EXCHANGE_RATE_DEBOUNCE_DELAY = 500`
+- 範囲バリデーションのテストケース追加
+  - 範囲外の値のエラー表示テスト
+  - 境界値テスト（50円、300円、49.99円、300.01円）
+  - デバウンス処理のテスト
+
+### Changed
+- `/src/app/settings/page.tsx` のバリデーションロジックを改善
+  - 正の数値チェックから範囲チェックへ変更
+  - デバウンス処理による遅延更新を実装
+  - HTML属性（min/max）を更新
+- 既存テストをデバウンス動作に対応
+
+### Removed
+- `doc/exchange-rate-validation-specification.md`: 実装完了により削除
+
 ## [0.23.0] - 2026-02-13
 
 ### Added
@@ -43,7 +73,8 @@
 ### Added
 - 過去のバージョンからの変更内容
 
-[Unreleased]: https://github.com/TakuyaFukumura/divichart-next-js-app/compare/v0.23.0...HEAD
+[Unreleased]: https://github.com/TakuyaFukumura/divichart-next-js-app/compare/v0.24.0...HEAD
+[0.24.0]: https://github.com/TakuyaFukumura/divichart-next-js-app/compare/v0.23.0...v0.24.0
 [0.23.0]: https://github.com/TakuyaFukumura/divichart-next-js-app/compare/v0.22.0...v0.23.0
 [0.22.0]: https://github.com/TakuyaFukumura/divichart-next-js-app/compare/v0.21.0...v0.22.0
 [0.21.0]: https://github.com/TakuyaFukumura/divichart-next-js-app/compare/v0.20.0...v0.21.0

@@ -1,7 +1,12 @@
 'use client';
 
-import {useEffect, useState, type ChangeEvent} from 'react';
+import {useEffect, useState, useRef, type ChangeEvent} from 'react';
 import {useExchangeRate} from '@/app/contexts/ExchangeRateContext';
+import {
+    MIN_USD_TO_JPY_RATE,
+    MAX_USD_TO_JPY_RATE,
+    EXCHANGE_RATE_DEBOUNCE_DELAY,
+} from '@/lib/exchangeRate';
 
 /**
  * 設定画面コンポーネント
@@ -20,6 +25,7 @@ export default function SettingsPage() {
     const [inputValue, setInputValue] = useState<string>(String(usdToJpyRate));
     const [error, setError] = useState<string>('');
     const [isEditing, setIsEditing] = useState<boolean>(false);
+    const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     // usdToJpyRate が変更されたときに inputValue を同期（編集中でない場合のみ）
     useEffect(() => {
@@ -28,9 +34,19 @@ export default function SettingsPage() {
         }
     }, [usdToJpyRate, isEditing]);
 
+    // クリーンアップ処理：コンポーネントのアンマウント時にデバウンスタイマーをクリア
+    useEffect(() => {
+        return () => {
+            if (debounceTimeoutRef.current) {
+                clearTimeout(debounceTimeoutRef.current);
+            }
+        };
+    }, []);
+
     /**
      * 入力値変更ハンドラー
      * 入力値をバリデーションして為替レートを更新する
+     * デバウンス処理により、連続入力時の不要な再計算を防ぐ
      */
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -38,26 +54,50 @@ export default function SettingsPage() {
         setError('');
         setIsEditing(true);
 
+        // 既存のデバウンスタイマーを必ずクリア
+        if (debounceTimeoutRef.current) {
+            clearTimeout(debounceTimeoutRef.current);
+            debounceTimeoutRef.current = null;
+        }
+
         const numValue = parseFloat(value);
         if (value === '' || isNaN(numValue)) {
             setError('数値を入力してください');
             return;
         }
 
-        if (numValue <= 0) {
-            setError('正の数値を入力してください');
+        if (numValue < MIN_USD_TO_JPY_RATE || numValue > MAX_USD_TO_JPY_RATE) {
+            setError(`為替レートは${MIN_USD_TO_JPY_RATE}円〜${MAX_USD_TO_JPY_RATE}円の範囲で入力してください`);
             return;
         }
 
-        // 有効な値の場合は即座に反映
-        setUsdToJpyRate(numValue);
+        // デバウンス処理でステート更新を遅延
+        debounceTimeoutRef.current = setTimeout(() => {
+            setUsdToJpyRate(numValue);
+            debounceTimeoutRef.current = null;
+        }, EXCHANGE_RATE_DEBOUNCE_DELAY);
     };
 
     /**
      * フォーカスが外れた際のハンドラー
      * 無効な入力値を現在の有効な値にリセットする
+     * 保留中のデバウンスを即座に反映する
      */
     const handleBlur = () => {
+        // 保留中のデバウンスタイマーがあれば即座に実行
+        if (debounceTimeoutRef.current) {
+            clearTimeout(debounceTimeoutRef.current);
+            debounceTimeoutRef.current = null;
+            
+            // エラーがない場合は、現在の入力値で即座に更新
+            if (!error) {
+                const numValue = parseFloat(inputValue);
+                if (!isNaN(numValue) && numValue >= MIN_USD_TO_JPY_RATE && numValue <= MAX_USD_TO_JPY_RATE) {
+                    setUsdToJpyRate(numValue);
+                }
+            }
+        }
+        
         setIsEditing(false);
         if (error) {
             setInputValue(String(usdToJpyRate));
@@ -70,6 +110,12 @@ export default function SettingsPage() {
      * 為替レートをデフォルト値（150円）に戻す
      */
     const handleReset = () => {
+        // 保留中のデバウンスタイマーをクリア
+        if (debounceTimeoutRef.current) {
+            clearTimeout(debounceTimeoutRef.current);
+            debounceTimeoutRef.current = null;
+        }
+        
         resetToDefault();
         setInputValue(String(defaultRate));
         setError('');
@@ -101,11 +147,12 @@ export default function SettingsPage() {
                                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 為替レート（1ドル = 円）
                             </label>
-                            <div className="flex items-center gap-4 mb-4">
+                            <div className="flex items-center gap-4 mb-2">
                                 <input
                                     id="usd-jpy-rate"
                                     type="number"
-                                    min="0.01"
+                                    min={MIN_USD_TO_JPY_RATE}
+                                    max={MAX_USD_TO_JPY_RATE}
                                     step="0.01"
                                     value={inputValue}
                                     onChange={handleInputChange}
@@ -116,10 +163,13 @@ export default function SettingsPage() {
                                             : 'border-gray-300 dark:border-gray-600'
                                     }`}
                                     aria-invalid={error ? 'true' : 'false'}
-                                    aria-describedby={error ? 'rate-error' : undefined}
+                                    aria-describedby={error ? 'rate-error' : 'rate-guide'}
                                 />
                                 <span className="text-gray-600 dark:text-gray-400">円</span>
                             </div>
+                            <p id="rate-guide" className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                入力可能範囲: {MIN_USD_TO_JPY_RATE}円 〜 {MAX_USD_TO_JPY_RATE}円
+                            </p>
                             {error && (
                                 <p id="rate-error" className="text-sm text-red-600 dark:text-red-400 mb-2">
                                     {error}
