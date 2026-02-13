@@ -281,9 +281,11 @@ Tailwind CSSのレスポンシブプレフィックスを活用し、画面サ�
             
             {/* グラフ背景: p-6 → モバイルではp-2 */}
             <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-2 sm:p-4 lg:p-6">
-                <ResponsiveContainer width="100%" height={300} className="sm:h-[400px]">
-                    {/* Chart */}
-                </ResponsiveContainer>
+                <div className="h-[300px] sm:h-[400px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                        {/* Chart */}
+                    </ResponsiveContainer>
+                </div>
             </div>
             
             {/* テーブルセクション: mt-8 → モバイルではmt-6 */}
