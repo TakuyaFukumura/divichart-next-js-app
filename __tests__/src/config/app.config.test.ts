@@ -12,8 +12,22 @@ describe('app.config', () => {
   });
 
   describe('goalConfig', () => {
+    const originalDefaultMonthlyTargetEnv = process.env.NEXT_PUBLIC_DEFAULT_MONTHLY_TARGET;
+
+    afterAll(() => {
+      if (originalDefaultMonthlyTargetEnv !== undefined) {
+        process.env.NEXT_PUBLIC_DEFAULT_MONTHLY_TARGET = originalDefaultMonthlyTargetEnv;
+      } else {
+        delete process.env.NEXT_PUBLIC_DEFAULT_MONTHLY_TARGET;
+      }
+    });
+
     it('デフォルト月次目標が30000であること', () => {
-      expect(goalConfig.defaultMonthlyTarget).toBe(30000);
+      delete process.env.NEXT_PUBLIC_DEFAULT_MONTHLY_TARGET;
+      jest.resetModules();
+      // 環境変数未設定時のデフォルト値を検証するために再 import する
+      const { goalConfig: freshGoalConfig } = require('@/config/app.config');
+      expect(freshGoalConfig.defaultMonthlyTarget).toBe(30000);
     });
 
     it('最小目標金額が1000であること', () => {
