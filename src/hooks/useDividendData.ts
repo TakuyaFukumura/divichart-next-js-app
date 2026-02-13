@@ -1,11 +1,12 @@
 import {useEffect, useState} from 'react';
 import {CSVRow} from '@/types/dividend';
 import {loadCSV} from '@/lib/csvLoader';
+import { appConfig } from '@/config';
 
 /**
  * 配当金データの読み込み状態を管理するカスタムフック
  *
- * @param csvFilePath - CSVファイルのパス（デフォルト: '/data/dividendlist_20260205.csv'）
+ * @param csvFilePath - CSVファイルのパス（デフォルト: appConfigから取得）
  * @returns 配当金データ、ローディング状態、エラー情報
  *
  * @remarks
@@ -13,7 +14,7 @@ import {loadCSV} from '@/lib/csvLoader';
  * - CSVファイルはShift-JISエンコーディングで保存されている想定
  * - エラーが発生した場合、エラーメッセージが返される
  */
-export function useDividendData(csvFilePath: string = '/data/dividendlist_20260205.csv') {
+export function useDividendData(csvFilePath: string = appConfig.csvFilePath) {
     const [data, setData] = useState<CSVRow[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);

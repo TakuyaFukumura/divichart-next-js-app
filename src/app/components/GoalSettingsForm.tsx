@@ -1,6 +1,7 @@
 'use client';
 
 import {useState} from 'react';
+import { appConfig } from '@/config';
 
 type GoalSettingsFormProps = {
     initialValue: number;
@@ -20,8 +21,8 @@ export default function GoalSettingsForm({initialValue, onSave}: GoalSettingsFor
      */
     const handleSave = () => {
         // バリデーション
-        if (isNaN(monthlyTarget) || monthlyTarget < 1000 || monthlyTarget > 10000000) {
-            setError('目標金額は1,000円〜10,000,000円の範囲で設定してください');
+        if (isNaN(monthlyTarget) || monthlyTarget < appConfig.goals.minTarget || monthlyTarget > appConfig.goals.maxTarget) {
+            setError(`目標金額は${appConfig.goals.minTarget.toLocaleString()}円〜${appConfig.goals.maxTarget.toLocaleString()}円の範囲で設定してください`);
             return;
         }
 
@@ -51,8 +52,8 @@ export default function GoalSettingsForm({initialValue, onSave}: GoalSettingsFor
                         type="number"
                         value={monthlyTarget}
                         onChange={(e) => setMonthlyTarget(Number(e.target.value))}
-                        min={1000}
-                        max={10000000}
+                        min={appConfig.goals.minTarget}
+                        max={appConfig.goals.maxTarget}
                         step={1000}
                         className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md
                         bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200

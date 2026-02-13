@@ -10,6 +10,7 @@ import DividendPieChart from '@/app/components/DividendPieChart';
 import DividendTable from '@/app/components/DividendTable';
 import {useExchangeRate} from '@/app/contexts/ExchangeRateContext';
 import {LoadingScreen, ErrorScreen} from '@/app/components/LoadingState';
+import { appConfig, chartConfig } from '@/config';
 
 /**
  * 配当ポートフォリオコンポーネント（内部実装）
@@ -31,7 +32,7 @@ function PortfolioContent() {
     useEffect(() => {
         const loadData = async () => {
             try {
-                const data = await loadCSV('/data/dividendlist_20260205.csv');
+                const data = await loadCSV(appConfig.csvFilePath);
                 setRawData(data);
 
                 // 利用可能な年を取得
@@ -66,7 +67,7 @@ function PortfolioContent() {
     // 年度またはデータが変更されたときにポートフォリオを再計算
     useEffect(() => {
         if (rawData.length > 0) {
-            const portfolio = generateYearlyPortfolio(rawData, currentYear, usdToJpyRate, 10);
+            const portfolio = generateYearlyPortfolio(rawData, currentYear, usdToJpyRate, chartConfig.portfolio.topStocksCount);
             setPortfolioData(portfolio);
         }
     }, [currentYear, rawData, usdToJpyRate]);
@@ -127,7 +128,7 @@ function PortfolioContent() {
                                     ※ USドル建ての配当金は1ドル={usdToJpyRate}円で換算しています。
                                 </p>
                                 <p className="mt-1">
-                                    ※ 上位10件を個別表示し、それ以外は「その他」として集約しています。
+                                    ※ 上位{chartConfig.portfolio.topStocksCount}件を個別表示し、それ以外は「その他」として集約しています。
                                 </p>
                             </div>
                         </>

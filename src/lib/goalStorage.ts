@@ -1,14 +1,15 @@
 import {GoalSettings} from '@/types/dividend';
+import { appConfig, storageKeys } from '@/config';
 
 /**
  * 目標設定の保存・読み込みを管理するユーティリティ
  */
 
 /** 目標設定の保存キー */
-export const GOAL_SETTINGS_STORAGE_KEY = 'goalSettings';
+export const GOAL_SETTINGS_STORAGE_KEY = storageKeys.goalSettings;
 
 /** デフォルト値: 月平均配当目標 [円] */
-export const DEFAULT_MONTHLY_TARGET = 30000;
+export const DEFAULT_MONTHLY_TARGET = appConfig.goals.defaultMonthlyTarget;
 
 /**
  * 目標設定を保存
@@ -52,8 +53,8 @@ export function loadGoalSettings(): GoalSettings {
             if (
                 typeof settings.monthlyTargetAmount === 'number' &&
                 !isNaN(settings.monthlyTargetAmount) &&
-                settings.monthlyTargetAmount >= 1000 &&
-                settings.monthlyTargetAmount <= 10000000
+                settings.monthlyTargetAmount >= appConfig.goals.minTarget &&
+                settings.monthlyTargetAmount <= appConfig.goals.maxTarget
             ) {
                 return settings;
             }

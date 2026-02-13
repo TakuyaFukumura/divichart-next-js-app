@@ -1,3 +1,5 @@
+import { chartConfig } from '@/config';
+
 /**
  * グラフのy軸用に金額を短縮表示する
  *
@@ -21,14 +23,14 @@ export function formatYAxisValue(value: number): string {
     const absValue = Math.abs(value);
 
     // 1万円以上の場合は万円単位で表示（小数点なし）
-    if (absValue >= 10000) {
-        const manValue = Math.floor(absValue / 10000);
+    if (absValue >= chartConfig.yAxis.tenThousand) {
+        const manValue = Math.floor(absValue / chartConfig.yAxis.tenThousand);
         return `${sign}${manValue}万円`;
     }
 
     // 1千円以上1万円未満の場合は千円単位で表示（小数点なし）
-    if (absValue >= 1000) {
-        const senValue = Math.floor(absValue / 1000);
+    if (absValue >= chartConfig.yAxis.thousand) {
+        const senValue = Math.floor(absValue / chartConfig.yAxis.thousand);
         return `${sign}${senValue}千円`;
     }
 

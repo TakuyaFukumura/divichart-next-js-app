@@ -2,6 +2,7 @@
 
 import {createContext, ReactNode, useContext, useEffect, useMemo, useState} from 'react';
 import {DEFAULT_USD_TO_JPY_RATE, getUsdToJpyRate} from '@/lib/exchangeRate';
+import { storageKeys, getStorageItem, setStorageItem, removeStorageItem } from '@/config';
 
 /**
  * 為替レートコンテキストの型定義
@@ -46,7 +47,7 @@ export function ExchangeRateProvider({children}: { readonly children: ReactNode 
     // 初回マウント時にlocalStorageから設定を読み込む
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            const savedRate = localStorage.getItem('usdToJpyRate');
+            const savedRate = getStorageItem(storageKeys.exchangeRate);
             if (savedRate) {
                 const rate = parseFloat(savedRate);
                 if (!isNaN(rate) && rate > 0) {
@@ -68,7 +69,7 @@ export function ExchangeRateProvider({children}: { readonly children: ReactNode 
         if (!isNaN(rate) && rate > 0) {
             setUsdToJpyRateState(rate);
             if (typeof window !== 'undefined') {
-                localStorage.setItem('usdToJpyRate', String(rate));
+                setStorageItem(storageKeys.exchangeRate, String(rate));
             }
         }
     };
@@ -80,7 +81,7 @@ export function ExchangeRateProvider({children}: { readonly children: ReactNode 
     const resetToDefault = () => {
         setUsdToJpyRateState(DEFAULT_USD_TO_JPY_RATE);
         if (typeof window !== 'undefined') {
-            localStorage.removeItem('usdToJpyRate');
+            removeStorageItem(storageKeys.exchangeRate);
         }
     };
 

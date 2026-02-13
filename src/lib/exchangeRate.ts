@@ -4,8 +4,10 @@
  * 環境変数から為替レートを取得し、未設定の場合はデフォルト値を返します。
  */
 
+import { appConfig } from '@/config';
+
 /** デフォルトの為替レート（1ドル=150円） */
-export const DEFAULT_USD_TO_JPY_RATE = 150;
+export const DEFAULT_USD_TO_JPY_RATE = appConfig.exchangeRate.defaultRate;
 
 /**
  * USドルから日本円への為替レートを取得

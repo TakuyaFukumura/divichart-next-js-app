@@ -114,18 +114,65 @@ pnpm start
 │   └── data/                # CSVデータファイル
 │       └── dividendlist_20260205.csv
 ├── src/
-│   └── app/
-│       ├── components/      # Reactコンポーネント
-│       │   ├── DarkModeProvider.tsx  # ダークモードProvider
-│       │   └── Header.tsx   # ヘッダーコンポーネント
-│       ├── globals.css      # グローバルスタイル
-│       ├── layout.tsx       # アプリケーションレイアウト
-│       └── page.tsx         # メインページ（配当金グラフ表示）
+│   ├── app/
+│   │   ├── components/      # Reactコンポーネント
+│   │   │   ├── DarkModeProvider.tsx  # ダークモードProvider
+│   │   │   └── Header.tsx   # ヘッダーコンポーネント
+│   │   ├── globals.css      # グローバルスタイル
+│   │   ├── layout.tsx       # アプリケーションレイアウト
+│   │   └── page.tsx         # メインページ（配当金グラフ表示）
+│   └── config/              # 設定ファイル
+│       ├── app.config.ts    # アプリケーション基本設定
+│       ├── chart.config.ts  # グラフ表示設定
+│       ├── storage.config.ts # localStorageキー管理
+│       ├── constants.ts     # アプリケーション定数
+│       └── index.ts         # 統合エクスポート
+├── .env.example             # 環境変数の例示ファイル
 ├── package.json
 ├── next.config.ts
 ├── tailwind.config.ts
 └── tsconfig.json
 ```
+
+## 環境変数
+
+アプリケーションの動作は環境変数でカスタマイズできます。`.env.example`をコピーして`.env.local`を作成してください。
+
+### 利用可能な環境変数
+
+#### 為替レート設定
+```bash
+NEXT_PUBLIC_USD_TO_JPY_RATE=150
+```
+USD → JPY の為替レートを設定します。未設定の場合はデフォルト値（150円）が使用されます。
+
+#### CSVファイルパス設定
+```bash
+NEXT_PUBLIC_CSV_FILE_PATH=/data/dividendlist_20260205.csv
+```
+配当データのCSVファイルパスを設定します。パスは`public`ディレクトリからの相対パスで指定します。
+
+#### 目標配当金設定
+```bash
+NEXT_PUBLIC_DEFAULT_MONTHLY_TARGET=30000
+```
+デフォルトの月次配当金目標を設定します（円）。未設定の場合はデフォルト値（30,000円）が使用されます。
+
+### 環境変数の使用例
+
+1. `.env.example`を`.env.local`にコピー：
+   ```bash
+   cp .env.example .env.local
+   ```
+
+2. `.env.local`を編集して必要な値を設定
+
+3. 開発サーバーを再起動
+
+**注意**: 
+- `NEXT_PUBLIC_`プレフィックス付きの変数はクライアント側で使用可能です
+- `.env.local`ファイルは`.gitignore`に含まれており、リポジトリにコミットされません
+- 本番環境では環境変数を直接設定してください
 
 ## データ形式
 
@@ -139,8 +186,9 @@ pnpm start
 
 ### 為替レート
 
-- USドル建ての配当金は固定レート（1ドル=150円）で円換算されます
-- 将来的に環境変数や設定ファイルから読み込むことを推奨します
+- USドル建ての配当金は設定された為替レートで円換算されます
+- デフォルトは1ドル=150円
+- 環境変数`NEXT_PUBLIC_USD_TO_JPY_RATE`で変更可能
 
 ## 開発
 

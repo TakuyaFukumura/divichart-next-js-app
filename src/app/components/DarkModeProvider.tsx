@@ -1,6 +1,7 @@
 'use client';
 
 import {createContext, ReactNode, useContext, useEffect, useMemo, useState} from 'react';
+import { storageKeys, getStorageItem, setStorageItem } from '@/config';
 
 /**
  * テーマの種類を表す型
@@ -47,7 +48,7 @@ export function DarkModeProvider({children}: { readonly children: ReactNode }) {
     useEffect(() => {
         // ブラウザ環境のみlocalStorageにアクセス
         if (globalThis.window !== undefined) {
-            const savedTheme = localStorage.getItem('theme') as Theme;
+            const savedTheme = getStorageItem(storageKeys.theme) as Theme;
             if (savedTheme && ['light', 'dark'].includes(savedTheme)) {
                 setTheme(savedTheme);
             }
@@ -72,7 +73,7 @@ export function DarkModeProvider({children}: { readonly children: ReactNode }) {
 
     const handleSetTheme = (newTheme: Theme) => {
         setTheme(newTheme);
-        localStorage.setItem('theme', newTheme);
+        setStorageItem(storageKeys.theme, newTheme);
     };
 
     const value = useMemo(() => ({theme, setTheme: handleSetTheme, isDark}), [theme, isDark]);
