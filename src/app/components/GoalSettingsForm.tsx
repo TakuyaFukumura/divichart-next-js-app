@@ -40,7 +40,7 @@ export default function GoalSettingsForm({initialValue, onSave}: GoalSettingsFor
     const yearlyTarget = displayTarget * 12;
 
     return (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-6">
             <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
                 月平均配当目標
             </h2>
