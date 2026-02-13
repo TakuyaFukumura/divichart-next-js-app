@@ -128,7 +128,7 @@ function PortfolioContent() {
                                     ※ USドル建ての配当金は1ドル={usdToJpyRate}円で換算しています。
                                 </p>
                                 <p className="mt-1">
-                                    ※ 上位10件を個別表示し、それ以外は「その他」として集約しています。
+                                    ※ 上位{chartConfig.portfolio.topStocksCount}件を個別表示し、それ以外は「その他」として集約しています。
                                 </p>
                             </div>
                         </>

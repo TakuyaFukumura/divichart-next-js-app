@@ -5,31 +5,79 @@ describe('app.config', () => {
     it('デフォルトレートが150であること', () => {
       expect(exchangeRateConfig.defaultRate).toBe(150);
     });
+  });
 
-    it('環境変数キーが正しく設定されていること', () => {
-      expect(exchangeRateConfig.envKey).toBe('NEXT_PUBLIC_USD_TO_JPY_RATE');
+  describe('getDefaultMonthlyTarget', () => {
+    const originalEnv = process.env.NEXT_PUBLIC_DEFAULT_MONTHLY_TARGET;
+
+    afterEach(() => {
+      // 環境変数を元に戻す
+      if (originalEnv !== undefined) {
+        process.env.NEXT_PUBLIC_DEFAULT_MONTHLY_TARGET = originalEnv;
+      } else {
+        delete process.env.NEXT_PUBLIC_DEFAULT_MONTHLY_TARGET;
+      }
+      jest.resetModules();
+    });
+
+    it('環境変数が未設定の場合、デフォルト値30000を返すこと', async () => {
+      delete process.env.NEXT_PUBLIC_DEFAULT_MONTHLY_TARGET;
+      jest.resetModules();
+      const { getDefaultMonthlyTarget: freshGetDefault } = await import('@/config/app.config');
+      expect(freshGetDefault()).toBe(30000);
+    });
+
+    it('環境変数が有効な値の場合、その値を返すこと', async () => {
+      process.env.NEXT_PUBLIC_DEFAULT_MONTHLY_TARGET = '50000';
+      jest.resetModules();
+      const { getDefaultMonthlyTarget: freshGetDefault } = await import('@/config/app.config');
+      expect(freshGetDefault()).toBe(50000);
+    });
+
+    it('環境変数が範囲内の最小値の場合、その値を返すこと', async () => {
+      process.env.NEXT_PUBLIC_DEFAULT_MONTHLY_TARGET = '1000';
+      jest.resetModules();
+      const { getDefaultMonthlyTarget: freshGetDefault } = await import('@/config/app.config');
+      expect(freshGetDefault()).toBe(1000);
+    });
+
+    it('環境変数が範囲内の最大値の場合、その値を返すこと', async () => {
+      process.env.NEXT_PUBLIC_DEFAULT_MONTHLY_TARGET = '10000000';
+      jest.resetModules();
+      const { getDefaultMonthlyTarget: freshGetDefault } = await import('@/config/app.config');
+      expect(freshGetDefault()).toBe(10000000);
+    });
+
+    it('環境変数が範囲外（小さすぎる）の場合、デフォルト値30000を返すこと', async () => {
+      process.env.NEXT_PUBLIC_DEFAULT_MONTHLY_TARGET = '999';
+      jest.resetModules();
+      const { getDefaultMonthlyTarget: freshGetDefault } = await import('@/config/app.config');
+      expect(freshGetDefault()).toBe(30000);
+    });
+
+    it('環境変数が範囲外（大きすぎる）の場合、デフォルト値30000を返すこと', async () => {
+      process.env.NEXT_PUBLIC_DEFAULT_MONTHLY_TARGET = '10000001';
+      jest.resetModules();
+      const { getDefaultMonthlyTarget: freshGetDefault } = await import('@/config/app.config');
+      expect(freshGetDefault()).toBe(30000);
+    });
+
+    it('環境変数が非数値の場合、デフォルト値30000を返すこと', async () => {
+      process.env.NEXT_PUBLIC_DEFAULT_MONTHLY_TARGET = 'invalid';
+      jest.resetModules();
+      const { getDefaultMonthlyTarget: freshGetDefault } = await import('@/config/app.config');
+      expect(freshGetDefault()).toBe(30000);
+    });
+
+    it('環境変数が空文字列の場合、デフォルト値30000を返すこと', async () => {
+      process.env.NEXT_PUBLIC_DEFAULT_MONTHLY_TARGET = '';
+      jest.resetModules();
+      const { getDefaultMonthlyTarget: freshGetDefault } = await import('@/config/app.config');
+      expect(freshGetDefault()).toBe(30000);
     });
   });
 
   describe('goalConfig', () => {
-    const originalDefaultMonthlyTargetEnv = process.env.NEXT_PUBLIC_DEFAULT_MONTHLY_TARGET;
-
-    afterAll(() => {
-      if (originalDefaultMonthlyTargetEnv !== undefined) {
-        process.env.NEXT_PUBLIC_DEFAULT_MONTHLY_TARGET = originalDefaultMonthlyTargetEnv;
-      } else {
-        delete process.env.NEXT_PUBLIC_DEFAULT_MONTHLY_TARGET;
-      }
-    });
-
-    it('デフォルト月次目標が30000であること', () => {
-      delete process.env.NEXT_PUBLIC_DEFAULT_MONTHLY_TARGET;
-      jest.resetModules();
-      // 環境変数未設定時のデフォルト値を検証するために再 import する
-      const { goalConfig: freshGoalConfig } = require('@/config/app.config');
-      expect(freshGoalConfig.defaultMonthlyTarget).toBe(30000);
-    });
-
     it('最小目標金額が1000であること', () => {
       expect(goalConfig.minTarget).toBe(1000);
     });

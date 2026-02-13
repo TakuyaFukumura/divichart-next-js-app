@@ -16,8 +16,6 @@ export interface AppConfig {
 export interface ExchangeRateConfig {
   /** デフォルトの USD → JPY レート */
   defaultRate: number;
-  /** 環境変数キー */
-  envKey: string;
 }
 
 /** 目標設定 */
@@ -35,7 +33,6 @@ export interface GoalConfig {
  */
 export const exchangeRateConfig: ExchangeRateConfig = {
   defaultRate: 150,
-  envKey: 'NEXT_PUBLIC_USD_TO_JPY_RATE',
 };
 
 /**
