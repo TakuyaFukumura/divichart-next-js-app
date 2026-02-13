@@ -36,24 +36,24 @@ export default function DividendTable({
     };
 
     return (
-        <div className="mt-8">
-            <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
+        <div className="mt-6 sm:mt-8">
+            <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-800 dark:text-gray-200">
                 配当内訳一覧
             </h2>
             <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-xl shadow">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700">
                     <thead className="bg-gray-100 dark:bg-gray-700">
                     <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                        <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                             銘柄コード
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                        <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                             銘柄名
                         </th>
-                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                        <th className="px-3 sm:px-6 py-2 sm:py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                             配当金額[円]
                         </th>
-                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                        <th className="px-3 sm:px-6 py-2 sm:py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                             割合[%]
                         </th>
                     </tr>
@@ -65,7 +65,7 @@ export default function DividendTable({
                             className={`${getRowBgClass(row, index)} hover:brightness-95 dark:hover:brightness-110 transition-colors`}
                         >
                             <td
-                                className={`px-6 py-4 whitespace-nowrap text-sm text-left ${
+                                className={`px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-left ${
                                     row.stockCode
                                         ? 'font-medium text-gray-900 dark:text-gray-300'
                                         : 'text-gray-500 dark:text-gray-500'
@@ -74,16 +74,16 @@ export default function DividendTable({
                                 {row.stockCode || '-'}
                             </td>
                             <td
-                                className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 ${
+                                className={`px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 ${
                                     row.stockName === 'その他' ? 'italic font-medium' : ''
                                 }`}
                             >
                                 {row.stockName}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right font-mono">
+                            <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right font-mono">
                                 ¥{row.amount.toLocaleString()}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right font-mono">
+                            <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300 text-right font-mono">
                                 {row.percentage.toFixed(1)}%
                             </td>
                         </tr>
@@ -92,13 +92,13 @@ export default function DividendTable({
                     <tfoot className="bg-gray-100 dark:bg-gray-700">
                     <tr>
                         {/* 銘柄コードと銘柄名の2列を結合 */}
-                        <td className="px-6 py-4 text-sm font-bold text-gray-900 dark:text-gray-200" colSpan={2}>
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-sm font-bold text-gray-900 dark:text-gray-200" colSpan={2}>
                             合計
                         </td>
-                        <td className="px-6 py-4 text-sm font-bold text-gray-900 dark:text-gray-200 text-right font-mono">
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-sm font-bold text-gray-900 dark:text-gray-200 text-right font-mono">
                             ¥{data.reduce((sum, row) => sum + row.amount, 0).toLocaleString()}
                         </td>
-                        <td className="px-6 py-4 text-sm font-bold text-gray-900 dark:text-gray-200 text-right font-mono">
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-sm font-bold text-gray-900 dark:text-gray-200 text-right font-mono">
                             {data.length > 0
                                 ? data.reduce((sum, row) => sum + row.percentage, 0).toFixed(1) + '%'
                                 : '-'}

@@ -57,13 +57,13 @@ export default function CumulativeDividendPage() {
     if (rawData.length === 0) {
         return (
             <div
-                className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-8">
+                className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-3 sm:p-6 lg:p-8">
                 <div className="max-w-6xl mx-auto">
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
-                        <h1 className="text-4xl font-bold mb-6 text-gray-800 dark:text-gray-200">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8">
+                        <h1 className="text-3xl sm:text-4xl font-bold mb-4 sm:mb-6 text-gray-800 dark:text-gray-200">
                             累計配当
                         </h1>
-                        <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-6">
+                        <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-2 sm:p-4 lg:p-6">
                             <p className="text-gray-500 dark:text-gray-400 text-center">
                                 表示する配当データがありません
                             </p>
@@ -76,49 +76,51 @@ export default function CumulativeDividendPage() {
 
     return (
         <div
-            className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-8">
+            className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-3 sm:p-6 lg:p-8">
             <div className="max-w-6xl mx-auto">
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
-                    <h1 className="text-4xl font-bold mb-6 text-gray-800 dark:text-gray-200">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 lg:p-8">
+                    <h1 className="text-3xl sm:text-4xl font-bold mb-4 sm:mb-6 text-gray-800 dark:text-gray-200">
                         累計配当
                     </h1>
 
-                    <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-6 mb-8">
-                        <ResponsiveContainer width="100%" height={400}>
-                            <LineChart data={data}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb"
-                                               className="dark:stroke-gray-600"/>
-                                <XAxis
-                                    dataKey="year"
-                                    tick={{fill: '#6b7280'}}
-                                    className="dark:fill-gray-400"
-                                />
-                                <YAxis
-                                    tick={{fill: '#6b7280'}}
-                                    className="dark:fill-gray-400"
-                                    tickFormatter={formatYAxisValue}
-                                />
-                                <Tooltip content={<CustomTooltip/>}/>
-                                <Legend
-                                    wrapperStyle={{
-                                        paddingTop: '20px',
-                                    }}
-                                />
-                                <Line
-                                    type="monotone"
-                                    dataKey="cumulativeDividend"
-                                    stroke="#3b82f6"
-                                    strokeWidth={2}
-                                    name="累計配当金（税引き後）[円]"
-                                    dot={{fill: '#3b82f6', r: 4}}
-                                    activeDot={{r: 6}}
-                                />
-                            </LineChart>
-                        </ResponsiveContainer>
+                    <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-2 sm:p-4 lg:p-6 mb-6 sm:mb-8">
+                        <div className="h-[300px] sm:h-[400px]">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <LineChart data={data}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb"
+                                                   className="dark:stroke-gray-600"/>
+                                    <XAxis
+                                        dataKey="year"
+                                        tick={{fill: '#6b7280'}}
+                                        className="dark:fill-gray-400"
+                                    />
+                                    <YAxis
+                                        tick={{fill: '#6b7280'}}
+                                        className="dark:fill-gray-400"
+                                        tickFormatter={formatYAxisValue}
+                                    />
+                                    <Tooltip content={<CustomTooltip/>}/>
+                                    <Legend
+                                        wrapperStyle={{
+                                            paddingTop: '20px',
+                                        }}
+                                    />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="cumulativeDividend"
+                                        stroke="#3b82f6"
+                                        strokeWidth={2}
+                                        name="累計配当金（税引き後）[円]"
+                                        dot={{fill: '#3b82f6', r: 4}}
+                                        activeDot={{r: 6}}
+                                    />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
                     </div>
 
                     <div className="mb-6">
-                        <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
+                        <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-800 dark:text-gray-200">
                             年別累計配当金集計
                         </h2>
                         <div className="overflow-x-auto">
@@ -126,13 +128,13 @@ export default function CumulativeDividendPage() {
                                 className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700">
                                 <thead className="bg-gray-100 dark:bg-gray-700">
                                 <tr>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                    <th className="px-3 sm:px-6 py-2 sm:py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                         年
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                    <th className="px-3 sm:px-6 py-2 sm:py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                         税引後年間配当[円]
                                     </th>
-                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                    <th className="px-3 sm:px-6 py-2 sm:py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                                         税引後累計配当[円]
                                     </th>
                                 </tr>
@@ -141,13 +143,13 @@ export default function CumulativeDividendPage() {
                                     className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                 {data.map((item) => (
                                     <tr key={item.year} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-100 font-mono">
+                                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-100 font-mono">
                                             {item.year}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-100 font-mono">
+                                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-right text-gray-900 dark:text-gray-100 font-mono">
                                             ¥{item.yearlyDividend.toLocaleString()}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900 dark:text-gray-100 font-mono">
+                                        <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-900 dark:text-gray-100 font-mono">
                                             ¥{item.cumulativeDividend.toLocaleString()}
                                         </td>
                                     </tr>

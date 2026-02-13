@@ -45,10 +45,10 @@ export default function GoalsPage() {
     }
 
     return (
-        <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-8">
+        <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-3 sm:p-6 lg:p-8">
             <div className="max-w-4xl mx-auto">
                 {/* ページタイトル */}
-                <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-8">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-200 mb-6 sm:mb-8">
                     配当目標達成度
                 </h1>
 
@@ -59,8 +59,8 @@ export default function GoalsPage() {
                 />
 
                 {/* プログレスバー表示エリア */}
-                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-6">
-                    <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 mb-6">
+                    <h2 className="text-lg sm:text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4 sm:mb-6">
                         年別達成状況
                     </h2>
 
