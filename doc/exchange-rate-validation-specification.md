@@ -221,7 +221,7 @@
    ```typescript
    import {useCallback, useRef} from 'react';
    
-   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+   const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
    const DEBOUNCE_DELAY = 500; // 500ミリ秒
    
    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
