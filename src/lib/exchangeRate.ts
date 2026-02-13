@@ -20,7 +20,7 @@ export const DEFAULT_USD_TO_JPY_RATE = appConfig.exchangeRate.defaultRate;
  * - 負の値やNaNの場合もデフォルト値を使用
  */
 export function getUsdToJpyRate(): number {
-    const envRate = process.env[appConfig.exchangeRate.envKey];
+    const envRate = process.env.NEXT_PUBLIC_USD_TO_JPY_RATE;
     
     if (!envRate) {
         return DEFAULT_USD_TO_JPY_RATE;
