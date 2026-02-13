@@ -555,7 +555,7 @@ Closes #123
 - 初回CHANGELOG導入
 
 [Unreleased]: https://github.com/TakuyaFukumura/divichart-next-js-app/compare/v0.19.0...HEAD
-[0.19.0]: https://github.com/TakuyaFukumura/divichart-next-js-app/releases/tag/v0.19.0
+[0.19.0]: https://github.com/TakuyaFukumura/divichart-next-js-app/compare/v0.18.0...v0.19.0
 ```
 
 ### 11.2 PR作成時のチェックリスト例
