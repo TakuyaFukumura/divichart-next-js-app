@@ -30,7 +30,7 @@ describe('CustomTooltip', () => {
             expect(screen.getByText('BLV')).toBeInTheDocument();
             expect(screen.getByText('金額: ¥50,000')).toBeInTheDocument();
             expect(screen.getByText('割合: 25.0%')).toBeInTheDocument();
-            
+
             // 銘柄名が含まれていないことを確認
             expect(screen.queryByText(/VA L-TERM BOND/)).not.toBeInTheDocument();
         });
@@ -59,7 +59,7 @@ describe('CustomTooltip', () => {
             expect(screen.getByText('その他')).toBeInTheDocument();
             expect(screen.getByText('金額: ¥10,000')).toBeInTheDocument();
             expect(screen.getByText('割合: 5.0%')).toBeInTheDocument();
-            
+
             // 「-」が含まれていないことを確認
             expect(screen.queryByText(/-/)).not.toBeInTheDocument();
         });

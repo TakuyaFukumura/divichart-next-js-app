@@ -1,9 +1,4 @@
-import {
-    saveGoalSettings,
-    loadGoalSettings,
-    GOAL_SETTINGS_STORAGE_KEY,
-    DEFAULT_MONTHLY_TARGET
-} from '@/lib/goalStorage';
+import {DEFAULT_MONTHLY_TARGET, GOAL_SETTINGS_STORAGE_KEY, loadGoalSettings, saveGoalSettings} from '@/lib/goalStorage';
 
 describe('goalStorage', () => {
     beforeEach(() => {

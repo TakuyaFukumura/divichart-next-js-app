@@ -9,8 +9,8 @@ import YearSelector from '@/app/components/YearSelector';
 import DividendPieChart from '@/app/components/DividendPieChart';
 import DividendTable from '@/app/components/DividendTable';
 import {useExchangeRate} from '@/app/contexts/ExchangeRateContext';
-import {LoadingScreen, ErrorScreen} from '@/app/components/LoadingState';
-import { appConfig, chartConfig } from '@/config';
+import {ErrorScreen, LoadingScreen} from '@/app/components/LoadingState';
+import {appConfig, chartConfig} from '@/config';
 
 /**
  * 配当ポートフォリオコンポーネント（内部実装）
@@ -78,8 +78,8 @@ function PortfolioContent() {
         router.push(`/portfolio?year=${year}`);
     }, [router]);
 
-    if (loading) return <LoadingScreen />;
-    if (error) return <ErrorScreen error={error} />;
+    if (loading) return <LoadingScreen/>;
+    if (error) return <ErrorScreen error={error}/>;
 
     if (availableYears.length === 0) {
         return (
@@ -154,7 +154,7 @@ function PortfolioContent() {
  */
 export default function PortfolioPage() {
     return (
-        <Suspense fallback={<LoadingScreen />}>
+        <Suspense fallback={<LoadingScreen/>}>
             <PortfolioContent/>
         </Suspense>
     );

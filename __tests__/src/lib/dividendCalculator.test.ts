@@ -3,13 +3,13 @@
  */
 
 import {
+    aggregateDividendsByYear,
     aggregateOthers,
     calculateStockDividends,
+    formatCumulativeDividendData,
+    formatYearlyDividendData,
     generateYearlyPortfolio,
     getAvailableYears,
-    aggregateDividendsByYear,
-    formatYearlyDividendData,
-    formatCumulativeDividendData,
 } from '@/lib/dividendCalculator';
 import {CSVRow} from '@/types/dividend';
 
@@ -339,9 +339,9 @@ describe('dividendCalculator', () => {
             const result = formatYearlyDividendData(map);
 
             expect(result).toEqual([
-                { year: '2023年', totalDividend: 1000 },
-                { year: '2024年', totalDividend: 1500 },
-                { year: '2025年', totalDividend: 2000 },
+                {year: '2023年', totalDividend: 1000},
+                {year: '2024年', totalDividend: 1500},
+                {year: '2025年', totalDividend: 2000},
             ]);
         });
 
@@ -354,8 +354,8 @@ describe('dividendCalculator', () => {
             const result = formatYearlyDividendData(map);
 
             expect(result).toEqual([
-                { year: '2024年', totalDividend: 1235 },
-                { year: '2025年', totalDividend: 5678 },
+                {year: '2024年', totalDividend: 1235},
+                {year: '2025年', totalDividend: 5678},
             ]);
         });
 
@@ -379,9 +379,9 @@ describe('dividendCalculator', () => {
             const result = formatCumulativeDividendData(map);
 
             expect(result).toEqual([
-                { year: '2023年', yearlyDividend: 1000, cumulativeDividend: 1000 },
-                { year: '2024年', yearlyDividend: 1500, cumulativeDividend: 2500 },
-                { year: '2025年', yearlyDividend: 2000, cumulativeDividend: 4500 },
+                {year: '2023年', yearlyDividend: 1000, cumulativeDividend: 1000},
+                {year: '2024年', yearlyDividend: 1500, cumulativeDividend: 2500},
+                {year: '2025年', yearlyDividend: 2000, cumulativeDividend: 4500},
             ]);
         });
 
@@ -394,8 +394,8 @@ describe('dividendCalculator', () => {
             const result = formatCumulativeDividendData(map);
 
             expect(result).toEqual([
-                { year: '2023年', yearlyDividend: 1235, cumulativeDividend: 1235 },
-                { year: '2024年', yearlyDividend: 5678, cumulativeDividend: 6913 },
+                {year: '2023年', yearlyDividend: 1235, cumulativeDividend: 1235},
+                {year: '2024年', yearlyDividend: 5678, cumulativeDividend: 6913},
             ]);
         });
 
@@ -417,9 +417,9 @@ describe('dividendCalculator', () => {
             const result = formatCumulativeDividendData(map);
 
             expect(result).toEqual([
-                { year: '2023年', yearlyDividend: 1000, cumulativeDividend: 1000 },
-                { year: '2024年', yearlyDividend: 2000, cumulativeDividend: 3000 },
-                { year: '2025年', yearlyDividend: 3000, cumulativeDividend: 6000 },
+                {year: '2023年', yearlyDividend: 1000, cumulativeDividend: 1000},
+                {year: '2024年', yearlyDividend: 2000, cumulativeDividend: 3000},
+                {year: '2025年', yearlyDividend: 3000, cumulativeDividend: 6000},
             ]);
         });
     });

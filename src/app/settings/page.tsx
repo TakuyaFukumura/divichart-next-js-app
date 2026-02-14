@@ -1,12 +1,8 @@
 'use client';
 
-import {useEffect, useState, useRef, type ChangeEvent} from 'react';
+import {type ChangeEvent, useEffect, useRef, useState} from 'react';
 import {useExchangeRate} from '@/app/contexts/ExchangeRateContext';
-import {
-    MIN_USD_TO_JPY_RATE,
-    MAX_USD_TO_JPY_RATE,
-    EXCHANGE_RATE_DEBOUNCE_DELAY,
-} from '@/lib/exchangeRate';
+import {EXCHANGE_RATE_DEBOUNCE_DELAY, MAX_USD_TO_JPY_RATE, MIN_USD_TO_JPY_RATE,} from '@/lib/exchangeRate';
 
 /**
  * 設定画面コンポーネント
@@ -88,7 +84,7 @@ export default function SettingsPage() {
         if (debounceTimeoutRef.current) {
             clearTimeout(debounceTimeoutRef.current);
             debounceTimeoutRef.current = null;
-            
+
             // エラーがない場合は、現在の入力値で即座に更新
             if (!error) {
                 const numValue = parseFloat(inputValue);
@@ -97,7 +93,7 @@ export default function SettingsPage() {
                 }
             }
         }
-        
+
         setIsEditing(false);
         if (error) {
             setInputValue(String(usdToJpyRate));
@@ -115,7 +111,7 @@ export default function SettingsPage() {
             clearTimeout(debounceTimeoutRef.current);
             debounceTimeoutRef.current = null;
         }
-        
+
         resetToDefault();
         setInputValue(String(defaultRate));
         setError('');

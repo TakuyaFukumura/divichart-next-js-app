@@ -1,7 +1,7 @@
 'use client';
 
 import {useState} from 'react';
-import { appConfig } from '@/config';
+import {appConfig} from '@/config';
 
 type GoalSettingsFormProps = {
     initialValue: number;
@@ -77,7 +77,8 @@ export default function GoalSettingsForm({initialValue, onSave}: GoalSettingsFor
 
             {/* エラーメッセージ */}
             {error && (
-                <div className="mt-3 p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-md text-sm">
+                <div
+                    className="mt-3 p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-md text-sm">
                     {error}
                 </div>
             )}

@@ -141,21 +141,27 @@ pnpm start
 ### 利用可能な環境変数
 
 #### 為替レート設定
+
 ```bash
 NEXT_PUBLIC_USD_TO_JPY_RATE=150
 ```
+
 USD → JPY の為替レートを設定します。未設定の場合はデフォルト値（150円）が使用されます。
 
 #### CSVファイルパス設定
+
 ```bash
 NEXT_PUBLIC_CSV_FILE_PATH=/data/dividendlist_20260205.csv
 ```
+
 配当データのCSVファイルパスを設定します。パスは`public`ディレクトリからの相対パスで指定します。
 
 #### 目標配当金設定
+
 ```bash
 NEXT_PUBLIC_DEFAULT_MONTHLY_TARGET=30000
 ```
+
 デフォルトの月次配当金目標を設定します（円）。未設定の場合はデフォルト値（30,000円）が使用されます。
 
 ### 環境変数の使用例
@@ -169,7 +175,8 @@ NEXT_PUBLIC_DEFAULT_MONTHLY_TARGET=30000
 
 3. 開発サーバーを再起動
 
-**注意**: 
+**注意**:
+
 - `NEXT_PUBLIC_`プレフィックス付きの変数はクライアント側で使用可能です
 - `.env.local`ファイルは`.gitignore`に含まれており、リポジトリにコミットされません
 - 本番環境では環境変数を直接設定してください

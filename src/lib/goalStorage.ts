@@ -1,5 +1,5 @@
 import {GoalSettings} from '@/types/dividend';
-import { appConfig, storageKeys } from '@/config';
+import {appConfig, storageKeys} from '@/config';
 
 /**
  * 目標設定の保存・読み込みを管理するユーティリティ

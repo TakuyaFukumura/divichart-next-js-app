@@ -1,4 +1,4 @@
-import {YearlyGoalAchievement, GoalAchievementSummary} from '@/types/dividend';
+import {GoalAchievementSummary, YearlyGoalAchievement} from '@/types/dividend';
 
 /**
  * 目標達成度の計算ロジック

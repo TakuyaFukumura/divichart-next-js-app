@@ -41,7 +41,8 @@ export default function DividendTable({
                 配当内訳一覧
             </h2>
             <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-xl shadow">
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700">
+                <table
+                    className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700">
                     <thead className="bg-gray-100 dark:bg-gray-700">
                     <tr>
                         <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">
@@ -92,7 +93,8 @@ export default function DividendTable({
                     <tfoot className="bg-gray-100 dark:bg-gray-700">
                     <tr>
                         {/* 銘柄コードと銘柄名の2列を結合 */}
-                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-sm font-bold text-gray-900 dark:text-gray-200" colSpan={2}>
+                        <td className="px-3 sm:px-6 py-3 sm:py-4 text-sm font-bold text-gray-900 dark:text-gray-200"
+                            colSpan={2}>
                             合計
                         </td>
                         <td className="px-3 sm:px-6 py-3 sm:py-4 text-sm font-bold text-gray-900 dark:text-gray-200 text-right font-mono">

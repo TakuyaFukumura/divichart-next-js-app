@@ -6,7 +6,7 @@ import {CSVRow, CumulativeDividendData} from '@/types/dividend';
 import {useDividendData} from '@/hooks/useDividendData';
 import {formatYAxisValue} from '@/lib/formatYAxisValue';
 import {useExchangeRate} from '@/app/contexts/ExchangeRateContext';
-import {LoadingScreen, ErrorScreen} from '@/app/components/LoadingState';
+import {ErrorScreen, LoadingScreen} from '@/app/components/LoadingState';
 import {aggregateDividendsByYear, formatCumulativeDividendData} from '@/lib/dividendCalculator';
 
 /**
@@ -50,8 +50,8 @@ export default function CumulativeDividendPage() {
         }
     }, [usdToJpyRate, rawData, calculateCumulativeDividendData]);
 
-    if (loading) return <LoadingScreen />;
-    if (error) return <ErrorScreen error={error} />;
+    if (loading) return <LoadingScreen/>;
+    if (error) return <ErrorScreen error={error}/>;
 
     // データが空の場合の表示
     if (rawData.length === 0) {

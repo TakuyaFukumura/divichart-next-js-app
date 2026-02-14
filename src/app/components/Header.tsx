@@ -233,7 +233,8 @@ export default function Header() {
             >
                 <div className="flex flex-col h-full">
                     {/* メニューヘッダー */}
-                    <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-gray-700">
+                    <div
+                        className="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-gray-700">
                         <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
                             divichart
                         </h2>

@@ -6,7 +6,7 @@ import {useDividendData} from '@/hooks/useDividendData';
 import {CSVRow} from '@/types/dividend';
 import {formatYAxisValue} from '@/lib/formatYAxisValue';
 import {useExchangeRate} from '@/app/contexts/ExchangeRateContext';
-import {LoadingScreen, ErrorScreen} from '@/app/components/LoadingState';
+import {ErrorScreen, LoadingScreen} from '@/app/components/LoadingState';
 import {aggregateDividendsByYear, formatYearlyDividendData} from '@/lib/dividendCalculator';
 
 /**
@@ -61,8 +61,8 @@ export default function Home() {
         }
     }, [usdToJpyRate, rawData, calculateDividendData]);
 
-    if (loading) return <LoadingScreen />;
-    if (error) return <ErrorScreen error={error} />;
+    if (loading) return <LoadingScreen/>;
+    if (error) return <ErrorScreen error={error}/>;
 
     // データが空の場合の表示
     if (rawData.length === 0) {
@@ -141,7 +141,8 @@ export default function Home() {
                             年別配当金集計
                         </h2>
                         <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700">
+                            <table
+                                className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700">
                                 <thead className="bg-gray-100 dark:bg-gray-700">
                                 <tr>
                                     <th className="px-3 sm:px-6 py-2 sm:py-3 text-right text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider">

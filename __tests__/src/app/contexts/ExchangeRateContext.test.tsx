@@ -9,7 +9,7 @@ import React from 'react';
 import {act, render, renderHook, screen, waitFor} from '@testing-library/react';
 import '@testing-library/jest-dom';
 import {ExchangeRateProvider, useExchangeRate} from '@/app/contexts/ExchangeRateContext';
-import {DEFAULT_USD_TO_JPY_RATE, MIN_USD_TO_JPY_RATE, MAX_USD_TO_JPY_RATE} from '@/lib/exchangeRate';
+import {DEFAULT_USD_TO_JPY_RATE, MAX_USD_TO_JPY_RATE, MIN_USD_TO_JPY_RATE} from '@/lib/exchangeRate';
 
 // localStorage のモック
 const localStorageMock = (() => {

@@ -1,4 +1,4 @@
-import { chartConfig } from '@/config';
+import {chartConfig} from '@/config';
 
 /**
  * グラフのy軸用に金額を短縮表示する
