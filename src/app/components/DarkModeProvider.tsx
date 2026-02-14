@@ -1,7 +1,7 @@
 'use client';
 
 import {createContext, ReactNode, useContext, useEffect, useMemo, useState} from 'react';
-import { storageKeys, getStorageItem, setStorageItem } from '@/config';
+import {getStorageItem, setStorageItem, storageKeys} from '@/config';
 
 /**
  * テーマの種類を表す型

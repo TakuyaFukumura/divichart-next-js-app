@@ -1,4 +1,4 @@
-import { getUsdToJpyRate, DEFAULT_USD_TO_JPY_RATE } from '@/lib/exchangeRate';
+import {DEFAULT_USD_TO_JPY_RATE, getUsdToJpyRate} from '@/lib/exchangeRate';
 
 describe('exchangeRate', () => {
     const originalEnv = process.env.NEXT_PUBLIC_USD_TO_JPY_RATE;

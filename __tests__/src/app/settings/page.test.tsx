@@ -12,9 +12,9 @@ import SettingsPage from '@/app/settings/page';
 import {ExchangeRateProvider, useExchangeRate} from '@/app/contexts/ExchangeRateContext';
 import {
     DEFAULT_USD_TO_JPY_RATE,
-    MIN_USD_TO_JPY_RATE,
-    MAX_USD_TO_JPY_RATE,
     EXCHANGE_RATE_DEBOUNCE_DELAY,
+    MAX_USD_TO_JPY_RATE,
+    MIN_USD_TO_JPY_RATE,
 } from '@/lib/exchangeRate';
 
 // localStorage のモック
@@ -515,7 +515,7 @@ describe('SettingsPage', () => {
 
         it('編集中は外部からの更新で上書きされない', async () => {
             jest.useFakeTimers();
-            
+
             const TestComponent = () => {
                 const {setUsdToJpyRate} = useExchangeRate();
                 return (

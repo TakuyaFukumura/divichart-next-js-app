@@ -6,7 +6,7 @@ import {useExchangeRate} from '@/app/contexts/ExchangeRateContext';
 import {aggregateDividendsByYear} from '@/lib/dividendCalculator';
 import {calculateGoalAchievements} from '@/lib/goalCalculator';
 import {loadGoalSettings, saveGoalSettings} from '@/lib/goalStorage';
-import {LoadingScreen, ErrorScreen} from '@/app/components/LoadingState';
+import {ErrorScreen, LoadingScreen} from '@/app/components/LoadingState';
 import GoalSettingsForm from '@/app/components/GoalSettingsForm';
 import YearlyGoalProgressBar from '@/app/components/YearlyGoalProgressBar';
 import GoalAchievementTable from '@/app/components/GoalAchievementTable';
@@ -45,7 +45,8 @@ export default function GoalsPage() {
     }
 
     return (
-        <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-3 sm:p-6 lg:p-8">
+        <div
+            className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-3 sm:p-6 lg:p-8">
             <div className="max-w-4xl mx-auto">
                 {/* ページタイトル */}
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-200 mb-6 sm:mb-8">

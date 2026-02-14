@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {CSVRow} from '@/types/dividend';
 import {loadCSV} from '@/lib/csvLoader';
-import { appConfig } from '@/config';
+import {appConfig} from '@/config';
 
 /**
  * 配当金データの読み込み状態を管理するカスタムフック

@@ -30,12 +30,12 @@ interface CustomTooltipProps {
 export const CustomTooltip = ({active, payload}: CustomTooltipProps) => {
     if (active && payload?.length) {
         const data = payload[0];
-        const { stockCode, stockName } = data.payload;
-        
+        const {stockCode, stockName} = data.payload;
+
         // 銘柄コードが存在する場合は、銘柄コードのみを表示
         // 銘柄コードが存在しない場合は、銘柄名を表示
         const displayTitle = stockCode || stockName;
-        
+
         return (
             <div
                 className="bg-white dark:bg-gray-800 p-3 border border-gray-300 dark:border-gray-600 rounded shadow-lg">
@@ -186,7 +186,7 @@ export default function DividendPieChart({
         return (
             <div
                 className="flex items-center justify-center bg-gray-50 dark:bg-gray-900 rounded-xl"
-                style={{ height: `${chartConfig.height}px` }}
+                style={{height: `${chartConfig.height}px`}}
             >
                 <p className="text-gray-500 dark:text-gray-400">
                     表示する配当データがありません

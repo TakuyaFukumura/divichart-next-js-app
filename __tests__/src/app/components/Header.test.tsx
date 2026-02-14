@@ -356,14 +356,14 @@ describe('Header', () => {
 
             // 開く
             fireEvent.click(hamburgerButton);
-            
+
             // メニューが開いたので、ハンバーガーボタンのラベルが変わる
             const hamburgerButtonAfterOpen = screen.getByLabelText('メインメニューを閉じる');
             expect(hamburgerButtonAfterOpen).toHaveAttribute('aria-expanded', 'true');
 
             // 閉じる
             fireEvent.click(hamburgerButtonAfterOpen);
-            
+
             // メニューが閉じたので、再度取得
             const hamburgerButtonAfterClose = screen.getByLabelText('メインメニューを開く');
             expect(hamburgerButtonAfterClose).toHaveAttribute('aria-expanded', 'false');
