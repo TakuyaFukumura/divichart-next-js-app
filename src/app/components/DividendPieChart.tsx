@@ -62,24 +62,45 @@ interface DividendPieChartProps {
 const MOBILE_QUERY = '(max-width: 639px)';
 const TABLET_QUERY = '(min-width: 640px) and (max-width: 1023px)';
 
+const getMediaQueryList = (query: string): MediaQueryList | null => {
+    const currentWindow = globalThis.window;
+    return currentWindow?.matchMedia ? currentWindow.matchMedia(query) : null;
+};
+
+const isMobileViewport = (): boolean => getMediaQueryList(MOBILE_QUERY)?.matches ?? false;
+
+const isTabletViewport = (): boolean => {
+    const isMobileMatch = isMobileViewport();
+    const isTabletMatch = getMediaQueryList(TABLET_QUERY)?.matches ?? false;
+    return !isMobileMatch && isTabletMatch;
+};
+
+const getChartDimensions = (isMobile: boolean, isTablet: boolean) => {
+    if (isMobile) {
+        return {outerRadius: 80, height: 350};
+    }
+
+    if (isTablet) {
+        return {outerRadius: 120, height: 400};
+    }
+
+    return {outerRadius: 140, height: 450};
+};
+
 export default function DividendPieChart({
                                              data,
                                          }: DividendPieChartProps) {
     // デバイス判定用のステート (lazy initializer で初期値を正確に設定)
-    const [isMobile, setIsMobile] = useState(() => {
-        if (typeof window === 'undefined') return false;
-        return window.matchMedia(MOBILE_QUERY).matches;
-    });
-    const [isTablet, setIsTablet] = useState(() => {
-        if (typeof window === 'undefined') return false;
-        const isMobileMatch = window.matchMedia(MOBILE_QUERY).matches;
-        const isTabletMatch = window.matchMedia(TABLET_QUERY).matches;
-        return !isMobileMatch && isTabletMatch;
-    });
+    const [isMobile, setIsMobile] = useState(isMobileViewport);
+    const [isTablet, setIsTablet] = useState(isTabletViewport);
 
     useEffect(() => {
-        const mobileQuery = window.matchMedia(MOBILE_QUERY);
-        const tabletQuery = window.matchMedia(TABLET_QUERY);
+        const mobileQuery = getMediaQueryList(MOBILE_QUERY);
+        const tabletQuery = getMediaQueryList(TABLET_QUERY);
+
+        if (!mobileQuery || !tabletQuery) {
+            return;
+        }
 
         const updateFromMediaQueries = () => {
             const isMobileMatch = mobileQuery.matches;
@@ -102,9 +123,10 @@ export default function DividendPieChart({
     }, []);
 
     // デバイスに応じたチャート設定
+    const {outerRadius, height} = getChartDimensions(isMobile, isTablet);
     const chartConfig = {
-        outerRadius: isMobile ? 80 : isTablet ? 120 : 140,
-        height: isMobile ? 350 : isTablet ? 400 : 450,
+        outerRadius,
+        height,
         labelThreshold: 3,
         showLabels: !isMobile, // モバイルではラベルを非表示
     };
