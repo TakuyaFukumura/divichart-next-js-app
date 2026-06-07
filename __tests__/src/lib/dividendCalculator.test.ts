@@ -3,10 +3,12 @@
  */
 
 import {
+    aggregateDividendsByMonth,
     aggregateDividendsByYear,
     aggregateOthers,
     calculateStockDividends,
     formatCumulativeDividendData,
+    formatMonthlyDividendData,
     formatYearlyDividendData,
     generateYearlyPortfolio,
     getAvailableYears,
@@ -328,6 +330,114 @@ describe('dividendCalculator', () => {
         });
     });
 
+    describe('aggregateDividendsByMonth', () => {
+        it('指定年の同月配当を合算する', () => {
+            const csvData: CSVRow[] = [
+                {
+                    '入金日': '2024/01/15',
+                    '商品': '日本株式',
+                    '口座': '一般NISA',
+                    '銘柄コード': '1234',
+                    '銘柄': 'テスト株式会社',
+                    '受取通貨': '円',
+                    '単価[円/現地通貨]': '100',
+                    '数量[株/口]': '10',
+                    '配当・分配金合計（税引前）[円/現地通貨]': '1000',
+                    '税額合計[円/現地通貨]': '0',
+                    '受取金額[円/現地通貨]': '1000',
+                },
+                {
+                    '入金日': '2024/01/31',
+                    '商品': '日本株式',
+                    '口座': '一般NISA',
+                    '銘柄コード': '5678',
+                    '銘柄': 'テスト2株式会社',
+                    '受取通貨': '円',
+                    '単価[円/現地通貨]': '50',
+                    '数量[株/口]': '10',
+                    '配当・分配金合計（税引前）[円/現地通貨]': '500',
+                    '税額合計[円/現地通貨]': '0',
+                    '受取金額[円/現地通貨]': '500',
+                },
+                {
+                    '入金日': '2025/01/15',
+                    '商品': '日本株式',
+                    '口座': '一般NISA',
+                    '銘柄コード': '9999',
+                    '銘柄': '対象外株式会社',
+                    '受取通貨': '円',
+                    '単価[円/現地通貨]': '100',
+                    '数量[株/口]': '10',
+                    '配当・分配金合計（税引前）[円/現地通貨]': '1000',
+                    '税額合計[円/現地通貨]': '0',
+                    '受取金額[円/現地通貨]': '1000',
+                },
+            ];
+
+            const result = aggregateDividendsByMonth(csvData, 2024, 150);
+
+            expect(result.get(1)).toBe(1500);
+            expect(result.has(2)).toBe(false);
+        });
+
+        it('USドルを円換算して月別集計する', () => {
+            const csvData: CSVRow[] = [
+                {
+                    '入金日': '2024/03/15',
+                    '商品': '米国株式',
+                    '口座': '旧NISA',
+                    '銘柄コード': 'AAPL',
+                    '銘柄': 'Apple Inc',
+                    '受取通貨': 'USドル',
+                    '単価[円/現地通貨]': '0.5',
+                    '数量[株/口]': '10',
+                    '配当・分配金合計（税引前）[円/現地通貨]': '5.0',
+                    '税額合計[円/現地通貨]': '0.5',
+                    '受取金額[円/現地通貨]': '4.5',
+                },
+            ];
+
+            const result = aggregateDividendsByMonth(csvData, 2024, 150);
+
+            expect(result.get(3)).toBe(675);
+        });
+
+        it('不正データを安全にスキップする', () => {
+            const csvData: CSVRow[] = [
+                {
+                    '入金日': '2024/13/15',
+                    '商品': '日本株式',
+                    '口座': '一般NISA',
+                    '銘柄コード': '1234',
+                    '銘柄': '不正月株式会社',
+                    '受取通貨': '円',
+                    '単価[円/現地通貨]': '100',
+                    '数量[株/口]': '10',
+                    '配当・分配金合計（税引前）[円/現地通貨]': '1000',
+                    '税額合計[円/現地通貨]': '0',
+                    '受取金額[円/現地通貨]': '1000',
+                },
+                {
+                    '入金日': '2024/03/15',
+                    '商品': '日本株式',
+                    '口座': '一般NISA',
+                    '銘柄コード': '5678',
+                    '銘柄': '不正金額株式会社',
+                    '受取通貨': '円',
+                    '単価[円/現地通貨]': '100',
+                    '数量[株/口]': '10',
+                    '配当・分配金合計（税引前）[円/現地通貨]': '1000',
+                    '税額合計[円/現地通貨]': '0',
+                    '受取金額[円/現地通貨]': 'invalid',
+                },
+            ];
+
+            const result = aggregateDividendsByMonth(csvData, 2024, 150);
+
+            expect(result.size).toBe(0);
+        });
+    });
+
     describe('formatYearlyDividendData', () => {
         it('Mapを配列に変換し年でソートする', () => {
             const map = new Map([
@@ -365,6 +475,24 @@ describe('dividendCalculator', () => {
             const result = formatYearlyDividendData(map);
 
             expect(result).toEqual([]);
+        });
+    });
+
+    describe('formatMonthlyDividendData', () => {
+        it('1月から12月まで0円を補完して返す', () => {
+            const map = new Map<number, number>([
+                [1, 1000],
+                [3, 1234.5],
+                [12, 2000],
+            ]);
+
+            const result = formatMonthlyDividendData(map);
+
+            expect(result).toHaveLength(12);
+            expect(result[0]).toEqual({month: '1月', totalDividend: 1000});
+            expect(result[1]).toEqual({month: '2月', totalDividend: 0});
+            expect(result[2]).toEqual({month: '3月', totalDividend: 1235});
+            expect(result[11]).toEqual({month: '12月', totalDividend: 2000});
         });
     });
 

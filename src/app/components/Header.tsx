@@ -174,6 +174,12 @@ export default function Header() {
                                     累計配当
                                 </Link>
                                 <Link
+                                    href="/monthly"
+                                    className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                                >
+                                    月別配当
+                                </Link>
+                                <Link
                                     href="/portfolio"
                                     className="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                                 >
@@ -276,6 +282,13 @@ export default function Header() {
                                 className="py-4 px-6 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                             >
                                 📈 累計配当
+                            </Link>
+                            <Link
+                                href="/monthly"
+                                onClick={closeMenu}
+                                className="py-4 px-6 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                            >
+                                🗓️ 月別配当
                             </Link>
                             <Link
                                 href="/portfolio"

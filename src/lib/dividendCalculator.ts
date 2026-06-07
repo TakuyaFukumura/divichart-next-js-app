@@ -1,4 +1,4 @@
-import {CSVRow, StockDividend, YearlyPortfolio} from '@/types/dividend';
+import {CSVRow, MonthlyDividendData, StockDividend, YearlyPortfolio} from '@/types/dividend';
 
 /**
  * 日付文字列から年を抽出
@@ -10,6 +10,23 @@ function extractYear(dateStr: string | undefined): string | null {
     if (!dateStr) return null;
     const year = dateStr.split('/')[0];
     return year && year.length === 4 ? year : null;
+}
+
+/**
+ * 日付文字列から月を抽出
+ *
+ * @param dateStr - YYYY/MM/DD形式の日付文字列
+ * @returns 月（1-12）、抽出失敗時はnull
+ */
+function extractMonth(dateStr: string | undefined): number | null {
+    if (!dateStr) return null;
+
+    const month = Number.parseInt(dateStr.split('/')[1], 10);
+    if (Number.isNaN(month) || month < 1 || month > 12) {
+        return null;
+    }
+
+    return month;
 }
 
 /**
@@ -104,6 +121,56 @@ export function formatCumulativeDividendData(
             year: `${year}年`,
             yearlyDividend: Math.round(yearlyAmount),
             cumulativeDividend: Math.round(cumulative),
+        };
+    });
+}
+
+/**
+ * CSVデータから指定年の月別配当金を集計
+ *
+ * @param csvData - CSVファイルから読み込んだ配当データ
+ * @param targetYear - 集計対象年
+ * @param exchangeRate - USドル→円の為替レート
+ * @returns 月をキー、配当金合計を値とするMap
+ */
+export function aggregateDividendsByMonth(
+    csvData: CSVRow[],
+    targetYear: number,
+    exchangeRate: number
+): Map<number, number> {
+    const monthlyDividends = new Map<number, number>();
+
+    for (const row of csvData) {
+        const year = extractYear(row['入金日']);
+        if (year !== String(targetYear)) continue;
+
+        const month = extractMonth(row['入金日']);
+        if (!month) continue;
+
+        const amount = parseAndConvertAmount(row, exchangeRate);
+        if (Number.isNaN(amount)) continue;
+
+        const current = monthlyDividends.get(month) ?? 0;
+        monthlyDividends.set(month, current + amount);
+    }
+
+    return monthlyDividends;
+}
+
+/**
+ * 月別配当金データをグラフ用に整形
+ *
+ * @param monthlyDividends - 月別配当金のMap
+ * @returns グラフ表示用の配当金データ配列（1月〜12月固定）
+ */
+export function formatMonthlyDividendData(
+    monthlyDividends: Map<number, number>
+): MonthlyDividendData[] {
+    return Array.from({length: 12}, (_, index) => {
+        const month = index + 1;
+        return {
+            month: `${month}月`,
+            totalDividend: Math.round(monthlyDividends.get(month) ?? 0),
         };
     });
 }
