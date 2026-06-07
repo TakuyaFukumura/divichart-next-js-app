@@ -73,7 +73,7 @@ function MonthlyDividendContent() {
     if (currentYear === null || data.length === 0) return <LoadingScreen/>;
 
     const totalDividend = data.reduce((sum, item) => sum + item.totalDividend, 0);
-    const averageDividend = data.length === 0 ? 0 : Math.floor(totalDividend / data.length);
+    const averageDividend = Math.floor(totalDividend / data.length);
 
     return (
         <div
@@ -84,13 +84,11 @@ function MonthlyDividendContent() {
                         月別配当
                     </h1>
 
-                    {currentYear !== null && (
-                        <YearSelector
-                            currentYear={currentYear}
-                            availableYears={availableYears}
-                            onYearChangeAction={handleYearChange}
-                        />
-                    )}
+                    <YearSelector
+                        currentYear={currentYear}
+                        availableYears={availableYears}
+                        onYearChangeAction={handleYearChange}
+                    />
 
                     <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-2 sm:p-4 lg:p-6 mb-6 sm:mb-8">
                         <div className="h-[300px] sm:h-[400px]">
