@@ -87,6 +87,17 @@ export type CumulativeDividendData = {
 };
 
 /**
+ * 月別配当金データの型定義
+ * グラフ表示に使用される月別配当金の集計データ
+ */
+export type MonthlyDividendData = {
+    /** 表示用の月（例: "1月"） */
+    month: string;
+    /** 月間配当金合計（税引き後）[円] */
+    totalDividend: number;
+};
+
+/**
  * 目標設定の型定義
  */
 export type GoalSettings = {
@@ -129,4 +140,3 @@ export type GoalAchievementSummary = {
     /** 最低達成率の年 */
     minAchievementYear: number;
 };
-

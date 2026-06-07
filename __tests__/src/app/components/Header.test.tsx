@@ -43,6 +43,9 @@ describe('Header', () => {
             const cumulativeLink = screen.getByRole('link', {name: '累計配当'});
             expect(cumulativeLink).toBeInTheDocument();
 
+            const monthlyLink = screen.getByRole('link', {name: '月別配当'});
+            expect(monthlyLink).toBeInTheDocument();
+
             const portfolioLink = screen.getByRole('link', {name: 'ポートフォリオ'});
             expect(portfolioLink).toBeInTheDocument();
 
@@ -69,6 +72,13 @@ describe('Header', () => {
 
             const link = screen.getByText('累計配当').closest('a');
             expect(link).toHaveAttribute('href', '/cumulative');
+        });
+
+        it('月別配当リンクが正しいhrefを持つ', () => {
+            renderWithProvider();
+
+            const link = screen.getByText('月別配当').closest('a');
+            expect(link).toHaveAttribute('href', '/monthly');
         });
 
         it('設定リンクが正しいhrefを持つ', () => {
@@ -339,10 +349,11 @@ describe('Header', () => {
             // モバイルメニュー内のリンクを確認
             const mobileMenu = screen.getByRole('navigation', {name: 'メインメニュー'});
             const links = mobileMenu.querySelectorAll('a');
-            expect(links.length).toBe(5);
+            expect(links.length).toBe(6);
 
             expect(screen.getAllByText('📊 年別配当').length).toBeGreaterThan(0);
             expect(screen.getAllByText('📈 累計配当').length).toBeGreaterThan(0);
+            expect(screen.getAllByText('🗓️ 月別配当').length).toBeGreaterThan(0);
             expect(screen.getAllByText('💼 ポートフォリオ').length).toBeGreaterThan(0);
             expect(screen.getAllByText('🎯 目標達成度').length).toBeGreaterThan(0);
             expect(screen.getAllByText('⚙️ 設定').length).toBeGreaterThan(0);

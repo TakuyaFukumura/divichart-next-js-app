@@ -7,6 +7,22 @@
 
 ## [Unreleased]
 
+## [0.25.0] - 2026-06-07
+
+### Added
+
+- 月別配当表示ページ `/monthly` を追加
+    - 年選択UIで対象年を切り替え可能
+    - 1月〜12月の月別配当を棒グラフと表で表示
+    - 合計配当金額と月平均配当金額を表示
+- 月別配当集計ロジックと型定義を追加
+- 月別配当ページと集計ロジックのテストを追加
+- ヘッダーに月別配当ページへの導線を追加
+
+### Removed
+
+- `docs/monthly-dividend-display-consideration.md`: 実装完了により削除
+
 ## [0.24.0] - 2026-02-13
 
 ### Added
@@ -81,7 +97,9 @@
 
 - 過去のバージョンからの変更内容
 
-[Unreleased]: https://github.com/TakuyaFukumura/divichart-next-js-app/compare/v0.24.0...HEAD
+[Unreleased]: https://github.com/TakuyaFukumura/divichart-next-js-app/compare/v0.25.0...HEAD
+
+[0.25.0]: https://github.com/TakuyaFukumura/divichart-next-js-app/compare/v0.24.0...v0.25.0
 
 [0.24.0]: https://github.com/TakuyaFukumura/divichart-next-js-app/compare/v0.23.0...v0.24.0
 
@@ -90,4 +108,3 @@
 [0.22.0]: https://github.com/TakuyaFukumura/divichart-next-js-app/compare/v0.21.0...v0.22.0
 
 [0.21.0]: https://github.com/TakuyaFukumura/divichart-next-js-app/compare/v0.20.0...v0.21.0
-
