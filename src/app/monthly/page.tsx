@@ -70,6 +70,8 @@ function MonthlyDividendContent() {
         );
     }
 
+    if (currentYear === null || data.length === 0) return <LoadingScreen/>;
+
     const totalDividend = data.reduce((sum, item) => sum + item.totalDividend, 0);
     const averageDividend = data.length === 0 ? 0 : Math.floor(totalDividend / data.length);
 
