@@ -28,6 +28,15 @@ interface DarkModeContextType {
  */
 const DarkModeContext = createContext<DarkModeContextType | undefined>(undefined);
 
+function getInitialTheme(): Theme {
+    if (typeof window === 'undefined') {
+        return 'light';
+    }
+
+    const savedTheme = getStorageItem(storageKeys.theme) as Theme;
+    return savedTheme && ['light', 'dark'].includes(savedTheme) ? savedTheme : 'light';
+}
+
 /**
  * ダークモードプロバイダーコンポーネント
  * アプリケーション全体にダークモード機能を提供する
@@ -42,34 +51,17 @@ const DarkModeContext = createContext<DarkModeContextType | undefined>(undefined
  * - 初回マウント時にlocalStorageから以前の設定を読み込む
  */
 export function DarkModeProvider({children}: { readonly children: ReactNode }) {
-    const [theme, setTheme] = useState<Theme>('light');
-    const [isDark, setIsDark] = useState(false);
+    const [theme, setTheme] = useState<Theme>(getInitialTheme);
+    const isDark = theme === 'dark';
 
     useEffect(() => {
-        // ブラウザ環境のみlocalStorageにアクセス
-        if (globalThis.window !== undefined) {
-            const savedTheme = getStorageItem(storageKeys.theme) as Theme;
-            if (savedTheme && ['light', 'dark'].includes(savedTheme)) {
-                setTheme(savedTheme);
-            }
+        // HTMLタグにdarkクラスを追加/削除
+        if (isDark) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
         }
-    }, []);
-
-    useEffect(() => {
-        const updateTheme = () => {
-            const isDarkMode = theme === 'dark';
-            setIsDark(isDarkMode);
-
-            // HTMLタグにdarkクラスを追加/削除
-            if (isDarkMode) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-        };
-
-        updateTheme();
-    }, [theme]);
+    }, [isDark]);
 
     const handleSetTheme = (newTheme: Theme) => {
         setTheme(newTheme);

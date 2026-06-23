@@ -1,6 +1,6 @@
 'use client';
 
-import {createContext, ReactNode, useContext, useEffect, useMemo, useState} from 'react';
+import {createContext, ReactNode, useContext, useMemo, useState} from 'react';
 import {DEFAULT_USD_TO_JPY_RATE, getUsdToJpyRate, MAX_USD_TO_JPY_RATE, MIN_USD_TO_JPY_RATE} from '@/lib/exchangeRate';
 import {getStorageItem, removeStorageItem, setStorageItem, storageKeys} from '@/config';
 
@@ -25,6 +25,22 @@ interface ExchangeRateContextType {
  */
 const ExchangeRateContext = createContext<ExchangeRateContextType | undefined>(undefined);
 
+function getInitialUsdToJpyRate(): number {
+    if (typeof window === 'undefined') {
+        return getUsdToJpyRate();
+    }
+
+    const savedRate = getStorageItem(storageKeys.exchangeRate);
+    if (!savedRate) {
+        return getUsdToJpyRate();
+    }
+
+    const rate = parseFloat(savedRate);
+    return !isNaN(rate) && rate >= MIN_USD_TO_JPY_RATE && rate <= MAX_USD_TO_JPY_RATE
+        ? rate
+        : getUsdToJpyRate();
+}
+
 /**
  * 為替レートプロバイダーコンポーネント
  * アプリケーション全体に為替レート設定機能を提供する
@@ -39,26 +55,7 @@ const ExchangeRateContext = createContext<ExchangeRateContextType | undefined>(u
  * - 初回マウント時にlocalStorageから以前の設定を読み込む
  */
 export function ExchangeRateProvider({children}: { readonly children: ReactNode }) {
-    const [usdToJpyRate, setUsdToJpyRateState] = useState<number>(() => {
-        // 初期値の設定（サーバーサイドレンダリング対応）
-        return getUsdToJpyRate();
-    });
-
-    // 初回マウント時にlocalStorageから設定を読み込む
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const savedRate = getStorageItem(storageKeys.exchangeRate);
-            if (savedRate) {
-                const rate = parseFloat(savedRate);
-                if (!isNaN(rate) && rate >= MIN_USD_TO_JPY_RATE && rate <= MAX_USD_TO_JPY_RATE) {
-                    setUsdToJpyRateState(rate);
-                    return;
-                }
-            }
-            // localStorage に値がない場合、または範囲外の場合は環境変数またはデフォルト値を使用
-            setUsdToJpyRateState(getUsdToJpyRate());
-        }
-    }, []);
+    const [usdToJpyRate, setUsdToJpyRateState] = useState<number>(getInitialUsdToJpyRate);
 
     /**
      * 為替レートを設定し、localStorageに保存する

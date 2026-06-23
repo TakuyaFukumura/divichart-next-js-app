@@ -1,6 +1,6 @@
 'use client';
 
-import {Suspense, useCallback, useEffect, useState} from 'react';
+import {Suspense, useCallback, useEffect, useMemo, useState} from 'react';
 import {useRouter, useSearchParams} from 'next/navigation';
 import {loadCSV} from '@/lib/csvLoader';
 import {generateYearlyPortfolio, getAvailableYears} from '@/lib/dividendCalculator';
@@ -21,9 +21,7 @@ function PortfolioContent() {
     const searchParams = useSearchParams();
 
     const [rawData, setRawData] = useState<CSVRow[]>([]);
-    const [portfolioData, setPortfolioData] = useState<YearlyPortfolio | null>(null);
     const [availableYears, setAvailableYears] = useState<number[]>([]);
-    const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear());
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const {usdToJpyRate} = useExchangeRate();
@@ -49,9 +47,8 @@ function PortfolioContent() {
         loadData();
     }, []); // 初回マウント時のみ実行
 
-    // URLパラメータの年度を反映
-    useEffect(() => {
-        if (availableYears.length === 0) return;
+    const currentYear = useMemo(() => {
+        if (availableYears.length === 0) return new Date().getFullYear();
 
         const yearParam = searchParams.get('year');
         let targetYear = yearParam ? Number.parseInt(yearParam, 10) : new Date().getFullYear();
@@ -61,20 +58,19 @@ function PortfolioContent() {
             targetYear = availableYears.at(-1)!;
         }
 
-        setCurrentYear(targetYear);
+        return targetYear;
     }, [searchParams, availableYears]);
 
-    // 年度またはデータが変更されたときにポートフォリオを再計算
-    useEffect(() => {
+    const portfolioData = useMemo<YearlyPortfolio | null>(() => {
         if (rawData.length > 0) {
-            const portfolio = generateYearlyPortfolio(rawData, currentYear, usdToJpyRate, chartConfig.portfolio.topStocksCount);
-            setPortfolioData(portfolio);
+            return generateYearlyPortfolio(rawData, currentYear, usdToJpyRate, chartConfig.portfolio.topStocksCount);
         }
+
+        return null;
     }, [currentYear, rawData, usdToJpyRate]);
 
     // 年度変更ハンドラ
     const handleYearChange = useCallback((year: number) => {
-        setCurrentYear(year);
         router.push(`/portfolio?year=${year}`);
     }, [router]);
 

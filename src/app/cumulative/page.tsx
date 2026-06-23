@@ -1,8 +1,8 @@
 'use client';
 
-import {useCallback, useEffect, useState} from 'react';
+import {useMemo} from 'react';
 import {CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from 'recharts';
-import {CSVRow, CumulativeDividendData} from '@/types/dividend';
+import {CumulativeDividendData} from '@/types/dividend';
 import {useDividendData} from '@/hooks/useDividendData';
 import {formatYAxisValue} from '@/lib/formatYAxisValue';
 import {useExchangeRate} from '@/app/contexts/ExchangeRateContext';
@@ -22,33 +22,15 @@ import {aggregateDividendsByYear, formatCumulativeDividendData} from '@/lib/divi
  */
 export default function CumulativeDividendPage() {
     const {data: rawData, loading, error} = useDividendData();
-    const [data, setData] = useState<CumulativeDividendData[]>([]);
     const {usdToJpyRate} = useExchangeRate();
-
-    /**
-     * CSVデータから累計配当金データを計算する関数
-     *
-     * @param csvData - CSVファイルから読み込まれた配当金データの配列
-     * @param exchangeRate - USドルから円への為替レート
-     * @returns 年別に集計された累計配当金データの配列（年でソート済み）
-     *
-     * @remarks
-     * - USドル建ての配当金は為替レートを使用して円に換算される
-     * - 配当金額が"-"の場合は0として扱われる（税額表示用）
-     * - 年別に集計し、累計を計算し、最終的に円単位で四捨五入される
-     */
-    const calculateCumulativeDividendData = useCallback((csvData: CSVRow[], exchangeRate: number): CumulativeDividendData[] => {
-        const yearlyDividends = aggregateDividendsByYear(csvData, exchangeRate);
-        return formatCumulativeDividendData(yearlyDividends);
-    }, []);
-
-    // 為替レートが変更されたときにデータを再計算
-    useEffect(() => {
-        if (rawData.length > 0) {
-            const chartData = calculateCumulativeDividendData(rawData, usdToJpyRate);
-            setData(chartData);
+    const data = useMemo(() => {
+        if (rawData.length === 0) {
+            return [];
         }
-    }, [usdToJpyRate, rawData, calculateCumulativeDividendData]);
+
+        const yearlyDividends = aggregateDividendsByYear(rawData, usdToJpyRate);
+        return formatCumulativeDividendData(yearlyDividends);
+    }, [rawData, usdToJpyRate]);
 
     if (loading) return <LoadingScreen/>;
     if (error) return <ErrorScreen error={error}/>;

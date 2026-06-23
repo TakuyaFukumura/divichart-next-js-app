@@ -22,13 +22,7 @@ export default function SettingsPage() {
     const [error, setError] = useState<string>('');
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-    // usdToJpyRate が変更されたときに inputValue を同期（編集中でない場合のみ）
-    useEffect(() => {
-        if (!isEditing) {
-            setInputValue(String(usdToJpyRate));
-        }
-    }, [usdToJpyRate, isEditing]);
+    const displayedInputValue = isEditing ? inputValue : String(usdToJpyRate);
 
     // クリーンアップ処理：コンポーネントのアンマウント時にデバウンスタイマーをクリア
     useEffect(() => {
@@ -150,7 +144,7 @@ export default function SettingsPage() {
                                     min={MIN_USD_TO_JPY_RATE}
                                     max={MAX_USD_TO_JPY_RATE}
                                     step="0.01"
-                                    value={inputValue}
+                                    value={displayedInputValue}
                                     onChange={handleInputChange}
                                     onBlur={handleBlur}
                                     className={`px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent w-[150px] ${

@@ -1,9 +1,8 @@
 'use client';
 
-import {useCallback, useEffect, useState} from 'react';
+import {useMemo} from 'react';
 import {Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis} from 'recharts';
 import {useDividendData} from '@/hooks/useDividendData';
-import {CSVRow} from '@/types/dividend';
 import {formatYAxisValue} from '@/lib/formatYAxisValue';
 import {useExchangeRate} from '@/app/contexts/ExchangeRateContext';
 import {ErrorScreen, LoadingScreen} from '@/app/components/LoadingState';
@@ -20,6 +19,25 @@ type DividendData = {
     totalDividend: number;
 };
 
+function CustomTooltip({active, payload}: Readonly<{
+    active?: boolean;
+    payload?: Array<{ payload: DividendData; value: number }>;
+}>) {
+    if (active && payload?.length) {
+        return (
+            <div
+                className="bg-white dark:bg-gray-800 p-3 border border-gray-300 dark:border-gray-600 rounded shadow-lg">
+                <p className="text-gray-800 dark:text-gray-200 font-semibold">{payload[0].payload.year}</p>
+                <p className="text-blue-600 dark:text-blue-400">
+                    配当金: ¥{payload[0].value.toLocaleString()}
+                </p>
+            </div>
+        );
+    }
+
+    return null;
+}
+
 /**
  * ホームページコンポーネント
  * 配当金データをCSVファイルから読み込み、年別に集計してグラフと表で表示する
@@ -33,33 +51,15 @@ type DividendData = {
  */
 export default function Home() {
     const {data: rawData, loading, error} = useDividendData();
-    const [data, setData] = useState<DividendData[]>([]);
     const {usdToJpyRate} = useExchangeRate();
-
-    /**
-     * CSVデータから年別配当金データを計算する関数
-     *
-     * @param csvData - CSVファイルから読み込まれた配当金データの配列
-     * @param exchangeRate - USドルから円への為替レート
-     * @returns 年別に集計された配当金データの配列（年でソート済み）
-     *
-     * @remarks
-     * - USドル建ての配当金は為替レートを使用して円に換算される
-     * - 配当金額が"-"の場合は0として扱われる（税額表示用）
-     * - 年別に集計し、最終的に円単位で四捨五入される
-     */
-    const calculateDividendData = useCallback((csvData: CSVRow[], exchangeRate: number): DividendData[] => {
-        const yearlyDividends = aggregateDividendsByYear(csvData, exchangeRate);
-        return formatYearlyDividendData(yearlyDividends);
-    }, []);
-
-    // 為替レートが変更されたときにデータを再計算
-    useEffect(() => {
-        if (rawData.length > 0) {
-            const chartData = calculateDividendData(rawData, usdToJpyRate);
-            setData(chartData);
+    const data = useMemo(() => {
+        if (rawData.length === 0) {
+            return [];
         }
-    }, [usdToJpyRate, rawData, calculateDividendData]);
+
+        const yearlyDividends = aggregateDividendsByYear(rawData, usdToJpyRate);
+        return formatYearlyDividendData(yearlyDividends);
+    }, [rawData, usdToJpyRate]);
 
     if (loading) return <LoadingScreen/>;
     if (error) return <ErrorScreen error={error}/>;
@@ -84,33 +84,6 @@ export default function Home() {
             </div>
         );
     }
-
-    /**
-     * チャート用のカスタムツールチップコンポーネント
-     * マウスホバー時に表示される配当金情報のツールチップをカスタマイズする
-     *
-     * @param props - ツールチップのプロパティ
-     * @param props.active - ツールチップがアクティブ（表示中）かどうか
-     * @param props.payload - 表示するデータの配列
-     * @returns カスタマイズされたツールチップのJSX要素、または非表示の場合はnull
-     */
-    const CustomTooltip = ({active, payload}: {
-        active?: boolean;
-        payload?: Array<{ payload: DividendData; value: number }>
-    }) => {
-        if (active && payload && payload.length) {
-            return (
-                <div
-                    className="bg-white dark:bg-gray-800 p-3 border border-gray-300 dark:border-gray-600 rounded shadow-lg">
-                    <p className="text-gray-800 dark:text-gray-200 font-semibold">{payload[0].payload.year}</p>
-                    <p className="text-blue-600 dark:text-blue-400">
-                        配当金: ¥{payload[0].value.toLocaleString()}
-                    </p>
-                </div>
-            );
-        }
-        return null;
-    };
 
     return (
         <div
