@@ -49,19 +49,6 @@ export default function Header() {
     };
 
     /**
-     * テーマに応じたラベルテキストを取得する
-     *
-     * @returns テーマを表すラベル文字列（ライトモードまたはダークモード）
-     */
-    const getThemeLabel = () => {
-        if (theme === 'light') {
-            return 'ライトモード';
-        } else {
-            return 'ダークモード';
-        }
-    };
-
-    /**
      * メニューを開閉する関数
      */
     const toggleMenu = () => {
@@ -206,10 +193,10 @@ export default function Header() {
                                 className="flex items-center gap-2 px-3 py-2 text-sm font-medium
                             text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700
                             rounded-lg transition-colors duration-200"
-                                title={`現在: ${getThemeLabel()}`}
+                                aria-label="テーマを切り替え"
+                                title="テーマを切り替え"
                             >
                                 <span className="text-lg">{getThemeIcon()}</span>
-                                <span className="hidden sm:inline">{getThemeLabel()}</span>
                             </button>
                         </div>
                     </div>
