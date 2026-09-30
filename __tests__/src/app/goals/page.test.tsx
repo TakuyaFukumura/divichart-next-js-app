@@ -16,6 +16,8 @@ describe('GoalsPage', () => {
         mockUseExchangeRate.mockReturnValue({
             usdToJpyRate: 150,
             setUsdToJpyRate: jest.fn(),
+            defaultRate: 150,
+            resetToDefault: jest.fn(),
         });
     });
 
